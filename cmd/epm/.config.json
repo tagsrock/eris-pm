@@ -1,0 +1,22 @@
+{
+	"port": 30303,
+	"mining": false,
+	"max_peers": 10,
+	"config_file": "config",
+	"root_dir": "/Users/BatBuddha/.ethchain",
+	"log_file": "",
+	"db_name": "database",
+	"contract_path": "/Users/BatBuddha/Programming/megaGoApps/goApps/src/github.com/eris-ltd/eris-std-lib",
+	"client": "EthGlue",
+	"version": "2.7.1",
+	"id": "chainId",
+	"key_session": "generous",
+	"key_store": "file",
+	"key_cursor": 0,
+	"key_file": "/Users/BatBuddha/Programming/megaGoApps/goApps/src/github.com/eris-ltd/decerver-interfaces/glue/eth/keys.txt",
+	"difficulty": "",
+	"log_level": 2,
+	"use_seed": false,
+	"seed_address": "",
+	"adversary": 0
+}
