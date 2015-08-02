@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/codegangsta/cli"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/codegangsta/cli"
 )
 
 func main() {
@@ -29,9 +29,6 @@ func main() {
 
 		// languages
 		compilerFlag,
-
-		// runtime configuration
-		runConfigFlag,
 	}
 
 	app.Commands = []cli.Command{

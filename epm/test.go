@@ -6,7 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/eris-ltd/common/go/common"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 )
 
 // for parsing/running companion test files for an epm deploy
@@ -115,7 +115,10 @@ func (e *EPM) ExecuteTest(line string, i int) error {
 	storage := args[1]
 
 	// retrieve the value
-	val := e.chain.StorageAt(common.AddHex(addr), common.AddHex(storage))
+	val, err := e.chain.StorageAt(common.AddHex(addr), common.AddHex(storage))
+	if err != nil {
+		return err
+	}
 	val = common.AddHex(val)
 
 	if args[2] != "_" {

@@ -2,8 +2,8 @@ package commands
 
 import (
 	"fmt"
-	"github.com/codegangsta/cli"
-	"github.com/eris-ltd/thelonious/monklog"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/codegangsta/cli"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/thelonious/monklog"
 	"os"
 	"reflect"
 )

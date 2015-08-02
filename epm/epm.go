@@ -9,9 +9,9 @@ import (
 	"regexp"
 	"strings"
 
-	. "github.com/eris-ltd/common/go/common"
-	"github.com/eris-ltd/modules/types"
-	"github.com/eris-ltd/thelonious/monklog"
+	. "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/modules/types"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/thelonious/monklog"
 )
 
 var logger *monklog.Logger = monklog.NewLogger("EPM")
@@ -48,7 +48,7 @@ type ChainClient interface {
 	// how best to make this extensible while supporting chains with
 	// different format types?
 
-	StorageAt(target, storage string) string
+	StorageAt(target, storage string) (string, error)
 }
 
 // EPM object. Maintains list of jobs and a symbols table

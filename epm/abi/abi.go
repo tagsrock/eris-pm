@@ -6,7 +6,7 @@ import (
 	"io"
 	"strings"
 
-	"github.com/eris-ltd/go-ethereum/crypto/sha3"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/go-ethereum/crypto/sha3"
 )
 
 var NullABI = ABI{}

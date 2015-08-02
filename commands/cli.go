@@ -10,7 +10,7 @@ import (
 	//	mod "github.com/eris-ltd/eris-pm/commands/modules/tendermint"
 
 	//	color "github.com/daviddengcn/go-colortext"
-	"github.com/eris-ltd/common/go/common"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/epm" // ed25519 key generation
 )
 

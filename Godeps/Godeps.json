@@ -1,0 +1,250 @@
+{
+	"ImportPath": "github.com/eris-ltd/eris-pm",
+	"GoVersion": "go1.4.2",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "code.google.com/p/go-uuid/uuid",
+			"Comment": "null-12",
+			"Rev": "7dda39b2e7d5e265014674c5af696ba4186679e9"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/pbkdf2",
+			"Comment": "null-236",
+			"Rev": "69e2a90ed92d03812364aeb947b7068dc42e561e"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/ripemd160",
+			"Comment": "null-236",
+			"Rev": "69e2a90ed92d03812364aeb947b7068dc42e561e"
+		},
+		{
+			"ImportPath": "code.google.com/p/go.crypto/scrypt",
+			"Comment": "null-236",
+			"Rev": "69e2a90ed92d03812364aeb947b7068dc42e561e"
+		},
+		{
+			"ImportPath": "github.com/agl/ed25519/edwards25519",
+			"Rev": "d2b94fd789ea21d12fac1a4443dd3a3f79cda72c"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/cli",
+			"Comment": "1.2.0-95-g9b2bd2b",
+			"Rev": "9b2bd2b3489748d4d0a204fa4eb2ee9e89e0ebc6"
+		},
+		{
+			"ImportPath": "github.com/codegangsta/inject",
+			"Comment": "v1.0-rc1-4-g4b81725",
+			"Rev": "4b8172520a03fa190f427bbd284db01b459bfce7"
+		},
+		{
+			"ImportPath": "github.com/ebuchman/go-shell-pipes",
+			"Rev": "83e1324808622485314bff0fd97b8b944200a7a4"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/common/go/common",
+			"Rev": "4efd89be9b8794df5518a5187af2a5e6fc9ebed9"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/common/go/log",
+			"Rev": "4efd89be9b8794df5518a5187af2a5e6fc9ebed9"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/epm-go/utils",
+			"Comment": "v0.8-249-g135a4c7",
+			"Rev": "135a4c78397584ed437685ac525868af838ea75c"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/go-ethereum/crypto",
+			"Comment": "v0.7.10-743-g24ec30d",
+			"Rev": "24ec30dfe0e7d8755dba0924dcce951d98b1ee44"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/go-ethereum/ethutil",
+			"Comment": "v0.7.10-743-g24ec30d",
+			"Rev": "24ec30dfe0e7d8755dba0924dcce951d98b1ee44"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/go-ethereum/logger",
+			"Comment": "v0.7.10-743-g24ec30d",
+			"Rev": "24ec30dfe0e7d8755dba0924dcce951d98b1ee44"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/lllc-server",
+			"Rev": "ec836cd6d889586c2b3561555e2e2a07d5fbe1e0"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/mint-client/mintx/core",
+			"Rev": "64c18ec37d04a5baaad6bb52749b8798494debeb"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/modules/types",
+			"Rev": "2aa62a602c8b065560ab32001b9c4afdb466c19a"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/thelonious/monklog",
+			"Comment": "v0.8-84-g0841a77",
+			"Rev": "0841a77cc857724301341d0dc21cd323efaa9972"
+		},
+		{
+			"ImportPath": "github.com/go-martini/martini",
+			"Comment": "v1.0-85-gbbd489b",
+			"Rev": "bbd489b35fd7eac9aaf442e5671ab21cdd972926"
+		},
+		{
+			"ImportPath": "github.com/gorilla/websocket",
+			"Rev": "1f87405cd9755fc388e111c4003caca4a2f52fa6"
+		},
+		{
+			"ImportPath": "github.com/inconshreveable/log15/stack",
+			"Comment": "v2.3-38-g352fceb",
+			"Rev": "352fceb48e895bd1dd0b9f5d3ae8f8516c49af0f"
+		},
+		{
+			"ImportPath": "github.com/inconshreveable/log15/term",
+			"Comment": "v2.3-38-g352fceb",
+			"Rev": "352fceb48e895bd1dd0b9f5d3ae8f8516c49af0f"
+		},
+		{
+			"ImportPath": "github.com/martini-contrib/gorelic",
+			"Rev": "f8b0843aa3ab66d8734aa7d9acf399bdc197c65d"
+		},
+		{
+			"ImportPath": "github.com/mattn/go-colorable",
+			"Rev": "043ae16291351db8465272edf465c9f388161627"
+		},
+		{
+			"ImportPath": "github.com/obscuren/ecies",
+			"Rev": "d899334bba7bf4a157cab19d8ad836dcb1de0c34"
+		},
+		{
+			"ImportPath": "github.com/rakyll/globalconf",
+			"Rev": "415abc325023f1a00cd2d9fa512e0e71745791a2"
+		},
+		{
+			"ImportPath": "github.com/rakyll/goini",
+			"Rev": "907cca0f578a5316fb864ec6992dc3d9730ec58c"
+		},
+		{
+			"ImportPath": "github.com/sfreiberg/gotwilio",
+			"Rev": "b7230c284bd0c1614c94d00b9998c49f9a2737d8"
+		},
+		{
+			"ImportPath": "github.com/syndtr/goleveldb/leveldb",
+			"Rev": "4875955338b0a434238a31165cb87255ab6e9e4a"
+		},
+		{
+			"ImportPath": "github.com/syndtr/gosnappy/snappy",
+			"Rev": "156a073208e131d7d2e212cb749feae7c339e846"
+		},
+		{
+			"ImportPath": "github.com/tendermint/ed25519",
+			"Rev": "4b6e74546c0f1a0cb29d177d7a94d3a2ed4d4d8d"
+		},
+		{
+			"ImportPath": "github.com/tendermint/log15",
+			"Comment": "v2.3-36-gc65281b",
+			"Rev": "c65281bb703b7612f60558e75b07c434c06e2636"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/account",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/alert",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/common",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/config",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/consensus/types",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/db",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/events",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/logger",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/merkle",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/permission/types",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/rpc/core/types",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/rpc/core_client",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/rpc/server",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/rpc/types",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/state",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/types",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/vm",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/tendermint/tendermint/wire",
+			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/yvasiyarov/go-metrics",
+			"Rev": "c25f46c4b94079672242ec48a545e7ca9ebe3aec"
+		},
+		{
+			"ImportPath": "github.com/yvasiyarov/gorelic",
+			"Comment": "v0.0.6-14-gb355764",
+			"Rev": "b355764846b999a8a73fc426304f669de56a1a6d"
+		},
+		{
+			"ImportPath": "github.com/yvasiyarov/newrelic_platform_go",
+			"Rev": "13d5af9721f4455a501db543c93827447089bab3"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/pbkdf2",
+			"Rev": "4ed45ec682102c643324fae5dff8dab085b6c300"
+		},
+		{
+			"ImportPath": "golang.org/x/crypto/ripemd160",
+			"Rev": "4ed45ec682102c643324fae5dff8dab085b6c300"
+		},
+		{
+			"ImportPath": "gopkg.in/fatih/set.v0",
+			"Comment": "v0.1.0-3-g27c4092",
+			"Rev": "27c40922c40b43fe04554d8223a402af3ea333f3"
+		}
+	]
+}

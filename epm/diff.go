@@ -3,7 +3,7 @@ package epm
 import (
 	"fmt"
 
-	"github.com/eris-ltd/modules/types"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/modules/types"
 )
 
 // TODO: abstract away the mechanism here so the particular

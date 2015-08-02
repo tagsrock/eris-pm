@@ -13,14 +13,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/eris-ltd/lllc-server"
-	//"github.com/eris-ltd/lllc-server/abi"
-	"github.com/eris-ltd/common/go/common"
-	"github.com/eris-ltd/eris-pm/epm/abi"
-	"github.com/eris-ltd/thelonious/monklog"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/lllc-server"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/thelonious/monklog" // What to do if a job errs
+	"github.com/eris-ltd/eris-pm/epm/abi"                                                      //"github.com/eris-ltd/lllc-server/abi"
 )
 
-// What to do if a job errs
 const (
 	PersistOnErr int = iota
 	ReturnOnErr
@@ -347,7 +345,10 @@ func (e *EPM) Query(args []string) error {
 	storage := args[1]
 	varName := args[2]
 
-	v := e.chain.StorageAt(addr, storage)
+	v, err := e.chain.StorageAt(addr, storage)
+	if err != nil {
+		return err
+	}
 	e.StoreVar(varName, v)
 	logger.Warnf("result: %s = %s\n", varName, v)
 	return nil

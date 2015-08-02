@@ -1,10 +1,7 @@
 package main
 
 import (
-	"fmt"
-
-	"github.com/codegangsta/cli"
-
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/codegangsta/cli"
 	"github.com/eris-ltd/eris-pm/commands"
 )
 
@@ -42,7 +39,6 @@ var (
 		Action: cliCall(commands.Deploy),
 		Flags: []cli.Flag{
 			chainFlag,
-			multiFlag,
 			diffFlag,
 			dontClearFlag,
 			contractPathFlag,

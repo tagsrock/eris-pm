@@ -12,12 +12,11 @@ import (
 	//epm-binary-generator:IMPORT
 	// mod "github.com/eris-ltd/eris-pm/commands/modules/tendermint"
 
-	"github.com/eris-ltd/common/go/common"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/thelonious/monklog" // TODO: needs work..
 	"github.com/eris-ltd/eris-pm/epm"
-	"github.com/eris-ltd/thelonious/monklog"
 )
 
-// TODO: needs work..
 func cleanupEPM() {
 	dirs := []string{epm.EpmDir}
 	for _, d := range dirs {

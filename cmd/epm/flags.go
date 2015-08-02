@@ -1,8 +1,7 @@
 package main
 
 import (
-	"github.com/codegangsta/cli"
-
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/codegangsta/cli"
 	"github.com/eris-ltd/eris-pm/commands"
 )
 
