@@ -29,7 +29,7 @@ const (
 var ErrMode = FailOnErr
 
 func (e *EPM) Commit() {
-	// TODO: wait for new block
+	e.chain.Commit()
 }
 
 // Execute parsed jobs

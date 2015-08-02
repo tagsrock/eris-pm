@@ -49,6 +49,8 @@ type ChainClient interface {
 	// different format types?
 
 	StorageAt(target, storage string) (string, error)
+
+	Commit() // wait for recent transactions to be committed
 }
 
 // EPM object. Maintains list of jobs and a symbols table

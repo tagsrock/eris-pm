@@ -14,6 +14,77 @@ import (
 	"github.com/eris-ltd/eris-pm/epm" // ed25519 key generation
 )
 
+// deploy a pdx file on a chain
+func Deploy(c *Context) {
+	packagePath := "."
+	if len(c.Args()) > 0 {
+		packagePath = c.Args()[0]
+	}
+
+	contractPath := c.String("c")
+	dontClear := c.Bool("dont-clear")
+	diffStorage := c.Bool("diff")
+
+	if !c.IsSet("c") {
+		contractPath = DefaultContractPath
+	}
+	var err error
+	epm.ContractPath, err = filepath.Abs(contractPath)
+	ifExit(err)
+
+	logger.Debugln("Contract root:", epm.ContractPath)
+
+	// clear the cache
+	if !dontClear {
+		err := os.RemoveAll(epm.EpmDir) //XXX: this is scratch!
+		if err != nil {
+			logger.Errorln("Error clearing cache: ", err)
+		}
+		common.InitDataDir(epm.EpmDir)
+	}
+
+	var chainType = "tendermint" // TODO:
+	var chainRoot = epm.EpmDir   // TODO: much better!!!
+
+	// Startup the chain
+	chain := LoadChain(c, chainType)
+
+	// setup EPM object with ChainInterface
+	e := epm.NewEPM(chain)
+	e.ReadVars(path.Join(chainRoot, EPMVars))
+
+	// comb directory for package-definition file
+	// exits on error
+	dir, pkg, test_ := getPkgDefFile(packagePath)
+
+	// epm parse the package definition file
+	err = e.Parse(path.Join(dir, pkg+"."+PkgExt))
+	ifExit(err)
+
+	if diffStorage {
+		e.Diff = true
+	}
+
+	// epm execute jobs
+	e.ExecuteJobs()
+	// write epm variables to file
+	e.WriteVars(path.Join(chainRoot, EPMVars))
+	// wait for a block
+	e.Commit()
+	// run tests
+	if test_ {
+		results, err := e.Test(path.Join(dir, pkg+"."+TestExt))
+		if err != nil {
+			logger.Errorln(err)
+			if results != nil {
+				logger.Errorln("Failed tests:", results.FailedTests)
+			}
+			fmt.Printf("Testing %s.pdt failed\n", pkg)
+			os.Exit(1)
+		}
+	}
+}
+
 /*
 // run a single epm on-chain command (endow, deploy, etc.)
 func Command(c *Context) {
@@ -163,78 +234,6 @@ func Test(c *Context) {
 	}
 }
 */
-
-// deploy a pdx file on a chain
-func Deploy(c *Context) {
-	packagePath := "."
-	if len(c.Args()) > 0 {
-		packagePath = c.Args()[0]
-	}
-
-	contractPath := c.String("c")
-	dontClear := c.Bool("dont-clear")
-	diffStorage := c.Bool("diff")
-
-	if !c.IsSet("c") {
-		contractPath = DefaultContractPath
-	}
-	var err error
-	epm.ContractPath, err = filepath.Abs(contractPath)
-	ifExit(err)
-
-	logger.Debugln("Contract root:", epm.ContractPath)
-
-	// clear the cache
-	if !dontClear {
-		err := os.RemoveAll(epm.EpmDir) //XXX: this is scratch!
-		if err != nil {
-			logger.Errorln("Error clearing cache: ", err)
-		}
-		common.InitDataDir(epm.EpmDir)
-	}
-
-	var chainType = "tendermint" // TODO:
-	var chainRoot = epm.EpmDir   // TODO: much better!!!
-
-	// Startup the chain
-	var chain epm.ChainClient
-	chain = LoadChain(c, chainType)
-
-	// setup EPM object with ChainInterface
-	e := epm.NewEPM(chain)
-	e.ReadVars(path.Join(chainRoot, EPMVars))
-
-	// comb directory for package-definition file
-	// exits on error
-	dir, pkg, test_ := getPkgDefFile(packagePath)
-
-	// epm parse the package definition file
-	err = e.Parse(path.Join(dir, pkg+"."+PkgExt))
-	ifExit(err)
-
-	if diffStorage {
-		e.Diff = true
-	}
-
-	// epm execute jobs
-	e.ExecuteJobs()
-	// write epm variables to file
-	e.WriteVars(path.Join(chainRoot, EPMVars))
-	// wait for a block
-	e.Commit()
-	// run tests
-	if test_ {
-		results, err := e.Test(path.Join(dir, pkg+"."+TestExt))
-		if err != nil {
-			logger.Errorln(err)
-			if results != nil {
-				logger.Errorln("Failed tests:", results.FailedTests)
-			}
-			fmt.Printf("Testing %s.pdt failed\n", pkg)
-			os.Exit(1)
-		}
-	}
-}
 
 /*
 func Console(c *Context) {
