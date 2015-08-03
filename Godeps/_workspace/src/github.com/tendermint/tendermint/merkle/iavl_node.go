@@ -2,7 +2,6 @@ package merkle
 
 import (
 	"bytes"
-	"fmt"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/code.google.com/p/go.crypto/ripemd160"
 	"io"
 
@@ -10,11 +9,10 @@ import (
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/wire"
 )
 
-type IAVLNode struct {
-	key interface // Node
-	{
+// Node
 
-	}
+type IAVLNode struct {
+	key       interface{}
 	value     interface{}
 	height    int8
 	size      int
@@ -148,8 +146,6 @@ func (node *IAVLNode) hashWithCount(t *IAVLTree) ([]byte, int) {
 }
 
 // NOTE: sets hashes recursively
-// leaves are {height, size, key, value}
-// inner nodes are {height, size, lefthash, righthash}
 func (node *IAVLNode) writeHashBytes(t *IAVLTree, w io.Writer) (n int64, hashCount int, err error) {
 	// height & size
 	wire.WriteInt8(node.height, w, &n, &err)
@@ -161,7 +157,6 @@ func (node *IAVLNode) writeHashBytes(t *IAVLTree, w io.Writer) (n int64, hashCou
 		encodeByteSlice(node.key, t.keyCodec, w, &n, &err)
 		encodeByteSlice(node.value, t.valueCodec, w, &n, &err)
 	} else {
-		// XXX: what if we give them each a go routine?!
 		// left
 		if node.leftNode != nil {
 			leftHash, leftCount := node.leftNode.hashWithCount(t)
@@ -190,7 +185,6 @@ func (node *IAVLNode) writeHashBytes(t *IAVLTree, w io.Writer) (n int64, hashCou
 // NOTE: clears leftNode/rightNode recursively
 func (node *IAVLNode) save(t *IAVLTree) []byte {
 	if node.hash == nil {
-		// should set hash for all child nodes so recursive calls to save don't have to do more hashing
 		node.hash, _ = node.hashWithCount(t)
 	}
 	if node.persisted {
@@ -213,9 +207,6 @@ func (node *IAVLNode) save(t *IAVLTree) []byte {
 }
 
 // NOTE: sets hashes recursively
-// nodes should have already been hashed
-// leaves are {height, size, key, value}
-// inner nodes are {height, size, key, lefthash, righthash}
 func (node *IAVLNode) writePersistBytes(t *IAVLTree, w io.Writer) (n int64, err error) {
 	// node header
 	wire.WriteInt8(node.height, w, &n, &err)
@@ -331,7 +322,6 @@ func (node *IAVLNode) getLeftNode(t *IAVLTree) *IAVLNode {
 	if node.leftNode != nil {
 		return node.leftNode
 	} else {
-		fmt.Println("GET NODE")
 		return t.ndb.GetNode(t, node.leftHash)
 	}
 }
@@ -345,7 +335,7 @@ func (node *IAVLNode) getRightNode(t *IAVLTree) *IAVLNode {
 }
 
 func (node *IAVLNode) rotateRight(t *IAVLTree) *IAVLNode {
-	node = node._copy() // necessary?
+	node = node._copy()
 	sl := node.getLeftNode(t)._copy()
 
 	slrHash, slrCached := sl.rightHash, sl.rightNode

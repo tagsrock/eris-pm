@@ -12,7 +12,10 @@ func (tI testItem) Hash() []byte {
 	return []byte(tI)
 }
 
-func testSimpleProof(t *testing.T, numItems int) {
+func TestSimpleProof(t *testing.T) {
+
+	numItems := 100
+
 	items := make([]Hashable, numItems)
 	for i := 0; i < numItems; i++ {
 		items[i] = testItem(RandBytes(32))
@@ -76,16 +79,4 @@ func testSimpleProof(t *testing.T, numItems int) {
 			t.Errorf("Expected verification to fail for mutated root hash")
 		}
 	}
-}
-
-func TestSimpleProof(t *testing.T) {
-	testSimpleProof(t, 2)
-	testSimpleProof(t, 3)
-	testSimpleProof(t, 5)
-	testSimpleProof(t, 10)
-	testSimpleProof(t, 99)
-	testSimpleProof(t, 100)
-	testSimpleProof(t, 101)
-	testSimpleProof(t, 1000)
-	testSimpleProof(t, 7919)
 }

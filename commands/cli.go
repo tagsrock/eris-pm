@@ -16,7 +16,7 @@ import (
 	"github.com/eris-ltd/eris-pm/epm" // ed25519 key generation
 )
 
-func Set(c *Context) {
+func Set(c *Context) error {
 	args := c.Args()
 	kv := make(map[string]string)
 	for _, a := range args {
@@ -27,26 +27,24 @@ func Set(c *Context) {
 		kv[spl[0]] = spl[1]
 	}
 
-	var chainType = "tendermint" // TODO:
-	var chainRoot = epm.EpmDir   // TODO: much better!!!
-
-	// Startup the chain
-	chain, err := LoadChain(c, chainType)
-	common.IfExit(err)
+	_, _, rootDir, err := ResolveRootFlag(c)
+	if err != nil {
+		return err
+	}
 
 	// setup EPM object with ChainInterface
-	e := epm.NewEPM(chain)
-	e.ReadVars(path.Join(chainRoot, EPMVars))
-
+	e := epm.NewEPM(nil)
+	if err := e.ReadVars(path.Join(rootDir, EPMVars)); err != nil {
+		return err
+	}
 	for k, v := range kv {
 		e.StoreVar(k, v)
 	}
-
 	// write epm variables to file
-	e.WriteVars(path.Join(chainRoot, EPMVars))
+	return e.WriteVars(path.Join(rootDir, EPMVars))
 }
 
-func Plop(c *Context) {
+func Plop(c *Context) error {
 	var root = epm.EpmDir // TODO: much better!!!
 
 	var toPlop string
@@ -58,7 +56,9 @@ func Plop(c *Context) {
 	switch toPlop {
 	case "vars":
 		b, err := ioutil.ReadFile(path.Join(root, EPMVars))
-		common.IfExit(err)
+		if err != nil {
+			return err
+		}
 		if len(c.Args()) > 1 {
 			// plop only a single var
 			spl := strings.Split(string(b), "\n")
@@ -73,7 +73,7 @@ func Plop(c *Context) {
 		}
 	case "abi":
 		if len(c.Args()) == 1 {
-			common.IfExit(fmt.Errorf("Specify a contract to see its abi"))
+			return fmt.Errorf("Specify a contract to see its abi")
 		}
 		e := epm.NewEPM(nil)
 		e.ReadVars(path.Join(root, EPMVars))
@@ -81,18 +81,23 @@ func Plop(c *Context) {
 		var err error
 		if epm.IsVar(addr) {
 			addr, err = e.VarSub(addr)
-			common.IfExit(err)
+			if err != nil {
+				return err
+			}
 		}
 		b, err := ioutil.ReadFile(path.Join(root, "abi", common.StripHex(addr)))
-		common.IfExit(err)
+		if err != nil {
+			return err
+		}
 		fmt.Println(string(b))
 	default:
 		logger.Errorln("Plop options: abi, vars")
 	}
+	return nil
 }
 
 // deploy a pdx file on a chain
-func Deploy(c *Context) {
+func Deploy(c *Context) error {
 	packagePath := "."
 	if len(c.Args()) > 0 {
 		packagePath = c.Args()[0]
@@ -107,7 +112,9 @@ func Deploy(c *Context) {
 	}
 	var err error
 	epm.ContractPath, err = filepath.Abs(contractPath)
-	common.IfExit(err)
+	if err != nil {
+		return err
+	}
 
 	logger.Debugln("Contract root:", epm.ContractPath)
 
@@ -122,23 +129,24 @@ func Deploy(c *Context) {
 		*/
 	}
 
-	var chainType = "tendermint" // TODO:
-	var chainRoot = epm.EpmDir   // TODO: much better!!!
-
 	// Startup the chain
-	chain, err := LoadChain(c, chainType)
-	common.IfExit(err)
+	chain, err := LoadChain(c)
+	if err != nil {
+		return err
+	}
 
 	// setup EPM object with ChainInterface
 	e := epm.NewEPM(chain)
-	e.ReadVars(path.Join(chainRoot, EPMVars))
+	e.ReadVars(path.Join(chain.RootDir(), EPMVars))
 
 	// comb directory for package-definition file
 	// exits on error
 	dir, pkg, test_ := getPkgDefFile(packagePath)
 
 	// epm parse the package definition file
-	common.IfExit(e.Parse(path.Join(dir, pkg+"."+PkgExt)))
+	if err := e.Parse(path.Join(dir, pkg+"."+PkgExt)); err != nil {
+		return err
+	}
 
 	if diffStorage {
 		e.Diff = true
@@ -147,7 +155,7 @@ func Deploy(c *Context) {
 	// epm execute jobs
 	e.ExecuteJobs()
 	// write epm variables to file
-	e.WriteVars(path.Join(chainRoot, EPMVars))
+	e.WriteVars(path.Join(chain.RootDir(), EPMVars))
 	// wait for a block
 	e.Commit()
 	// run tests
@@ -162,6 +170,7 @@ func Deploy(c *Context) {
 			os.Exit(1)
 		}
 	}
+	return nil
 }
 
 /*

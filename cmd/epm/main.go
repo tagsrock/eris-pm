@@ -22,6 +22,7 @@ func main() {
 	app.Flags = []cli.Flag{
 		// which chain
 		chainFlag,
+		chainIDFlag,
 
 		// log
 		logLevelFlag,
@@ -29,10 +30,17 @@ func main() {
 		// rpc
 		rpcHostFlag,
 		rpcPortFlag,
-		rpcLocalFlag,
+		rpcAddrFlag,
+
+		// key server
+		signPortFlag,
+		signHostFlag,
 
 		// languages
 		compilerFlag,
+
+		// pubkey
+		pubkeyFlag,
 	}
 
 	app.Commands = []cli.Command{

@@ -57,35 +57,7 @@ func P(n *IAVLNode) string {
 	}
 }
 
-func TestSimpleIAVL(t *testing.T) {
-
-	t1 := NewIAVLTree(wire.BasicCodec, wire.BasicCodec, 0, nil)
-	n := &IAVLNode{
-		key:   5,
-		value: "",
-	}
-	n.hashWithCount(t1)
-	t1.root = n
-
-	fmt.Println("root node:", P(n))
-	t1.Set(3, "")
-	fmt.Println("root node:", P(t1.root))
-	t1.Set(2, "")
-	fmt.Println("root node:", P(t1.root))
-
-}
-
 func TestUnit(t *testing.T) {
-	expectHeightSize := func(tree *IAVLTree, height, size int) {
-		tree.root.calcHeightAndSize(tree)
-		if tree.root.height != int8(height) {
-			t.Fatalf("Expected tree to have height %v, got %v", height, tree.root.height)
-		}
-		if tree.root.size != size {
-			t.Fatalf("Expected tree to have size %v, got %v", size, tree.root.size)
-		}
-
-	}
 
 	expectHash := func(tree *IAVLTree, hashCount int) {
 		// ensure number of new hash calculations is as expected.
@@ -105,7 +77,7 @@ func TestUnit(t *testing.T) {
 		}
 	}
 
-	expectSet := func(tree *IAVLTree, i int, repr string, hashCount, height, size int) {
+	expectSet := func(tree *IAVLTree, i int, repr string, hashCount int) {
 		origNode := tree.root
 		updated := tree.Set(i, "")
 		// ensure node was added & structure is as expected.
@@ -113,8 +85,6 @@ func TestUnit(t *testing.T) {
 			t.Fatalf("Adding %v to %v:\nExpected         %v\nUnexpectedly got %v updated:%v",
 				i, P(origNode), repr, P(tree.root), updated)
 		}
-		// ensure height/size requirements
-		expectHeightSize(tree, height, size)
 		// ensure hash calculation requirements
 		expectHash(tree, hashCount)
 		tree.root = origNode
@@ -138,26 +108,23 @@ func TestUnit(t *testing.T) {
 	// Case 1:
 	t1 := T(N(4, 20))
 
-	expectHeightSize(t1, 1, 2)
-
-	expectSet(t1, 2, "((2 4) 20)", 3, 2, 3)
-	expectSet(t1, 8, "((4 8) 20)", 3, 2, 3)
-	expectSet(t1, 25, "(4 (20 25))", 3, 2, 3)
+	expectSet(t1, 8, "((4 8) 20)", 3)
+	expectSet(t1, 25, "(4 (20 25))", 3)
 
 	t2 := T(N(4, N(20, 25)))
 
-	expectSet(t2, 8, "((4 8) (20 25))", 3, 2, 4)
-	expectSet(t2, 30, "((4 20) (25 30))", 4, 2, 4)
+	expectSet(t2, 8, "((4 8) (20 25))", 3)
+	expectSet(t2, 30, "((4 20) (25 30))", 4)
 
 	t3 := T(N(N(1, 2), 6))
 
-	expectSet(t3, 4, "((1 2) (4 6))", 4, 2, 4)
-	expectSet(t3, 8, "((1 2) (6 8))", 3, 2, 4)
+	expectSet(t3, 4, "((1 2) (4 6))", 4)
+	expectSet(t3, 8, "((1 2) (6 8))", 3)
 
 	t4 := T(N(N(1, 2), N(N(5, 6), N(7, 9))))
 
-	expectSet(t4, 8, "(((1 2) (5 6)) ((7 8) 9))", 5, 3, 7)
-	expectSet(t4, 10, "(((1 2) (5 6)) (7 (9 10)))", 5, 3, 7)
+	expectSet(t4, 8, "(((1 2) (5 6)) ((7 8) 9))", 5)
+	expectSet(t4, 10, "(((1 2) (5 6)) (7 (9 10)))", 5)
 
 	//////// Test Remove cases:
 
@@ -344,50 +311,12 @@ func TestIAVLProof(t *testing.T) {
 
 }
 
-//---------------
-// NOTE: these benchmarks never actually hit the GetNode function
-// since there is no db and no cache and all nodes are present in
-// RAM as nodes (rather than hashes)
-// thus this measures performance of the raw tree traversal and balancing ops
-
-func BenchmarkIAVLTreeEmpty(b *testing.B) {
+func BenchmarkImmutableAvlTree(b *testing.B) {
 	b.StopTimer()
+
 	t := NewIAVLTree(wire.BasicCodec, wire.BasicCodec, 0, nil)
-	fmt.Println("ok, starting")
-	runtime.GC()
-	b.StartTimer()
-	// 900ns/op, 1111111ops/s
-	for i := 0; i < b.N; i++ {
-		ri := RandInt64()
-		t.Set(ri, "")
-		t.Remove(ri)
-	}
-}
-
-func BenchmarkIAVLTreeThousand(b *testing.B) {
-	b.StopTimer()
-	t := NewIAVLTree(wire.BasicCodec, wire.BasicCodec, 0, nil)
-	// 9700ns/op, 103092ops/s
-	for i := 0; i < 1000; i++ {
-		t.Set(RandInt64(), "")
-	}
-
-	fmt.Println("ok, starting")
-
-	runtime.GC()
-
-	b.StartTimer()
-	for i := 0; i < b.N; i++ {
-		ri := RandInt64()
-		t.Set(ri, "")
-		t.Remove(ri)
-	}
-}
-
-func BenchmarkIAVLTreeMillion(b *testing.B) {
-	b.StopTimer()
-	t := NewIAVLTree(wire.BasicCodec, wire.BasicCodec, 0, nil)
-	// 25000ns/op, 40000ops/s
+	// 23000ns/op, 43000ops/s
+	// for i := 0; i < 10000000; i++ {
 	for i := 0; i < 1000000; i++ {
 		t.Set(RandInt64(), "")
 	}

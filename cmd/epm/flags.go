@@ -72,24 +72,26 @@ var (
 
 	rpcAddrFlag = cli.StringFlag{
 		Name:  "node-addr",
-		Value: "http://localhost:46657/",
+		Value: "",
 		Usage: "set the full http address of the rpc node",
 	}
 
-	rpcLocalFlag = cli.BoolFlag{
-		Name:  "local",
-		Usage: "let the rpc server handle keys (sign txs)",
+	signPortFlag = cli.IntFlag{
+		Name:  "sign_port",
+		Usage: "set the port for the eris-keys server",
+		Value: 4767,
 	}
 
-	signPortFlag = cli.IntFlag{
-		Name:  "sign-addr-port",
-		Usage: "set the full http address of the eris-keys server",
-		Value: 4676,
+	signHostFlag = cli.StringFlag{
+		Name:  "sign_host",
+		Usage: "set the host for the eris-keys server",
+		Value: "localhost",
 	}
 
 	chainIDFlag = cli.StringFlag{
-		Name:  "chainid",
+		Name:  "chain_id",
 		Usage: "specify the chain id",
+		Value: "etcb_testnet",
 	}
 
 	pubkeyFlag = cli.StringFlag{

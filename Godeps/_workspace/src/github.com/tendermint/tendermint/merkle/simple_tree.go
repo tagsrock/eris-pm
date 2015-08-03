@@ -100,7 +100,6 @@ type SimpleProof struct {
 }
 
 // proofs[0] is the proof for items[0].
-// requires all items that go into the merkle tree, returns a proof for each one
 func SimpleProofsFromHashables(items []Hashable) (proofs []*SimpleProof) {
 	trails, root := trailsFromHashables(items)
 	proofs = make([]*SimpleProof, len(items))

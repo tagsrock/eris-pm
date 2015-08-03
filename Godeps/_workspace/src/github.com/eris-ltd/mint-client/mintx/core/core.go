@@ -434,9 +434,12 @@ func signTx(signAddr, chainID string, tx_ types.Tx) ([]byte, types.Tx, error) {
 }
 
 type TxResult struct {
-	Hash      []byte // all txs get a hash
-	Return    []byte // only CallTx has a return value
-	Exception string // only CallTx
+	Hash []byte // all txs get a hash
+
+	// only CallTx
+	Address   []byte // only for new contracts
+	Return    []byte
+	Exception string
 
 	//TODO: make Broadcast() errors more responsive so we
 	// can differentiate mempool errors from other
@@ -482,6 +485,11 @@ func SignAndBroadcast(chainID, nodeAddr, signAddr string, tx types.Tx, sign, bro
 		}
 		txResult = &TxResult{
 			Hash: receipt.TxHash,
+		}
+		if tx_, ok := tx.(*types.CallTx); ok {
+			if len(tx_.Address) == 0 {
+				txResult.Address = types.NewContractAddress(tx_.Input.Address, tx_.Input.Sequence)
+			}
 		}
 	}
 	return

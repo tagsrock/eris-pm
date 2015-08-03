@@ -33,10 +33,13 @@ var (
 
 // TODO: these should return byte strings
 type ChainClient interface {
-	Tx(addr, amt string) (string, error)             // simple tx
-	Msg(addr string, data []string) (string, error)  // msg a contract
-	Call(addr string, data []string) (string, error) // simulate msging a contract
-	Script(code string) (string, string, error)      // deploy a new contract
+	RootDir() string
+	WriteConfig() error
+
+	Tx(addr, amt string) (string, error)           // simple tx
+	Msg(addr string, data string) (string, error)  // msg a contract
+	Call(addr string, data string) (string, error) // simulate msging a contract
+	Script(code string) (string, string, error)    // deploy a new contract
 
 	NameReg(name string, value string) (string, error) // add entry to name registrar
 

@@ -5,6 +5,8 @@ import (
 	"errors"
 	"io"
 
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/golang.org/x/crypto/ripemd160"
+
 	acm "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/account"
 	. "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/common"
 	ptypes "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/permission/types"
@@ -187,6 +189,15 @@ func (tx *CallTx) WriteSignBytes(chainID string, w io.Writer, n *int64, err *err
 
 func (tx *CallTx) String() string {
 	return Fmt("CallTx{%v -> %x: %x}", tx.Input, tx.Address, tx.Data)
+}
+
+func NewContractAddress(caller []byte, nonce int) []byte {
+	temp := make([]byte, 32+8)
+	copy(temp, caller)
+	PutInt64BE(temp[32:], int64(nonce))
+	hasher := ripemd160.New()
+	hasher.Write(temp) // does not error
+	return hasher.Sum(nil)
 }
 
 //-----------------------------------------------------------------------------

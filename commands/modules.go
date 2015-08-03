@@ -2,9 +2,13 @@ package commands
 
 import (
 	"fmt"
+	"os"
+	"path"
 
 	//epm-binary-generator:IMPORT
 	mod "github.com/eris-ltd/eris-pm/commands/modules/tendermint"
+
+	"github.com/spf13/viper"
 
 	"github.com/eris-ltd/eris-pm/epm"
 )
@@ -14,30 +18,68 @@ import (
 //epm-binary-generator:CHAIN
 const CHAIN = ""
 
-// chainroot is a full path to the dir
-func LoadChain(c *Context, chainType string) (epm.ChainClient, error) {
-	logger.Debugln("Loading chain ", c.String("type"))
+func LoadChain(c *Context) (epm.ChainClient, error) {
+	var chainExists bool
+	rootDir, chainType, chainID, err := ResolveRootFlag(c)
+	if err == nil {
+		// if the dir hasnt been laid yet, the root wont resolve
+		chainExists = true
+		rootDir = ComposeRoot(chainType, chainID)
+	}
 
-	// TODO: these things from flags
+	if chainExists {
+		viper.SetConfigName("config") // name of config file (without extension)
+		viper.AddConfigPath(rootDir)  // path to look for the config file in
+		viper.ReadInConfig()          // Find and read the config file
+	}
 
-	// need a toml config
+	var rpcAddr, signAddr string
+	var pubkey string
 
-	rpcAddr := c.String("node-addr")
-	if rpcAddr == "" {
+	if c.IsSet("host") || c.IsSet("port") || !chainExists {
 		rpcHost, rpcPort := c.String("host"), c.Int("port")
 		rpcAddr = fmt.Sprintf("http://%s:%d/", rpcHost, rpcPort)
+	} else {
+		rpcAddr = viper.GetString("node_addr")
 	}
-	signHost, signPort := c.String("sign-addr-host"), c.Int("sign-addr-port")
 
-	signAddr := fmt.Sprintf("http://%s:%d", signHost, signPort)
-	chainID, pubkey := c.String("chainid"), c.String("pubkey")
+	if c.IsSet("sign_host") || c.IsSet("sign_port") || !chainExists {
+		signHost, signPort := c.String("sign_host"), c.Int("sign_port")
+		signAddr = fmt.Sprintf("http://%s:%d", signHost, signPort)
+		fmt.Println("GAHH", signHost, signPort, signAddr)
+	} else {
+		signAddr = viper.GetString("sign_addr")
+	}
 
-	chain, err := mod.NewChain(chainID, rpcAddr, signAddr, pubkey)
+	if chainExists {
+		chainID = viper.GetString("chain_id")
+	}
+
+	if c.IsSet("pubkey") || !chainExists {
+		pubkey = c.String("pubkey")
+	} else {
+		pubkey = viper.GetString("pubkey")
+	}
+
+	logger.Debugln("ChainType, ChainID, RootDir", chainType, chainID, rootDir)
+
+	chain, err := mod.NewChain(rootDir, chainID, rpcAddr, signAddr, pubkey)
 	if err != nil {
 		return nil, err
 	}
 
 	// TODO: set contract path?
+
+	if _, err := os.Stat(path.Join(rootDir, "config.toml")); err != nil {
+		if _, err := os.Stat(rootDir); err != nil {
+			if err := os.MkdirAll(rootDir, 0777); err != nil {
+				logger.Errorln("Failed to write config file", err)
+			}
+		}
+		if err := chain.WriteConfig(); err != nil {
+			logger.Errorln("Failed to write config file", err)
+		}
+	}
 
 	return chain, nil
 }

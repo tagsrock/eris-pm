@@ -236,7 +236,7 @@ transact:
 `
 
 func TestInterpreter(t *testing.T) {
-	e, _ := NewEPM(nil, "")
+	e := NewEPM(nil)
 	e.vars["alpha"] = "0x42"
 	p := Parse(text2)
 	p.run()
@@ -254,7 +254,7 @@ transact:
 `
 
 func TestInterpreter2(t *testing.T) {
-	e, _ := NewEPM(nil, "")
+	e := NewEPM(nil)
 	e.vars["alpha"] = "0x42"
 	e.vars["A"] = "0x5"
 	e.vars["B"] = "0x3"
@@ -305,7 +305,7 @@ func testParse(t *testing.T, input string) (*EPM, *parser) {
 	p := Parse(input)
 	p.run()
 	// setup EPM object with ChainInterface
-	e, _ := NewEPM(nil, "")
+	e := NewEPM(nil)
 
 	e.jobs = p.jobs
 	printJobs(e.jobs)

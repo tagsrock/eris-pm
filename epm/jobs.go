@@ -12,9 +12,9 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/eris-ltd/eris-abi/abi"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/lllc-server"
-	"github.com/eris-ltd/eris-pm/epm/abi" //"github.com/eris-ltd/lllc-server/abi"
 )
 
 const (
@@ -188,8 +188,8 @@ func (e *EPM) Assert(args []string) error {
 
 // Deploy a contract and save its address
 func (e *EPM) Deploy(args []string) error {
-	contract := args[0]
-	key := args[1]
+	contract := common.StripHex(args[0])
+	key := common.StripHex(args[1])
 	contract = strings.Trim(contract, "\"")
 	logger.Debugln("Deploying contract:", contract)
 	var p string
@@ -207,15 +207,16 @@ func (e *EPM) Deploy(args []string) error {
 	}
 	logger.Debugln("Abi spec:", string(abiSpec))
 	// send transaction
-	_, addr, err := e.chain.Script(hex.EncodeToString(bytecode))
+	txID, addr, err := e.chain.Script(hex.EncodeToString(bytecode))
 	if err != nil {
 		err = fmt.Errorf("Error deploying contract %s: %s", p, err.Error())
 		logger.Infoln(err.Error())
 		return err
 	}
 	logger.Warnf("Deployed %s as %s\n", addr, key)
+	logger.Debugf("TxID: %s\n", txID)
 	// TODO: push abi to ipfs
-	/*abiDir := path.Join(e.chain.Property("RootDir").(string), "abi")
+	abiDir := path.Join(e.chain.RootDir(), "abi")
 	if _, err := os.Stat(abiDir); err != nil {
 		if err := os.Mkdir(abiDir, 0700); err != nil {
 			return err
@@ -223,7 +224,7 @@ func (e *EPM) Deploy(args []string) error {
 	}
 	if err := ioutil.WriteFile(path.Join(abiDir, common.StripHex(addr)), []byte(abiSpec), 0600); err != nil {
 		return err
-	}*/
+	}
 	// save contract address
 	e.StoreVar(key, addr)
 	return nil
@@ -231,8 +232,8 @@ func (e *EPM) Deploy(args []string) error {
 
 // Modify lines in the contract prior to deploy, and save its address
 func (e *EPM) ModifyDeploy(args []string) error {
-	contract := args[0]
-	key := args[1]
+	contract := common.StripHex(args[0])
+	key := common.StripHex(args[1])
 	args = args[2:]
 
 	contract = strings.Trim(contract, "\"")
@@ -261,35 +262,34 @@ func coerceHex(aa string, padright bool) string {
 	return aa
 }
 
-func (e *EPM) packArgsABI(to string, data ...string) ([]string, error) {
-	packed := []string{}
-	// TODO:check for abi spec from IPFS
-	/*
-		abiSpec, ok := ReadAbi(e.chain.Property("RootDir").(string), to)
-		if ok {
-			funcName := data[0]
-			args := data[1:]
+func (e *EPM) packArgsABI(to string, data ...string) (string, error) {
+	packed := ""
+	// TODO: ipfs
+	abiSpec, ok := ReadAbi(e.chain.RootDir(), to)
+	if ok {
+		funcName := data[0]
+		args := data[1:]
 
-			fmt.Println("ABI Spec", abiSpec)
-			a := []interface{}{}
-			for _, aa := range args {
-				aa = coerceHex(aa, true)
-				bb, _ := hex.DecodeString(common.StripHex(aa))
-				a = append(a, bb)
-			}
-			packedBytes, err := abiSpec.Pack(funcName, a...)
-			if err != nil {
-				return nil, err
-			}
-			packed = []string{hex.EncodeToString(packedBytes)}
+		fmt.Println("ABI Spec", abiSpec)
+		a := []interface{}{}
+		for _, aa := range args {
+			aa = coerceHex(aa, true)
+			bb, _ := hex.DecodeString(common.StripHex(aa))
+			a = append(a, bb)
+		}
+		packedBytes, err := abiSpec.Pack(funcName, a...)
+		if err != nil {
+			return "", err
+		}
+		packed = hex.EncodeToString(packedBytes)
 
-		} else {
+	} else {
+		/*
 			for _, aa := range data {
 				aa = coerceHex(aa, false)
 				packed = append(packed, aa)
-			}
-		}
-	*/
+			}*/
+	}
 	return packed, nil
 }
 
@@ -297,7 +297,7 @@ func (e *EPM) packArgsABI(to string, data ...string) ([]string, error) {
 // Data should be list of strings/hex/numeric
 // already resolved
 func (e *EPM) Transact(args []string) (err error) {
-	to := args[0]
+	to := common.StripHex(args[0])
 	data := args[1:]
 
 	packed, err := e.packArgsABI(to, data...)
@@ -305,10 +305,12 @@ func (e *EPM) Transact(args []string) (err error) {
 		return
 	}
 
-	if _, err = e.chain.Msg(to, packed); err != nil {
+	txID, err := e.chain.Msg(to, packed)
+	if err != nil {
 		return
 	}
 	logger.Warnf("Sent %s to %s", data, to)
+	logger.Debugf("TxID: %s\n", txID)
 	return
 }
 
@@ -316,7 +318,7 @@ func (e *EPM) Transact(args []string) (err error) {
 // Data should be list of strings/hex/numeric
 // already resolved
 func (e *EPM) Call(args []string) (err error) {
-	to := args[0]
+	to := common.StripHex(args[0])
 	data := args[1 : len(args)-1]
 	varName := args[len(args)-1]
 
@@ -338,8 +340,8 @@ func (e *EPM) Call(args []string) (err error) {
 // Issue a query.
 // XXX: Only works after a commit ...
 func (e *EPM) Query(args []string) error {
-	addr := args[0]
-	storage := args[1]
+	addr := common.StripHex(args[0])
+	storage := common.StripHex(args[1])
 	varName := args[2]
 
 	v, err := e.chain.StorageAt(addr, storage)
@@ -387,7 +389,7 @@ func (e *EPM) Set(args []string) error {
 
 // Send a basic transaction transfering value.
 func (e *EPM) Endow(args []string) error {
-	addr := args[0]
+	addr := common.StripHex(args[0])
 	value := args[1]
 	e.chain.Tx(addr, value)
 	logger.Warnf("Endowed %s with %s", addr, value)
