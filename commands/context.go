@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/codegangsta/cli"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/thelonious/monklog"
 	"os"
 	"reflect"
 )
@@ -19,8 +18,6 @@ var (
 
 	DefaultContractPath = "." //path.Join(utils.ErisLtd, "eris-std-lib")
 	defaultDatabase     = ".chain"
-
-	logger *monklog.Logger = monklog.NewLogger("EPM-CLI")
 )
 
 type Context struct {

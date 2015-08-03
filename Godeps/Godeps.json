@@ -45,16 +45,11 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/common/go/common",
-			"Rev": "4efd89be9b8794df5518a5187af2a5e6fc9ebed9"
+			"Rev": "f48a7aa1490bf08e013cbb0c128500e1c05bc25f"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/common/go/log",
-			"Rev": "4efd89be9b8794df5518a5187af2a5e6fc9ebed9"
-		},
-		{
-			"ImportPath": "github.com/eris-ltd/epm-go/utils",
-			"Comment": "v0.8-249-g135a4c7",
-			"Rev": "135a4c78397584ed437685ac525868af838ea75c"
+			"Rev": "f48a7aa1490bf08e013cbb0c128500e1c05bc25f"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/go-ethereum/crypto",
@@ -73,7 +68,7 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/lllc-server",
-			"Rev": "ec836cd6d889586c2b3561555e2e2a07d5fbe1e0"
+			"Rev": "ae8962e8d5a3ddbffbf2ba405e1a8b4cd03d753b"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/mint-client/mintx/core",
@@ -82,11 +77,6 @@
 		{
 			"ImportPath": "github.com/eris-ltd/modules/types",
 			"Rev": "2aa62a602c8b065560ab32001b9c4afdb466c19a"
-		},
-		{
-			"ImportPath": "github.com/eris-ltd/thelonious/monklog",
-			"Comment": "v0.8-84-g0841a77",
-			"Rev": "0841a77cc857724301341d0dc21cd323efaa9972"
 		},
 		{
 			"ImportPath": "github.com/go-martini/martini",
@@ -108,8 +98,16 @@
 			"Rev": "352fceb48e895bd1dd0b9f5d3ae8f8516c49af0f"
 		},
 		{
+			"ImportPath": "github.com/jehiah/go-strftime",
+			"Rev": "834e15c05a45371503440cc195bbd05c9a0968d9"
+		},
+		{
 			"ImportPath": "github.com/martini-contrib/gorelic",
 			"Rev": "f8b0843aa3ab66d8734aa7d9acf399bdc197c65d"
+		},
+		{
+			"ImportPath": "github.com/martini-contrib/secure",
+			"Rev": "de8e19a0490b816696d093388d53f2e1f0c08b7d"
 		},
 		{
 			"ImportPath": "github.com/mattn/go-colorable",
@@ -126,6 +124,11 @@
 		{
 			"ImportPath": "github.com/rakyll/goini",
 			"Rev": "907cca0f578a5316fb864ec6992dc3d9730ec58c"
+		},
+		{
+			"ImportPath": "github.com/segmentio/analytics-go",
+			"Comment": "v2.0.0-2-g0f10a19",
+			"Rev": "0f10a1942c812a6dc8b4978ed8a80cfc42e8a617"
 		},
 		{
 			"ImportPath": "github.com/sfreiberg/gotwilio",
@@ -219,6 +222,10 @@
 		{
 			"ImportPath": "github.com/tendermint/tendermint/wire",
 			"Rev": "88b245a3afe0627d5d58647d4fb35cfb1975f9e4"
+		},
+		{
+			"ImportPath": "github.com/xtgo/uuid",
+			"Rev": "a0b114877d4caeffbd7f87e3757c17fce570fea7"
 		},
 		{
 			"ImportPath": "github.com/yvasiyarov/go-metrics",

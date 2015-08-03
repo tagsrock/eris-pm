@@ -11,6 +11,8 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/log" // so we can flush logs on exit/ifexit
 )
 
 var (
@@ -63,6 +65,7 @@ func Usr() string {
 func Exit(err error) {
 	status := 0
 	if err != nil {
+		log.Flush()
 		fmt.Println(err)
 		status = 1
 	}
@@ -71,6 +74,7 @@ func Exit(err error) {
 
 func IfExit(err error) {
 	if err != nil {
+		log.Flush()
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -88,11 +92,9 @@ func AbsolutePath(Datadir string, filename string) string {
 }
 
 func InitDataDir(Datadir string) error {
-	_, err := os.Stat(Datadir)
-	if err != nil {
+	if _, err := os.Stat(Datadir); err != nil {
 		if os.IsNotExist(err) {
-			err := os.MkdirAll(Datadir, 0777)
-			if err != nil {
+			if err := os.MkdirAll(Datadir, 0777); err != nil {
 				return err
 			}
 		}

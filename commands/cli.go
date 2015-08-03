@@ -2,9 +2,11 @@ package commands
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 
 	//epm-binary-generator:IMPORT
 	//	mod "github.com/eris-ltd/eris-pm/commands/modules/tendermint"
@@ -13,6 +15,81 @@ import (
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/epm" // ed25519 key generation
 )
+
+func Set(c *Context) {
+	args := c.Args()
+	kv := make(map[string]string)
+	for _, a := range args {
+		spl := strings.Split(a, ":")
+		if len(spl) < 2 {
+			common.Exit(fmt.Errorf("Arguments for set should be given as <key>:<value>. Got %s", a))
+		}
+		kv[spl[0]] = spl[1]
+	}
+
+	var chainType = "tendermint" // TODO:
+	var chainRoot = epm.EpmDir   // TODO: much better!!!
+
+	// Startup the chain
+	chain, err := LoadChain(c, chainType)
+	common.IfExit(err)
+
+	// setup EPM object with ChainInterface
+	e := epm.NewEPM(chain)
+	e.ReadVars(path.Join(chainRoot, EPMVars))
+
+	for k, v := range kv {
+		e.StoreVar(k, v)
+	}
+
+	// write epm variables to file
+	e.WriteVars(path.Join(chainRoot, EPMVars))
+}
+
+func Plop(c *Context) {
+	var root = epm.EpmDir // TODO: much better!!!
+
+	var toPlop string
+	if len(c.Args()) > 0 {
+		toPlop = c.Args()[0]
+	} else {
+		toPlop = ""
+	}
+	switch toPlop {
+	case "vars":
+		b, err := ioutil.ReadFile(path.Join(root, EPMVars))
+		common.IfExit(err)
+		if len(c.Args()) > 1 {
+			// plop only a single var
+			spl := strings.Split(string(b), "\n")
+			for _, s := range spl {
+				ss := strings.Split(s, ":")
+				if ss[0] == c.Args()[1] {
+					fmt.Println(ss[1])
+				}
+			}
+		} else {
+			fmt.Println(string(b))
+		}
+	case "abi":
+		if len(c.Args()) == 1 {
+			common.IfExit(fmt.Errorf("Specify a contract to see its abi"))
+		}
+		e := epm.NewEPM(nil)
+		e.ReadVars(path.Join(root, EPMVars))
+		addr := c.Args()[1]
+		var err error
+		if epm.IsVar(addr) {
+			addr, err = e.VarSub(addr)
+			common.IfExit(err)
+		}
+		b, err := ioutil.ReadFile(path.Join(root, "abi", common.StripHex(addr)))
+		common.IfExit(err)
+		fmt.Println(string(b))
+	default:
+		logger.Errorln("Plop options: abi, vars")
+	}
+}
 
 // deploy a pdx file on a chain
 func Deploy(c *Context) {
@@ -30,24 +107,27 @@ func Deploy(c *Context) {
 	}
 	var err error
 	epm.ContractPath, err = filepath.Abs(contractPath)
-	ifExit(err)
+	common.IfExit(err)
 
 	logger.Debugln("Contract root:", epm.ContractPath)
 
 	// clear the cache
 	if !dontClear {
-		err := os.RemoveAll(epm.EpmDir) //XXX: this is scratch!
-		if err != nil {
-			logger.Errorln("Error clearing cache: ", err)
-		}
-		common.InitDataDir(epm.EpmDir)
+		/*
+			err := os.RemoveAll(epm.EpmDir) //XXX: this is scratch!
+			if err != nil {
+				logger.Errorln("Error clearing cache: ", err)
+			}
+			common.InitDataDir(epm.EpmDir)
+		*/
 	}
 
 	var chainType = "tendermint" // TODO:
 	var chainRoot = epm.EpmDir   // TODO: much better!!!
 
 	// Startup the chain
-	chain := LoadChain(c, chainType)
+	chain, err := LoadChain(c, chainType)
+	common.IfExit(err)
 
 	// setup EPM object with ChainInterface
 	e := epm.NewEPM(chain)
@@ -58,8 +138,7 @@ func Deploy(c *Context) {
 	dir, pkg, test_ := getPkgDefFile(packagePath)
 
 	// epm parse the package definition file
-	err = e.Parse(path.Join(dir, pkg+"."+PkgExt))
-	ifExit(err)
+	common.IfExit(e.Parse(path.Join(dir, pkg+"."+PkgExt)))
 
 	if diffStorage {
 		e.Diff = true
@@ -89,7 +168,7 @@ func Deploy(c *Context) {
 // run a single epm on-chain command (endow, deploy, etc.)
 func Command(c *Context) {
 	root, chainType, _, err := ResolveRootFlag(c)
-	ifExit(err)
+	common.IfExit(err)
 
 	chain := mod.NewChain(chainType, c.Bool("rpc"))
 
@@ -113,13 +192,13 @@ func Command(c *Context) {
 		contractPath = DefaultContractPath
 	}
 	epm.ContractPath, err = filepath.Abs(contractPath)
-	ifExit(err)
+	common.IfExit(err)
 	logger.Infoln("Contract path:", epm.ContractPath)
 
 	epm.ErrMode = epm.ReturnOnErr
 	// load epm
 	e, err := epm.NewEPM(chain, epm.LogFile)
-	ifExit(err)
+	common.IfExit(err)
 	e.ReadVars(path.Join(root, EPMVars))
 
 	// we don't need to turn anything on for "set"
@@ -130,7 +209,7 @@ func Command(c *Context) {
 	// run job
 	e.AddJob(job)
 	err = e.ExecuteJobs()
-	ifExit(err)
+	common.IfExit(err)
 	e.WriteVars(path.Join(root, EPMVars))
 	// not everything needs a new block
 	if cmd != "call" && cmd != "assert" && cmd != "set" {
@@ -151,14 +230,14 @@ func Test(c *Context) {
 	diffStorage := c.Bool("diff")
 
 	chainRoot, chainType, _, err := ResolveRootFlag(c)
-	ifExit(err)
+	common.IfExit(err)
 	// hierarchy : name > chainId > db > config > HEAD > default
 
 	if !c.IsSet("contracts") {
 		contractPath = DefaultContractPath
 	}
 	epm.ContractPath, err = filepath.Abs(contractPath)
-	ifExit(err)
+	common.IfExit(err)
 
 	logger.Debugln("Contract root:", epm.ContractPath)
 
@@ -173,7 +252,7 @@ func Test(c *Context) {
 
 	// read all pdxs in the dir
 	fs, err := ioutil.ReadDir(packagePath)
-	ifExit(err)
+	common.IfExit(err)
 	failed := make(map[string][]int)
 	for _, f := range fs {
 		fname := f.Name()
@@ -191,12 +270,12 @@ func Test(c *Context) {
 		var chain epm.Blockchain
 		chain = LoadChain(c, chainType, chainRoot)
 		e, err := epm.NewEPM(chain, epm.LogFile)
-		ifExit(err)
+		common.IfExit(err)
 		e.ReadVars(path.Join(chainRoot, EPMVars))
 
 		// epm parse the package definition file
 		err = e.Parse(path.Join(dir, fname))
-		ifExit(err)
+		common.IfExit(err)
 
 		if diffStorage {
 			e.Diff = true
@@ -243,7 +322,7 @@ func Console(c *Context) {
 	diffStorage := c.Bool("diff")
 
 	chainRoot, chainType, _, err := ResolveRootFlag(c)
-	ifExit(err)
+	common.IfExit(err)
 	// hierarchy : name > chainId > db > config > HEAD > default
 
 	// Startup the chain
@@ -254,7 +333,7 @@ func Console(c *Context) {
 		contractPath = DefaultContractPath
 	}
 	epm.ContractPath, err = filepath.Abs(contractPath)
-	ifExit(err)
+	common.IfExit(err)
 
 	logger.Debugln("Contract root:", epm.ContractPath)
 
@@ -269,7 +348,7 @@ func Console(c *Context) {
 
 	// setup EPM object with ChainInterface
 	e, err := epm.NewEPM(chain, epm.LogFile)
-	ifExit(err)
+	common.IfExit(err)
 	e.ReadVars(path.Join(chainRoot, EPMVars))
 
 	if diffStorage {

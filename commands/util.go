@@ -13,7 +13,6 @@ import (
 	// mod "github.com/eris-ltd/eris-pm/commands/modules/tendermint"
 
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/thelonious/monklog" // TODO: needs work..
 	"github.com/eris-ltd/eris-pm/epm"
 )
 
@@ -79,7 +78,7 @@ func cleanPullUpdate(clean, pull, update bool) {
 }
 
 // looks for pkg-def file
-// exits if error (none or more than 1)
+// common.Exits if error (none or more than 1)
 // returns dir of pkg, name of pkg (no extension) and whether or not there's a test file
 func getPkgDefFile(pkgPath string) (string, string, bool) {
 	logger.Infoln("Pkg path:", pkgPath)
@@ -88,7 +87,7 @@ func getPkgDefFile(pkgPath string) (string, string, bool) {
 
 	// if its not a directory, look for a corresponding test file
 	f, err := os.Stat(pkgPath)
-	ifExit(err)
+	common.IfExit(err)
 
 	if !f.IsDir() {
 		dir, fil := path.Split(pkgPath)
@@ -96,7 +95,7 @@ func getPkgDefFile(pkgPath string) (string, string, bool) {
 		pkgName = spl[0]
 		ext := spl[1]
 		if ext != PkgExt {
-			exit(fmt.Errorf("Did not understand extension. Got %s, expected %s\n", ext, PkgExt))
+			common.Exit(fmt.Errorf("Did not understand extension. Got %s, expected %s\n", ext, PkgExt))
 		}
 
 		_, err := os.Stat(path.Join(dir, pkgName) + "." + TestExt)
@@ -111,7 +110,7 @@ func getPkgDefFile(pkgPath string) (string, string, bool) {
 
 	// read dir for files
 	files, err := ioutil.ReadDir(pkgPath)
-	ifExit(err)
+	common.IfExit(err)
 
 	// find all package-defintion and package-definition-test files
 	candidates := make(map[string]int)
@@ -130,11 +129,11 @@ func getPkgDefFile(pkgPath string) (string, string, bool) {
 			candidates_test[name] = 1
 		}
 	}
-	// exit if too many or no options
+	// common.Exit if too many or no options
 	if len(candidates) > 1 {
-		exit(fmt.Errorf("More than one package-definition file available. Please select with the '-p' flag"))
+		common.Exit(fmt.Errorf("More than one package-definition file available. Please select with the '-p' flag"))
 	} else if len(candidates) == 0 {
-		exit(fmt.Errorf("No package-definition files found for extensions %s, %s", PkgExt, TestExt))
+		common.Exit(fmt.Errorf("No package-definition files found for extensions %s, %s", PkgExt, TestExt))
 	}
 	// this should run once (there's only one candidate)
 	for k, _ := range candidates {
@@ -151,24 +150,6 @@ func getPkgDefFile(pkgPath string) (string, string, bool) {
 
 func checkInit() error {
 	return nil
-}
-
-func exit(err error) {
-	if err != nil {
-		logger.Errorln(err)
-		monklog.Flush()
-		os.Exit(1)
-	}
-	monklog.Flush()
-	os.Exit(0)
-}
-
-func ifExit(err error) {
-	if err != nil {
-		logger.Errorln(err)
-		monklog.Flush()
-		os.Exit(1)
-	}
 }
 
 func confirm(message string) bool {

@@ -2,9 +2,10 @@ package lllcserver
 
 import (
 	"fmt"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/epm-go/utils"
 	"io/ioutil"
 	"path"
+
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 )
 
 // 0 for nothing, 4 for everything
@@ -14,8 +15,8 @@ var (
 	logger    = &Logger{}
 )
 
-// Client cache location in decerver tree
-var ClientCache = path.Join(utils.Lllc, "client")
+// Client cache location in eris tree
+var ClientCache = path.Join(common.LllcScratchPath, "client")
 
 // filename is either a filename or literal code
 func resolveCode(filename string, literal bool) (code []byte, err error) {
@@ -119,5 +120,5 @@ func Compile(filename string) ([]byte, string, error) {
 
 // Compile a literal piece of code
 func CompileLiteral(code string, lang string) ([]byte, string, error) {
-	return compile([]byte(code), lang, utils.Lllc)
+	return compile([]byte(code), lang, common.LllcScratchPath)
 }

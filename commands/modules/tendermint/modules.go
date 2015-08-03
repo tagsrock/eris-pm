@@ -10,26 +10,22 @@ import (
 	"github.com/eris-ltd/eris-pm/epm"
 
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
-	"github.com/eris-ltd/mint-client/Godeps/_workspace/src/github.com/gorilla/websocket"
-	rpcserver "github.com/tendermint/tendermint/rpc/server"
-	rpctypes "github.com/tendermint/tendermint/rpc/types"
-	"github.com/tendermint/tendermint/types"
-	"github.com/tendermint/tendermint/wire"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/gorilla/websocket"
+	rpcserver "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/server"
+	rpctypes "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/types"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/types"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/wire"
 )
 
 var (
 	SIGN      = true
 	BROADCAST = true
-	WAIT      = false // we implement waiting here so we only subscribe once on big pdxs
+	WAIT      = // we implement waiting here so we only subscribe once on big pdxs
+	false
 )
 
-func NewChain(chainType string) epm.ChainClient {
-	switch chainType {
-	case "tendermint", "mint":
-		return &Tendermint{} // TODO!
-	}
-	return nil
-
+func NewChain(chainID, nodeAddr, signAddr, pubkey string) (epm.ChainClient, error) {
+	return NewTendermint(chainID, nodeAddr, signAddr, pubkey)
 }
 
 // implements epm.ChainClient
@@ -55,7 +51,7 @@ type Tendermint struct {
 	conn *websocket.Conn // ws conn
 }
 
-func NewTendermint(chainID, nodeAddr, signAddr, pubkey string) *Tendermint {
+func NewTendermint(chainID, nodeAddr, signAddr, pubkey string) (*Tendermint, error) {
 
 	//TODO: get addr from pubkey!
 	var addr string
@@ -78,13 +74,15 @@ func NewTendermint(chainID, nodeAddr, signAddr, pubkey string) *Tendermint {
 
 	// setup a websocket connection
 	// and subscribe to inputs from the sending address
-	t.setupWSConn()
+	if err := t.setupWSConn(); err != nil {
+		return nil, err
+	}
 
 	// waits for transactions sent by this client to be confirmed
 	// and clears them from the txPool
 	go t.clearTransactions()
 
-	return t
+	return t, nil
 }
 
 func (t *Tendermint) Tx(addr, amt string) (string, error) {
@@ -195,6 +193,8 @@ func (t *Tendermint) clearTransactions() {
 		_, p, err := t.conn.ReadMessage()
 		if err != nil {
 			logger.Debugln(fmt.Errorf("Error reading ws: %v\n", err))
+			// TODO: the connection was probably lost or something.
+			// we should try and renew it ...
 			continue
 		}
 

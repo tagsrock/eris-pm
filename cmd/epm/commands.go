@@ -33,6 +33,12 @@ var (
 			},
 		}*/
 
+	setCmd = cli.Command{
+		Name:   "set",
+		Usage:  "set an epm var",
+		Action: cliCall(commands.Set),
+	}
+
 	deployCmd = cli.Command{
 		Name:   "deploy",
 		Usage:  "deploy a .pdx file onto a blockchain",
@@ -42,6 +48,15 @@ var (
 			diffFlag,
 			dontClearFlag,
 			contractPathFlag,
+		},
+	}
+
+	plopCmd = cli.Command{
+		Name:   "plop",
+		Usage:  "machine readable variable display: epm plop <addr | chainid | config | genesis | key | pid | vars>",
+		Action: cliCall(commands.Plop),
+		Flags: []cli.Flag{
+			chainFlag,
 		},
 	}
 

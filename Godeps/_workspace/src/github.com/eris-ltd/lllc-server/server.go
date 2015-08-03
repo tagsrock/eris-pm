@@ -6,10 +6,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/ebuchman/go-shell-pipes"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/epm-go/utils"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/go-martini/martini"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/martini-contrib/gorelic"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -19,12 +15,20 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/ebuchman/go-shell-pipes"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/go-martini/martini"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/martini-contrib/gorelic"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/martini-contrib/secure"
+	segment "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/segmentio/analytics-go"
 )
 
 var (
-	//"" = abi.ABI{}
-	NEWRELIC_KEY = os.Getenv("NEWRELIC_KEY")
+	NEWRELIC_KEY = os.Getenv( //"" = abi.ABI{}
+	"NEWRELIC_KEY")
 	NEWRELIC_APP = os.Getenv("NEWRELIC_APP")
+	SEGMENT_KEY  = os.Getenv("SEGMENT_KEY")
 )
 
 // must have compiler installed!
@@ -36,8 +40,8 @@ func homeDir() string {
 	return usr.HomeDir
 }
 
-// Server cache location in decerver tree
-var ServerCache = path.Join(utils.Lllc, "server")
+// Server cache location in eris tree
+var ServerCache = path.Join(common.LllcScratchPath, "server")
 
 // Handler for proxy requests (ie. a compile request from langauge other than go)
 func ProxyHandler(w http.ResponseWriter, r *http.Request) {
@@ -87,6 +91,7 @@ func CompileHandler(w http.ResponseWriter, r *http.Request) {
 		logger.Errorln("failed to marshal", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+
 	w.Write(respJ)
 }
 
@@ -121,6 +126,12 @@ func compileResponse(w http.ResponseWriter, r *http.Request) *Response {
 	}
 
 	resp := compileServerCore(req)
+
+	// track
+	if SEGMENT_KEY != "" {
+		informSegment(req.Language, r)
+	}
+
 	return resp
 }
 
@@ -177,6 +188,30 @@ func compileServerCore(req *Request) *Response {
 	resp = NewResponse(compiled, docs, err)
 
 	return resp
+}
+
+func informSegment(lang string, r *http.Request) {
+	seg := segment.New(SEGMENT_KEY)
+
+	con := make(map[string]interface{})
+	ip := strings.Split(r.RemoteAddr, ":")[0]
+	con["ip"] = ip
+
+	prp := make(map[string]interface{})
+	prp["name"] = lang
+	prp["path"] = "/compile/" + lang
+	prp["url"] = "http://compilers.eris.industries/compile/" + lang
+
+	t := &segment.Page{
+		Context:     con,
+		Traits:      prp,
+		AnonymousId: ip,
+		// Category:    lang,
+		Name: "Compile lang: " + lang,
+	}
+
+	logger.Debugln("Sending notification to Segment.")
+	seg.Page(t)
 }
 
 func commandWrapper_(prgrm string, args []string) (string, error) {
@@ -242,15 +277,22 @@ func CompileWrapper(filename string, lang string) ([]byte, string, error) {
 }
 
 // Start the compile server
-func StartServer(addr string) {
-	//martini.Env = martini.Prod
-	srv := martini.Classic()
+func StartServer(addrUnsecure, addrSecure, key, cert string) {
+	martini.Env = martini.Prod
+	srv := martini.New()
+	srv.Use(martini.Logger())
+	srv.Use(martini.Recovery())
 
 	// Static files
 	srv.Use(martini.Static("./web"))
 
-	srv.Post("/compile", CompileHandler)
-	srv.Post("/compile2", CompileHandlerJs)
+	// Routes
+	r := martini.NewRouter()
+	srv.MapTo(r, (*martini.Routes)(nil))
+	srv.Action(r.Handle)
+
+	r.Post("/compile", CompileHandler)
+	r.Post("/compile2", CompileHandlerJs)
 
 	// new relic for error reporting
 	if NEWRELIC_KEY != "" {
@@ -259,7 +301,34 @@ func StartServer(addr string) {
 		srv.Use(gorelic.Handler)
 	}
 
-	srv.RunOnAddr(addr)
+	// Use SSL ?
+	if addrSecure == "" {
+
+		srv.RunOnAddr(addrUnsecure)
+
+	} else {
+
+		srv.Use(secure.Secure(secure.Options{
+			SSLRedirect: true,
+			SSLHost:     addrSecure,
+		}))
+
+		// HTTP
+		if addrUnsecure != "" {
+			go func() {
+				if err := http.ListenAndServe(addrUnsecure, srv); err != nil {
+					logger.Errorln("Cannot serve on http port: ", err)
+					os.Exit(1)
+				}
+			}()
+		}
+
+		// HTTPS
+		if err := http.ListenAndServeTLS(addrSecure, cert, key, srv); err != nil {
+			logger.Errorln("Cannot serve on https port: ", err)
+			os.Exit(1)
+		}
+	}
 }
 
 // Start the proxy server

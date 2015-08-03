@@ -11,10 +11,7 @@ import (
 
 	. "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/modules/types"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/thelonious/monklog"
 )
-
-var logger *monklog.Logger = monklog.NewLogger("EPM")
 
 var (
 	StateDiffOpen  = "!{"
@@ -73,6 +70,7 @@ type EPM struct {
 
 // New empty EPM
 func NewEPM(chain ChainClient) *EPM {
+	fmt.Println(logger.Level)
 	e := &EPM{
 		chain:     chain,
 		jobs:      []Job{},
@@ -201,7 +199,7 @@ func (e *EPM) Jobs() []Job {
 
 // Store a variable (strips {{ }} from key if necessary)
 func (e *EPM) StoreVar(key, val string) {
-	fmt.Println("Storing:", key, val)
+	logger.Debugln("Storing:", key, val)
 	if len(key) > 4 && key[:2] == "{{" && key[len(key)-2:] == "}}" {
 		key = key[2 : len(key)-2]
 	}

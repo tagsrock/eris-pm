@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
 	"path"
@@ -15,8 +14,7 @@ import (
 
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/lllc-server"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/thelonious/monklog" // What to do if a job errs
-	"github.com/eris-ltd/eris-pm/epm/abi"                                                      //"github.com/eris-ltd/lllc-server/abi"
+	"github.com/eris-ltd/eris-pm/epm/abi" //"github.com/eris-ltd/lllc-server/abi"
 )
 
 const (
@@ -55,8 +53,7 @@ func (e *EPM) ExecuteJobs() error {
 			case ReturnOnErr:
 				return err
 			case FailOnErr:
-				monklog.Flush()
-				log.Fatal(err)
+				common.Exit(err)
 			case PersistOnErr:
 				continue
 			}
@@ -476,18 +473,18 @@ func (e *EPM) Modify(contract string, args []string) (string, error) {
 func ReadAbi(root, to string) (abi.ABI, bool) {
 	p := path.Join(root, "abi", common.StripHex(to))
 	if _, err := os.Stat(p); err != nil {
-		log.Println("Abi doesn't exist for", p)
+		logger.Errorln("Abi doesn't exist for", p)
 		return abi.NullABI, false
 	}
 	b, err := ioutil.ReadFile(p)
 	if err != nil {
-		log.Println("Failed to read abi file:", err)
+		logger.Errorln("Failed to read abi file:", err)
 		return abi.NullABI, false
 	}
 	a := new(abi.ABI)
 
 	if err := a.UnmarshalJSON(b); err != nil {
-		log.Println("failed to unmarshal", err)
+		logger.Errorln("failed to unmarshal", err)
 		return abi.NullABI, false
 	}
 	return *a, true
