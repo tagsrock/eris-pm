@@ -15,7 +15,7 @@ var (
 
 	typeFlag = cli.StringFlag{
 		Name:   "type",
-		Value:  "thelonious",
+		Value:  "tendermint",
 		Usage:  "set the chain type (thelonious, genesis, bitcoin, ethereum)",
 		EnvVar: "",
 	}

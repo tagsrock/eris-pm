@@ -23,6 +23,7 @@ func main() {
 		// which chain
 		chainFlag,
 		chainIDFlag,
+		typeFlag,
 
 		// log
 		logLevelFlag,

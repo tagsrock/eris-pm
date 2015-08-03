@@ -1,0 +1,10 @@
+deploy:
+	storage.sol => {{STOR}}
+transact:
+	{{STOR}} => set 0x5
+commit:
+call:
+	{{STOR}} => get => {{A}}
+assert:
+	{{A}} => 0x5
+
