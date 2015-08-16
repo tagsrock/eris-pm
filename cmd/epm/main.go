@@ -11,7 +11,7 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = "epm"
-	app.Usage = "The Eris Package Manager Tests and Operates Blockchains and Smart Contract Systems"
+	app.Usage = "The Eris Package Manager Tests and Deploys Smart Contract Systems"
 	app.Version = "0.10.0"
 	app.Author = "Ethan Buchman"
 	app.Email = "ethan@erisindustries.com"
