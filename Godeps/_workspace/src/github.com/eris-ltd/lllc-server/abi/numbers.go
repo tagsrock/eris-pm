@@ -4,7 +4,7 @@ import (
 	"math/big"
 	"reflect"
 
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/go-ethereum/ethutil"
+	"github.com/eris-ltd/go-ethereum/ethutil"
 )
 
 var big_t = reflect.TypeOf(&big.Int{})

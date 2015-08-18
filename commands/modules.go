@@ -8,7 +8,7 @@ import (
 	//epm-binary-generator:IMPORT
 	mod "github.com/eris-ltd/eris-pm/commands/modules/tendermint"
 
-	"github.com/spf13/viper"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/viper"
 
 	"github.com/eris-ltd/eris-pm/epm"
 )

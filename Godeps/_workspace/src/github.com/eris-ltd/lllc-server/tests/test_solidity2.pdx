@@ -1,4 +1,0 @@
-deploy:
-	storage2.sol => {{STOR}}
-transact:
-	{{STOR}} => set 0x5 0x9

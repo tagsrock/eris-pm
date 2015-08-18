@@ -14,9 +14,8 @@ import (
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/wire"
 )
 
-const // 4KB
-(
-	partSize = 4096
+const (
+	partSize = 4096 // 4KB
 )
 
 var (

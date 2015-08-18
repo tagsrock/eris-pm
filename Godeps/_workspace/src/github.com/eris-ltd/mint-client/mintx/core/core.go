@@ -17,7 +17,6 @@ import (
 	ptypes "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/permission/types"
 	rtypes "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core/types"
 	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core_client"
-	rpcserver "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/server"
 	rpctypes "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/types"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/types"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/wire"
@@ -234,7 +233,7 @@ func (n NameGetter) GetNameRegEntry(name string) *types.NameRegEntry {
 	if err != nil {
 		panic(err)
 	}
-	return entry
+	return entry.Entry
 }
 
 /*
@@ -254,14 +253,19 @@ func Bond(nodeAddr, pubkey, unbondAddr, amtS, nonceS string) (*types.BondTx, err
 	if err != nil {
 		return nil, err
 	}
+	var pubKey account.PubKeyEd25519
+	var unbondAddrBytes []byte
 
 	if unbondAddr == "" {
-		return nil, fmt.Errorf("Unbond address must be given with --unbond-to flag")
-	}
+		pkb, _ := hex.DecodeString(pubkey)
+		copy(pubKey[:], pkb)
+		unbondAddrBytes = pubKey.Address()
+	} else {
+		unbondAddrBytes, err = hex.DecodeString(unbondAddr)
+		if err != nil {
+			return nil, fmt.Errorf("unbondAddr is bad hex: %v", err)
+		}
 
-	unbondAddrBytes, err := hex.DecodeString(unbondAddr)
-	if err != nil {
-		return nil, fmt.Errorf("unbondAddr is bad hex: %v", err)
 	}
 
 	tx, err := types.NewBondTx(pub)
@@ -356,7 +360,7 @@ func Broadcast(tx types.Tx, broadcastRPC string) (*rtypes.Receipt, error) {
 	if err != nil {
 		return nil, err
 	}
-	return rec, nil
+	return &rec.Receipt, nil
 }
 
 //------------------------------------------------------------------------------------
@@ -469,7 +473,7 @@ func SignAndBroadcast(chainID, nodeAddr, signAddr string, tx types.Tx, sign, bro
 					logger.Debugln("Waiting for tx to be committed ...")
 					msg := <-ch
 					if msg.Error != nil {
-						logger.Infoln("Encountered error waiting for event: %v\n", msg.Error)
+						logger.Infof("Encountered error waiting for event: %v\n", msg.Error)
 						err = msg.Error
 					} else {
 						txResult.Return = msg.Value
@@ -526,18 +530,6 @@ func subscribeAndWait(tx types.Tx, chainID, nodeAddr string, inputAddr []byte) (
 		return nil, fmt.Errorf("Error subscribing to AccInput event: %v", err)
 	}
 
-	go func() {
-		pingTicker := time.NewTicker((time.Second * rpcserver.WSReadTimeoutSeconds) / 2)
-		for {
-			select {
-			case <-pingTicker.C:
-				if err := conn.WriteControl(websocket.PingMessage, []byte("whatevs"), time.Now().Add(time.Second)); err != nil {
-					logger.Debugln("error writing ping:", err)
-				}
-			}
-		}
-	}()
-
 	resultChan := make(chan Msg, 1)
 
 	// Read message
@@ -548,13 +540,7 @@ func subscribeAndWait(tx types.Tx, chainID, nodeAddr string, inputAddr []byte) (
 				resultChan <- Msg{Error: err}
 				break
 			} else {
-				var response struct {
-					Result struct {
-						Event string               `json:"event"`
-						Data  types.EventMsgCallTx `json:"data"`
-					} `json:"result"`
-					Error string `json:"error"`
-				}
+				var response rtypes.Response
 				err := new(error)
 				wire.ReadJSON(&response, p, err)
 				if *err != nil {
@@ -565,22 +551,36 @@ func subscribeAndWait(tx types.Tx, chainID, nodeAddr string, inputAddr []byte) (
 					resultChan <- Msg{Error: fmt.Errorf("response error: %v", response.Error)}
 					return
 				}
-				if response.Result.Event != eid {
-					logger.Debugf("received unsolicited event! Got %s, expected %s\n", response.Result.Event, eid)
-					continue
+
+				result, ok := response.Result.(*rtypes.ResultEvent)
+				if !ok {
+					resultChan <- Msg{Error: fmt.Errorf("response error: expected result to be *rtypes.ResultEvent ")}
+					return
 				}
-				if !bytes.Equal(types.TxID(chainID, response.Result.Data.Tx), types.TxID(chainID, tx)) {
-					logger.Debugf("Received event for same input from another transaction: %X\n", types.TxID(chainID, response.Result.Data.Tx))
+
+				if result.Event != eid {
+					logger.Debugf("received unsolicited event! Got %s, expected %s\n", result.Event, eid)
 					continue
 				}
 
-				if response.Result.Data.Exception != "" {
-					resultChan <- Msg{Value: response.Result.Data.Return, Exception: response.Result.Data.Exception}
+				data, ok := result.Data.(types.EventDataTx)
+				if !ok {
+					resultChan <- Msg{Error: fmt.Errorf("response error: expected result.Data to be *types.EventDataTx")}
+					return
+				}
+
+				if !bytes.Equal(types.TxID(chainID, data.Tx), types.TxID(chainID, tx)) {
+					logger.Debugf("Received event for same input from another transaction: %X\n", types.TxID(chainID, data.Tx))
+					continue
+				}
+
+				if data.Exception != "" {
+					resultChan <- Msg{Value: data.Return, Exception: data.Exception}
 					return
 				}
 
 				// GOOD!
-				resultChan <- Msg{Value: response.Result.Data.Return}
+				resultChan <- Msg{Value: data.Return}
 				return
 			}
 		}
@@ -643,13 +643,16 @@ func checkCommon(nodeAddr, pubkey, addr, amtS, nonceS string) (pub account.PubKe
 
 		// fetch nonce from node
 		client := cclient.NewClient(nodeAddr, "HTTP")
-		var ac *account.Account
-		ac, err = client.GetAccount(addrBytes)
-		if err != nil {
-			err = fmt.Errorf("Error connecting to node (%s) to fetch nonce: %s", nodeAddr, err.Error())
+		ac, err2 := client.GetAccount(addrBytes)
+		if err2 != nil {
+			err = fmt.Errorf("Error connecting to node (%s) to fetch nonce: %s", nodeAddr, err2.Error())
 			return
 		}
-		nonce = int64(ac.Sequence) + 1
+		if ac == nil || ac.Account == nil {
+			err = fmt.Errorf("unknown account %X", addrBytes)
+			return
+		}
+		nonce = int64(ac.Account.Sequence) + 1
 	} else {
 		nonce, err = strconv.ParseInt(nonceS, 10, 64)
 		if err != nil {

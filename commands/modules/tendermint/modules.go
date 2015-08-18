@@ -9,7 +9,6 @@ import (
 	"path"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/eris-ltd/eris-pm/epm"
 
@@ -17,7 +16,6 @@ import (
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/gorilla/websocket"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/account"
 	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core_client"
-	rpcserver "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/server"
 	rpctypes "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/types"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/types"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/wire"
@@ -253,20 +251,6 @@ func (t *Tendermint) setupWSConn() error {
 
 	// TODO: we should also subscribe to and track new blocks ...
 
-	// run the ping loop
-	go func() {
-		pingTicker := time.NewTicker((time.Second * rpcserver.WSReadTimeoutSeconds) / 2)
-		for {
-			select {
-			case <-pingTicker.C:
-				if err := conn.WriteControl(websocket.PingMessage, []byte("whatevs"), time.Now().Add(time.Second)); err != nil {
-					logger.Debugln("error writing ping:", err)
-				}
-			case <-t.quit:
-				return
-			}
-		}
-	}()
 	t.conn = conn
 	t.eid = eid
 	return nil

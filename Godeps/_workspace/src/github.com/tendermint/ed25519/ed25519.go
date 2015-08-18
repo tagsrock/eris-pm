@@ -1,7 +1,6 @@
 // Copyright 2013 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
-// yeeeee
 
 // Package ed25519 implements the Ed25519 signature algorithm. See
 // http://ed25519.cr.yp.to/.
