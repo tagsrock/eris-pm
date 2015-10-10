@@ -3,18 +3,18 @@ package epm
 import (
 	"fmt"
 
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/modules/types"
+	// "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/modules/types"
 )
 
 // TODO: abstract away the mechanism here so the particular
-// chain module can deal with state diffs and we don't need silly types.State
+// chain module can deal with state diffs and we don't need silly State
 // will be faster too
 
-func (e *EPM) CurrentState() types.State { //map[string]string{
+func (e *EPM) CurrentState() State { //map[string]string{
 	if e.chain == nil {
-		return types.State{}
+		return State{}
 	}
-	return types.State{}
+	return State{}
 }
 
 func (e *EPM) newDiffSched(i int) {
@@ -41,12 +41,12 @@ func (e *EPM) checkTakeStateDiff(i int) {
 	}
 }
 
-func StorageDiff(pre, post types.State) types.State { //map[string]string) map[string]map[string]string{
-	diff := types.State{make(map[string]*types.Storage), []string{}}
+func StorageDiff(pre, post State) State { //map[string]string) map[string]map[string]string{
+	diff := State{make(map[string]*Storage), []string{}}
 	// for each account in post, compare all elements.
 	for _, addr := range post.Order {
 		acct := post.State[addr]
-		diff.State[addr] = &types.Storage{make(map[string]string), []string{}}
+		diff.State[addr] = &Storage{make(map[string]string), []string{}}
 		diff.Order = append(diff.Order, addr)
 		acct2, ok := pre.State[addr]
 		if !ok {
@@ -70,7 +70,7 @@ func StorageDiff(pre, post types.State) types.State { //map[string]string) map[s
 	return diff
 }
 
-func PrettyPrintAcctDiff(dif types.State) string { //map[string]string) string{
+func PrettyPrintAcctDiff(dif State) string { //map[string]string) string{
 	result := ""
 	for _, addr := range dif.Order {
 		acct := dif.State[addr]
@@ -87,7 +87,7 @@ func PrettyPrintAcctDiff(dif types.State) string { //map[string]string) string{
 	return result
 }
 
-func PrintDiff(name string, pre, post types.State) { //map[string]string) {
+func PrintDiff(name string, pre, post State) { //map[string]string) {
 	/*
 	   fmt.Println("pre")
 	   fmt.Println(PrettyPrintAcctDiff(pre))

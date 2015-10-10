@@ -97,8 +97,8 @@ func (e *EPM) resolveFunc(name string) (func([]string) error, int) {
 		f = e.Log
 	case "set":
 		f = e.Set
-	case "endow":
-		f = e.Endow
+	// case "endow":
+	// 	f = e.Endow
 	case "test":
 		f = func(a []string) error {
 			e.Commit()
@@ -109,7 +109,7 @@ func (e *EPM) resolveFunc(name string) (func([]string) error, int) {
 			}
 			return nil
 		}
-	case "epm":
+	case "deploy-package":
 		f = e.EPMx
 	case "include":
 		f = e.Include
@@ -388,13 +388,13 @@ func (e *EPM) Set(args []string) error {
 }
 
 // Send a basic transaction transfering value.
-func (e *EPM) Endow(args []string) error {
-	addr := common.StripHex(args[0])
-	value := args[1]
-	e.chain.Tx(addr, value)
-	logger.Warnf("Endowed %s with %s", addr, value)
-	return nil
-}
+// func (e *EPM) Endow(args []string) error {
+// 	addr := common.StripHex(args[0])
+// 	value := args[1]
+// 	e.chain.Tx(addr, value)
+// 	logger.Warnf("Endowed %s with %s", addr, value)
+// 	return nil
+// }
 
 func (e *EPM) Include(args []string) error {
 	if len(args)%2 != 0 {
@@ -493,7 +493,7 @@ func ReadAbi(root, to string) (abi.ABI, bool) {
 }
 
 func SetCompilerServer(hostPort string) {
-	for lang, _ := range lllcserver.Languages {
+	for lang := range lllcserver.Languages {
 		lllcserver.SetLanguageURL(lang, hostPort)
 		lllcserver.SetLanguageNet(lang, true)
 	}

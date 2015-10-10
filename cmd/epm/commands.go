@@ -1,10 +1,10 @@
 package main
 
 import (
+	"github.com/eris-ltd/eris-pm/commands"
+
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/codegangsta/cli"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
-
-	"github.com/eris-ltd/eris-pm/commands"
 )
 
 // wraps a epm-go/commands function in a closure that accepts cli.Context
@@ -27,7 +27,7 @@ var (
 		Usage:  "deploy a .pdx file onto a blockchain",
 		Action: cliCall(commands.Deploy),
 		Flags: []cli.Flag{
-			chainFlag,
+			// chainFlag,
 			diffFlag,
 			dontClearFlag,
 			contractPathFlag,
@@ -38,8 +38,8 @@ var (
 		Name:   "plop",
 		Usage:  "machine readable variable display: epm plop <addr | chainid | config | genesis | key | pid | vars>",
 		Action: cliCall(commands.Plop),
-		Flags: []cli.Flag{
-			chainFlag,
+		Flags:  []cli.Flag{
+		// chainFlag,
 		},
 	}
 

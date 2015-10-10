@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	. "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/modules/types"
 )
 
 var (
@@ -63,7 +62,7 @@ type EPM struct {
 
 	pkgdef string
 	Diff   bool
-	states map[string]types.State
+	states map[string]State
 
 	//map job numbers to names of diffs invoked before a job
 	diffSched map[int][]string
@@ -80,7 +79,7 @@ func NewEPM(chain ChainClient) *EPM {
 		vars:      make(map[string]string),
 		log:       ".epm-log",
 		Diff:      false, // off by default
-		states:    make(map[string]types.State),
+		states:    make(map[string]State),
 		diffSched: make(map[int][]string),
 	}
 	return e

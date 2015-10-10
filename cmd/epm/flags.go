@@ -6,25 +6,31 @@ import (
 )
 
 var (
-	chainFlag = cli.StringFlag{
-		Name:   "chain",
-		Value:  "",
-		Usage:  "set the chain by <ref name> or by <type>/<id>",
-		EnvVar: "",
-	}
+	// chainFlag = cli.StringFlag{
+	// 	Name:   "chain",
+	// 	Value:  "",
+	// 	Usage:  "set the chain by <ref name> or by <type>/<id>",
+	// 	EnvVar: "",
+	// }
 
-	typeFlag = cli.StringFlag{
-		Name:   "type",
-		Value:  "tendermint",
-		Usage:  "set the chain type (thelonious, genesis, bitcoin, ethereum)",
-		EnvVar: "",
-	}
+	// typeFlag = cli.StringFlag{
+	// 	Name:   "type",
+	// 	Value:  "tendermint",
+	// 	Usage:  "set the chain type (thelonious, genesis, bitcoin, ethereum)",
+	// 	EnvVar: "",
+	// }
 
-	interactiveFlag = cli.BoolFlag{
-		Name:   "i",
-		Usage:  "run epm in interactive mode",
-		EnvVar: "",
-	}
+	// interactiveFlag = cli.BoolFlag{
+	// 	Name:   "i",
+	// 	Usage:  "run epm in interactive mode",
+	// 	EnvVar: "",
+	// }
+
+	// chainIDFlag = cli.StringFlag{
+	// 	Name:  "chain_id",
+	// 	Usage: "specify the chain id",
+	// 	Value: "etcb_testnet",
+	// }
 
 	diffFlag = cli.BoolFlag{
 		Name:   "diff",
@@ -53,7 +59,7 @@ var (
 
 	logLevelFlag = cli.IntFlag{
 		Name:   "log",
-		Value:  2,
+		Value:  0,
 		Usage:  "set the log level",
 		EnvVar: "EPM_LOG",
 	}
@@ -86,12 +92,6 @@ var (
 		Name:  "sign_host",
 		Usage: "set the host for the eris-keys server",
 		Value: "localhost",
-	}
-
-	chainIDFlag = cli.StringFlag{
-		Name:  "chain_id",
-		Usage: "specify the chain id",
-		Value: "etcb_testnet",
 	}
 
 	pubkeyFlag = cli.StringFlag{

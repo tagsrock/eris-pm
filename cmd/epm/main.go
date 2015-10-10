@@ -3,6 +3,8 @@ package main
 import (
 	"os"
 
+	"github.com/eris-ltd/eris-pm/version"
+
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/codegangsta/cli"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/log"
 )
@@ -11,8 +13,8 @@ func main() {
 
 	app := cli.NewApp()
 	app.Name = "epm"
-	app.Usage = "The Eris Package Manager Tests and Deploys Smart Contract Systems"
-	app.Version = "0.10.0"
+	app.Usage = "The Eris Package Manager Tests and Deploys Smart Contract Engines"
+	app.Version = version.VERSION
 	app.Author = "Ethan Buchman"
 	app.Email = "ethan@erisindustries.com"
 
@@ -20,10 +22,10 @@ func main() {
 	app.After = after
 
 	app.Flags = []cli.Flag{
-		// which chain
-		chainFlag,
-		chainIDFlag,
-		typeFlag,
+		// // which chain
+		// chainFlag,
+		// chainIDFlag,
+		// typeFlag,
 
 		// log
 		logLevelFlag,
@@ -42,6 +44,10 @@ func main() {
 
 		// pubkey
 		pubkeyFlag,
+
+		// files
+		contractPathFlag,
+		pdxPathFlag,
 	}
 
 	app.Commands = []cli.Command{

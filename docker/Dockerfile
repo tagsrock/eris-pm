@@ -1,0 +1,33 @@
+# Pull base image.
+FROM quay.io/eris/base
+MAINTAINER Eris Industries <support@erisindustries.com>
+
+#-----------------------------------------------------------------------------
+# dependencies
+RUN apt-get update && \
+  apt-get install -y --no-install-recommends \
+    libgmp3-dev jq && \
+  rm -rf /var/lib/apt/lists/*
+
+#-----------------------------------------------------------------------------
+# install epm
+
+# set the repo and install epm
+ENV REPO $GOPATH/src/github.com/eris-ltd/eris-pm
+COPY . $REPO
+WORKDIR $REPO
+RUN cd ./cmd/epm && go build -o /usr/local/bin/epm
+
+#-----------------------------------------------------------------------------
+# cleanup
+
+RUN rm -rf $GOPATH/src/*
+
+#-----------------------------------------------------------------------------
+# root dir
+
+# persist data, set user
+VOLUME /home/$USER/.eris
+WORKDIR /home/$USER/.eris
+USER $USER
+ENTRYPOINT "epm"
