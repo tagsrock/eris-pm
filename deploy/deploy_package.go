@@ -6,7 +6,7 @@ import (
 )
 
 func Deploy(do *definitions.Do) error {
-	// check if Do struct has Package added. If not then load.
+	// check if Do struct has Package added (via possible marshalling from Tests). If not then load.
 	if do.Package == nil {
 		var err error
 
@@ -17,6 +17,7 @@ func Deploy(do *definitions.Do) error {
 	}
 
 	// run jobs
+
 
 	return nil
 }

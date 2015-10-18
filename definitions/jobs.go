@@ -14,14 +14,6 @@ type Deploy struct {
 	// TODO
 }
 
-type Include struct {
-	// TODO
-}
-
-type ModifyDeploy struct {
-	// TODO
-}
-
 type PackageDeploy struct {
 	// TODO
 }

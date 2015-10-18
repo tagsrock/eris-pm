@@ -10,8 +10,6 @@ type Package struct {
 	// Contract compile and send to the chain functions
 	// @dennismckinnon working on these
 	Deploy         *Deploy        `mapstructure:"deploy" json:"deploy" yaml:"deploy" toml:"deploy"`
-	Include        *Include       `mapstructure:"include" json:"include" yaml:"include" toml:"include"`
-	ModifyDeploy   *ModifyDeploy  `mapstructure:"modify-deploy" json:"modify-deploy" yaml:"modify-deploy" toml:"modify-deploy"`
 	PackageDeploy  *PackageDeploy `mapstructure:"package-deploy" json:"package-deploy" yaml:"package-deploy" toml:"package-deploy"`
 
 	// Wrapper for mintx
