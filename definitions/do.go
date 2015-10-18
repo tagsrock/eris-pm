@@ -10,7 +10,8 @@ type Do struct {
 	Compiler      string   `mapstructure:"," json:"," yaml:"," toml:","`
 	DefaultGas    uint     `mapstructure:"," json:"," yaml:"," toml:","`
 
-	Result string
+	Package *Package
+	Result  string
 }
 
 func NowDo() *Do {

@@ -32,3 +32,7 @@ type Package struct {
 	GetNameEntry   *GetNameEntry  `mapstructure:"query-name" json:"query-name" yaml:"query-name" toml:"query-name"`
 	Assert         *Assert        `mapstructure:"assert" json:"assert" yaml:"assert" toml:"assert"`
 }
+
+func BlankPackage() *Package {
+	return &Package{}
+}

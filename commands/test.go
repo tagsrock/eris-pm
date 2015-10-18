@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/eris-ltd/eris-pm/test"
+	"github.com/eris-ltd/eris-pm/deploy"
 
 	. "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
@@ -28,5 +28,5 @@ func addTestFlags() {}
 
 //----------------------------------------------------
 func TestPackage(cmd *cobra.Command, args []string) {
-	IfExit(test.Test(do))
+	IfExit(deploy.Test(do))
 }

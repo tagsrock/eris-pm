@@ -1,7 +1,6 @@
 package commands
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/eris-ltd/eris-pm/version"
@@ -66,20 +65,4 @@ func AddGlobalFlags() {
 	EPMCmd.PersistentFlags().UintVarP(&do.DefaultGas, "gas", "g", 1111111111, "default gas to use; can be overridden for a single job")
 	EPMCmd.PersistentFlags().BoolVarP(&do.Verbose, "verbose", "v", false, "verbose output")
 	EPMCmd.PersistentFlags().BoolVarP(&do.Debug, "debug", "d", false, "debug level output")
-}
-
-func ArgCheck(num int, comp string, cmd *cobra.Command, args []string) error {
-	switch comp {
-	case "eq":
-		if len(args) != num {
-			cmd.Help()
-			return fmt.Errorf("\n**Note** you sent our marmots the wrong number of arguments.\nPlease send the marmots %d arguments only.", num)
-		}
-	case "ge":
-		if len(args) < num {
-			cmd.Help()
-			return fmt.Errorf("\n**Note** you sent our marmots the wrong number of arguments.\nPlease send the marmots at least %d argument(s).", num)
-		}
-	}
-	return nil
 }
