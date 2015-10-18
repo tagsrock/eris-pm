@@ -66,7 +66,7 @@ var (
 
 	rpcHostFlag = cli.StringFlag{
 		Name:  "host",
-		Value: "localhost",
+		Value: "chain",
 		Usage: "set the rpc host",
 	}
 
@@ -91,7 +91,7 @@ var (
 	signHostFlag = cli.StringFlag{
 		Name:  "sign_host",
 		Usage: "set the host for the eris-keys server",
-		Value: "localhost",
+		Value: "keys",
 	}
 
 	pubkeyFlag = cli.StringFlag{
