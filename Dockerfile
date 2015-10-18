@@ -15,8 +15,8 @@ RUN apt-get update && \
 # set the repo and install epm
 ENV REPO $GOPATH/src/github.com/eris-ltd/eris-pm
 COPY . $REPO
-WORKDIR $REPO
-RUN cd ./cmd/epm && go build -o /usr/local/bin/epm
+WORKDIR $REPO/cmd/epm
+RUN go build -o /usr/local/bin/epm
 
 #-----------------------------------------------------------------------------
 # cleanup
