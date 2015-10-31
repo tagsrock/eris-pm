@@ -9,6 +9,10 @@ jobs:
     set:
       val: 1234
 
+- name: receipient
+  job:
+    set:
+      val: 58FD1799AA32DED3F6EAC096A1DC77834A446B9C
 
 - name: sendTxTest1
   job:
@@ -20,5 +24,5 @@ jobs:
 - name: sendTxTest2
   job:
     send:
-      destination: 6A3AFFB16BFB95AA547930572D71C460EFBCD857
+      destination: $receipient
       amount: $val1

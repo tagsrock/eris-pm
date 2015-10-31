@@ -16,6 +16,7 @@ import (
 func SendJob(send *definitions.Send, do *definitions.Do) (string, error) {
 	var result string
 
+	// TODO: unfuckify this
 	send.Source = txPreProcess(send.Source, do.Package)
 	send.Destination = txPreProcess(send.Destination, do.Package)
 	send.Amount = txPreProcess(send.Amount, do.Package)
@@ -30,6 +31,7 @@ func SendJob(send *definitions.Send, do *definitions.Do) (string, error) {
 		return "", err
 	}
 
+	// TODO: DRY these
 	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, send.Wait)
 	if err != nil {
 		logger.Errorf("ERROR =>\t\t\t%v\n", err)
@@ -108,6 +110,7 @@ func RegisterNameJob(name *definitions.RegisterName, do *definitions.Do) (string
 func registerNameTx(name *definitions.RegisterName, do *definitions.Do) (string, error) {
 	var result string
 
+	// TODO: unfuckify this
 	name.Source = txPreProcess(name.Source, do.Package)
 	name.Name = txPreProcess(name.Name, do.Package)
 	name.Data = txPreProcess(name.Data, do.Package)
@@ -115,6 +118,8 @@ func registerNameTx(name *definitions.RegisterName, do *definitions.Do) (string,
 	name.Fee = txPreProcess(name.Fee, do.Package)
 
 	name.Source = useDefault(name.Source, do.Package.Account)
+	name.Fee = useDefault(name.Fee, "1234")       // TODO: less hackify this.
+	name.Amount = useDefault(name.Amount, "9999") // TODO: less hackify this.
 
 	logger.Infof("NameReg Transaction =>\t\t%s:%s\n", name.Name, name.Data)
 
@@ -124,6 +129,7 @@ func registerNameTx(name *definitions.RegisterName, do *definitions.Do) (string,
 		return "", err
 	}
 
+	// TODO: DRY these
 	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, name.Wait)
 	if err != nil {
 		logger.Errorf("ERROR =>\t\t\t%v\n", err)
@@ -139,24 +145,10 @@ func registerNameTx(name *definitions.RegisterName, do *definitions.Do) (string,
 	return result, nil
 }
 
-func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
-	var result string
-
-	logger.Infof("Calling =>\t\t\t%s:%v", call.Destination, call.Data)
-	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, call.Source, call.Destination, call.Amount, call.Nonce, call.Gas, call.Gas, call.Data)
-	if err != nil {
-		return "", err
-	}
-
-	if err := util.UnpackSignAndBroadcast(core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, call.Wait)); err != nil {
-		return "", err
-	}
-	return result, nil
-}
-
 func PermissionJob(perm *definitions.Permission, do *definitions.Do) (string, error) {
 	var result string
 
+	// TODO: unfuckify this
 	perm.Source = txPreProcess(perm.Source, do.Package)
 	perm.Action = txPreProcess(perm.Action, do.Package)
 	perm.PermissionFlag = txPreProcess(perm.PermissionFlag, do.Package)
@@ -186,6 +178,7 @@ func PermissionJob(perm *definitions.Permission, do *definitions.Do) (string, er
 		return "", err
 	}
 
+	// TODO: DRY these
 	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, perm.Wait)
 	if err != nil {
 		logger.Errorf("ERROR =>\t\t\t%v\n", err)
@@ -204,21 +197,38 @@ func PermissionJob(perm *definitions.Permission, do *definitions.Do) (string, er
 func BondJob(bond *definitions.Bond, do *definitions.Do) (string, error) {
 	var result string
 
+	// TODO: unfuckify this
+	bond.UnbondAccount = txPreProcess(bond.UnbondAccount, do.Package)
+	bond.Amount = txPreProcess(bond.Amount, do.Package)
+
 	logger.Infof("Bond Transaction =>\t\t%s:%s", bond.UnbondAccount, bond.Amount)
 	tx, err := core.Bond(do.Chain, do.Signer, do.PublicKey, bond.UnbondAccount, bond.Amount, bond.Nonce)
 	if err != nil {
 		return "", err
 	}
 
-	logger.Debugf("Bond Transaction Sent =>\t\t%v\n", tx)
-	if err := util.UnpackSignAndBroadcast(core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, bond.Wait)); err != nil {
+	// TODO: DRY these
+	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, bond.Wait)
+	if err != nil {
+		logger.Errorf("ERROR =>\t\t\t%v\n", err)
 		return "", err
 	}
+
+	if err := util.UnpackSignAndBroadcast(res, err); err != nil {
+		logger.Errorf("ERROR =>\t\t\t%v\n", err)
+		return "", err
+	}
+
+	result = fmt.Sprintf("%X", res.Hash)
 	return result, nil
 }
 
 func UnbondJob(unbond *definitions.Unbond, do *definitions.Do) (string, error) {
 	var result string
+
+	// TODO: unfuckify this
+	unbond.Account = txPreProcess(unbond.Account, do.Package)
+	unbond.Height = txPreProcess(unbond.Height, do.Package)
 
 	logger.Infof("Unbond Transaction =>\t\t%s:%s", unbond.Account, unbond.Height)
 	tx, err := core.Unbond(unbond.Account, unbond.Height)
@@ -226,15 +236,28 @@ func UnbondJob(unbond *definitions.Unbond, do *definitions.Do) (string, error) {
 		return "", err
 	}
 
-	logger.Debugf("Unbond Transaction Sent =>\t\t%v\n", tx)
-	if err := util.UnpackSignAndBroadcast(core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, unbond.Wait)); err != nil {
+	// TODO: DRY these
+	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, unbond.Wait)
+	if err != nil {
+		logger.Errorf("ERROR =>\t\t\t%v\n", err)
 		return "", err
 	}
+
+	if err := util.UnpackSignAndBroadcast(res, err); err != nil {
+		logger.Errorf("ERROR =>\t\t\t%v\n", err)
+		return "", err
+	}
+
+	result = fmt.Sprintf("%X", res.Hash)
 	return result, nil
 }
 
 func RebondJob(rebond *definitions.Rebond, do *definitions.Do) (string, error) {
 	var result string
+
+	// TODO: unfuckify this
+	rebond.Account = txPreProcess(rebond.Account, do.Package)
+	rebond.Height = txPreProcess(rebond.Height, do.Package)
 
 	logger.Infof("Rebond Transaction =>\t\t%s:%s", rebond.Account, rebond.Height)
 	tx, err := core.Rebond(rebond.Account, rebond.Height)
@@ -242,10 +265,19 @@ func RebondJob(rebond *definitions.Rebond, do *definitions.Do) (string, error) {
 		return "", err
 	}
 
-	logger.Debugf("Rebond Transaction Sent =>\t\t%v\n", tx)
-	if err := util.UnpackSignAndBroadcast(core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, rebond.Wait)); err != nil {
+	// TODO: DRY these
+	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, rebond.Wait)
+	if err != nil {
+		logger.Errorf("ERROR =>\t\t\t%v\n", err)
 		return "", err
 	}
+
+	if err := util.UnpackSignAndBroadcast(res, err); err != nil {
+		logger.Errorf("ERROR =>\t\t\t%v\n", err)
+		return "", err
+	}
+
+	result = fmt.Sprintf("%X", res.Hash)
 	return result, nil
 }
 

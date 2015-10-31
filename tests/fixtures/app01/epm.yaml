@@ -18,7 +18,7 @@ jobs:
 - name: blocks_to_save
   job:
     set:
-      val: 9999
+      val: 5000
 
 - name: MinersFee
   job:
@@ -37,8 +37,5 @@ jobs:
 - name: nameRegTest2
   job:
     register:
-      source: $account
       name: marmots
       data: love_eris
-      amount: $blocks_to_save
-      fee: $MinersFee
