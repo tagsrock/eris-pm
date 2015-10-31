@@ -1,0 +1,24 @@
+jobs:
+- name: account1
+  job:
+    account:
+      address: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
+
+- name: val1
+  job:
+    set:
+      val: 1234
+
+
+- name: sendTxTest1
+  job:
+    send:
+      source: $account1
+      destination: 6A3AFFB16BFB95AA547930572D71C460EFBCD857
+      amount: $val1
+
+- name: sendTxTest2
+  job:
+    send:
+      destination: 6A3AFFB16BFB95AA547930572D71C460EFBCD857
+      amount: $val1

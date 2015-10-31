@@ -1,12 +1,10 @@
 package definitions
 
 type Account struct {
-	Name    string `mapstructure:"name" json:"name" yaml:"name" toml:"name"`
 	Address string `mapstructure:"address" json:"address" yaml:"address" toml:"address"`
 }
 
 type Set struct {
-	Key   string `mapstructure:"key" json:"key" yaml:"key" toml:"key"`
 	Value string `mapstructure:"val" json:"val" yaml:"val" toml:"val"`
 }
 
@@ -21,47 +19,62 @@ type PackageDeploy struct {
 type Send struct {
 	Source      string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
 	Destination string `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
-	Amount      uint   `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
+	Amount      string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
+	Nonce       string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
 	Wait        bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
-type Bond struct {
-	Account     string `mapstructure:"account" json:"account" yaml:"account" toml:"account"`
-	Amount      uint   `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
+type RegisterName struct {
+	Source   string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	Name     string `mapstructure:"name" json:"name" yaml:"name" toml:"name"`
+	Data     string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+	DataFile string `mapstructure:"data_file" json:"data_file" yaml:"data_file" toml:"data_file"`
+	Amount   string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
+	Nonce    string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
+	Fee      string `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
+	Wait     bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+}
+
+type Call struct {
+	Source      string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
 	Destination string `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
+	Data        string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+	Amount      string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
+	Nonce       string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
+	Fee         string `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
+	Gas         string `mapstructure:"gas" json:"gas" yaml:"gas" toml:"gas"`
+	Wait        bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+}
+
+// Action: "set_base", "unset_base", "set_global", "add_role" "rm_role"
+type Permission struct {
+	Source         string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	Nonce          string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
+	Action         string `mapstructure:"action" json:"action" yaml:"action" toml:"action"`
+	Target         string `mapstructure:"target" json:"target" yaml:"target" toml:"target"`
+	PermissionFlag string `mapstructure:"permission" json:"permission" yaml:"permission" toml:"permission"`
+	Value          string `mapstructure:"value" json:"value" yaml:"value" toml:"value"`
+	Role           string `mapstructure:"role" json:"role" yaml:"role" toml:"role"`
+	Wait           bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+}
+
+type Bond struct {
+	UnbondAccount string `mapstructure:"account" json:"account" yaml:"account" toml:"account"`
+	Amount        string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
+	Nonce         string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
+	Wait          bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
 type Unbond struct {
 	Account string `mapstructure:"account" json:"account" yaml:"account" toml:"account"`
-	Height  uint   `mapstructure:"height" json:"height" yaml:"height" toml:"height"`
+	Height  string `mapstructure:"height" json:"height" yaml:"height" toml:"height"`
+	Wait    bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
 type Rebond struct {
 	Account string `mapstructure:"account" json:"account" yaml:"account" toml:"account"`
-	Height  uint   `mapstructure:"height" json:"height" yaml:"height" toml:"height"`
-}
-
-type RegisterName struct {
-	Source string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
-	Name 	 string `mapstructure:"name" json:"name" yaml:"name" toml:"name"`
-	Data   string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
-	Amount uint   `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
-	Fee    uint   `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
-	Wait   bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
-}
-
-type Call struct {
-	Source      string   `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
-	Destination string   `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
-	Data        []string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
-	Amount      uint     `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
-	Fee         uint     `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
-	Gas         uint     `mapstructure:"gas" json:"gas" yaml:"gas" toml:"gas"`
-	Wait        bool     `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
-}
-
-type Permission struct {
-	// todo
+	Height  string `mapstructure:"height" json:"height" yaml:"height" toml:"height"`
+	Wait    bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
 type DumpState struct {
@@ -79,16 +92,20 @@ type RestoreState struct {
 	FilePath string `mapstructure:"file" json:"file" yaml:"file" toml:"file"`
 }
 
+// aka. Simulated Call. Only exposed for testing
+type Query struct {
+	Source      string   `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	Destination string   `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
+	Data        []string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+}
+
+// Only exposed for testing
 type GetNameEntry struct {
 	Name string `mapstructure:"name" json:"name" yaml:"name" toml:"name"`
 	Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
 }
 
-type Query struct {
-	Account string `mapstructure:"account" json:"account" yaml:"account" toml:"account"`
-	Storage string `mapstructure:"storage" json:"storage" yaml:"storage" toml:"storage"` // this probably isnt right. HELP!
-}
-
+// Only exposed for testing
 type Assert struct {
 	Key      string `mapstructure:"key" json:"key" yaml:"key" toml:"key"`
 	Relation string `mapstructure:"relation" json:"relation" yaml:"relation" toml:"relation"`

@@ -1,0 +1,40 @@
+
+{
+  "chain_id": "my_tests",
+  "accounts": [
+    {
+      "address": "1040E6521541DAB4E7EE57F21226DD17CE9F0FB7",
+      "amount": 999999999999,
+      "permissions": {
+        "base": {
+          "perms": 16383,
+          "set": 16383
+        },
+        "roles": []
+			}
+    },
+    {
+      "address": "6A3AFFB16BFB95AA547930572D71C460EFBCD857",
+      "amount": 110000000000
+    },
+    {
+      "address": "58FD1799AA32DED3F6EAC096A1DC77834A446B9C",
+      "amount": 110000000000
+    }
+  ],
+  "validators": [
+    {
+      "pub_key": [
+        1,
+        "82DADAE153406412833F8098439ED4B5DCC26C0B43C2775EFFE8B911B49D0182"
+      ],
+      "amount": 5000000000,
+      "unbond_to": [
+        {
+          "address": "1040E6521541DAB4E7EE57F21226DD17CE9F0FB7",
+          "amount": 5000000000
+        }
+      ]
+    }
+  ]
+}

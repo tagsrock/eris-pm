@@ -27,7 +27,8 @@ RUN rm -rf $GOPATH/src/*
 # root dir
 
 # persist data, set user
+RUN chown --recursive $USER:$USER /home/$USER
 VOLUME /home/$USER/.eris
 WORKDIR /home/$USER/.eris
 USER $USER
-ENTRYPOINT "epm"
+ENTRYPOINT ["epm"]
