@@ -34,7 +34,7 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/mint-client/mintx/core",
-			"Rev": "63ff914a395da0f2c204fa9baaa307870c2570d8"
+			"Rev": "ea030b0805b8caf0c6913d7104253f1d92884563"
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",

@@ -107,7 +107,7 @@ var PermsFuncs = []PermFunc{
 }
 
 func Permissions(nodeAddr, signAddr, pubkey, addrS, nonceS, permFunc string, argsS []string) (*types.PermissionsTx, error) {
-	pub, _, nonce, err := checkCommon(nodeAddr, signAddr, pubkey, addrS, "0", "0")
+	pub, _, nonce, err := checkCommon(nodeAddr, signAddr, pubkey, addrS, "0", nonceS)
 	if err != nil {
 		return nil, err
 	}

@@ -5,54 +5,26 @@ jobs:
     account:
       address: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
 
-- name: account_tgt
-  job:
-    set:
-      val: 58FD1799AA32DED3F6EAC096A1DC77834A446B9C
-
-- name: perm
-  job:
-    set:
-      val: call
-
-- name: role
+- name: MinersFee
   job:
     set:
       val: 1234
 
-- name: permTest1
+- name: to_save
   job:
-    permission:
+    set:
+      val: 5000
+
+- name: nameRegTestDataFile1
+  job:
+    register:
       source: $account
-      action: set_base
-      target: $account_tgt
-      permission: $perm
-      value: "true"
+      data_file: names1.csv
+      amount: $to_save
+      fee: $MinersFee
 
-- name: permTest2
+- name: nameRegTestDataFile2
   job:
-    permission:
-      action: unset_base
-      target: $account_tgt
-      permission: $perm
-
-- name: permTest3
-  job:
-    permission:
-      action: add_role
-      target: $account_tgt
-      role: $role
-
-- name: permTest4
-  job:
-    permission:
-      action: rm_role
-      target: $account_tgt
-      role: $role
-
-- name: permTest5
-  job:
-    permission:
-      action: set_global
-      permission: call
-      value: "true"
+    register:
+      data_file: ./names2.csv
+      fee: $MinersFee

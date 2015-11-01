@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/eris-ltd/eris-pm/commands"
+	"github.com/eris-ltd/eris-pm/cmd"
 
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
 )

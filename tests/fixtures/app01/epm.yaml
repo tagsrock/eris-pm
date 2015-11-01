@@ -15,7 +15,7 @@ jobs:
     set:
       val: "marmots"
 
-- name: blocks_to_save
+- name: to_save
   job:
     set:
       val: 5000
@@ -31,7 +31,7 @@ jobs:
       source: $account
       name: $val1
       data: $val2
-      amount: $blocks_to_save
+      amount: $to_save
       fee: $MinersFee
 
 - name: nameRegTest2

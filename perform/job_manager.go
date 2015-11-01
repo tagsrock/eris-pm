@@ -10,27 +10,20 @@ func RunDeployJobs(do *definitions.Do) error {
 		logger.Printf("Executing Job Named =>\t\t%s\n", job.JobName)
 		var err error
 		switch {
+		// Util jobs
 		case job.Job.Account != nil:
 			logger.Infof("\tType =>\t\t\tAccount\n")
 			job.JobResult, err = SetAccountJob(job.Job.Account, do)
 		case job.Job.Set != nil:
 			logger.Infof("\tType =>\t\t\tSet\n")
 			job.JobResult, err = SetValJob(job.Job.Set, do)
-		case job.Job.Deploy != nil:
-			logger.Infof("\tType =>\t\t\tDeploy\n")
-			job.JobResult, err = DeployJob(job.Job.Deploy, do)
-		case job.Job.PackageDeploy != nil:
-			logger.Infof("\tType =>\t\t\tPackageDeploy\n")
-			job.JobResult, err = PackageDeployJob(job.Job.PackageDeploy, do)
+		// Transaction jobs
 		case job.Job.Send != nil:
 			logger.Infof("\tType =>\t\t\tSend\n")
 			job.JobResult, err = SendJob(job.Job.Send, do)
 		case job.Job.RegisterName != nil:
 			logger.Infof("\tType =>\t\t\tRegisterName\n")
 			job.JobResult, err = RegisterNameJob(job.Job.RegisterName, do)
-		case job.Job.Call != nil:
-			logger.Infof("\tType =>\t\t\tCall\n")
-			job.JobResult, err = CallJob(job.Job.Call, do)
 		case job.Job.Permission != nil:
 			logger.Infof("\tType =>\t\t\tPermission\n")
 			job.JobResult, err = PermissionJob(job.Job.Permission, do)
@@ -43,6 +36,17 @@ func RunDeployJobs(do *definitions.Do) error {
 		case job.Job.Rebond != nil:
 			logger.Infof("\tType =>\t\t\tRebond\n")
 			job.JobResult, err = RebondJob(job.Job.Rebond, do)
+		// Contracts jobs
+		case job.Job.Deploy != nil:
+			logger.Infof("\tType =>\t\t\tDeploy\n")
+			job.JobResult, err = DeployJob(job.Job.Deploy, do)
+		case job.Job.PackageDeploy != nil:
+			logger.Infof("\tType =>\t\t\tPackageDeploy\n")
+			job.JobResult, err = PackageDeployJob(job.Job.PackageDeploy, do)
+		case job.Job.Call != nil:
+			logger.Infof("\tType =>\t\t\tCall\n")
+			job.JobResult, err = CallJob(job.Job.Call, do)
+		// State jobs
 		case job.Job.RestoreState != nil:
 			logger.Infof("\tType =>\t\t\tRestoreState\n")
 			job.JobResult, err = RestoreStateJob(job.Job.RestoreState, do)
@@ -83,9 +87,9 @@ func RunTestJobs(do *definitions.Do) error {
 			return err
 		}
 
-		// if err = util.WriteJobResult(job.JobName, job.JobResult); err != nil {
-		// 	return err
-		// }
+		if err = util.WriteJobResult(job.JobName, job.JobResult); err != nil {
+			return err
+		}
 	}
 
 	return nil
