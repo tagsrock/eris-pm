@@ -36,6 +36,9 @@ Complete documentation is available at https://docs.erisindustries.com
 		log.SetLoggers(logLevel, os.Stdout, os.Stderr) // TODO: make this better....
 
 		util.ClearJobResults()
+
+		// TODO: get chainid from node endpoint
+		config.Set("chain_id", do.ChainID)
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		log.Flush()

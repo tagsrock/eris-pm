@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/eris-ltd/eris-pm",
-	"GoVersion": "go1.5",
+	"GoVersion": "go1.4.2",
 	"Packages": [
 		"./..."
 	],
@@ -34,6 +34,10 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/mint-client/mintx/core",
+			"Rev": "ea030b0805b8caf0c6913d7104253f1d92884563"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/mint-client/utils",
 			"Rev": "ea030b0805b8caf0c6913d7104253f1d92884563"
 		},
 		{
@@ -79,6 +83,14 @@
 		{
 			"ImportPath": "github.com/mitchellh/mapstructure",
 			"Rev": "542b39186cdb2013d4acdf713d5e11671c2fe934"
+		},
+		{
+			"ImportPath": "github.com/naoina/go-stringutil",
+			"Rev": "360db0db4b01d34e12a2ec042c09e7d37fece761"
+		},
+		{
+			"ImportPath": "github.com/naoina/toml",
+			"Rev": "5667c316ee9576e9d5bca793ce4ec813a88ce7d3"
 		},
 		{
 			"ImportPath": "github.com/russross/blackfriday",

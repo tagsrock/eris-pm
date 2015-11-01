@@ -3,7 +3,7 @@
 package tendermint_test
 
 import (
-	"github.com/naoina/toml"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/naoina/toml"
 	"os"
 	"path"
 	"strings"
