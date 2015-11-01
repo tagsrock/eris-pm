@@ -77,7 +77,7 @@ echo "Getting Setup"
 if [ "$circle" = true ]
 then
   export ERIS_PULL_APPROVE="true"
-  eris init
+  eris init --yes --skip-pull
 fi
 
 is_it_running keys
