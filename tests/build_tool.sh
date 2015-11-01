@@ -35,16 +35,11 @@ release_maj=$(echo $release_min | cut -d . -f 1-2)
 # ---------------------------------------------------------------------------
 # Go!
 
-start=`pwd`
-cd $repo
-
 if [[ "$branch" = "master" ]]
 then
-  docker build -t $testimage:latest .
+  docker build -t $testimage:latest $repo
   docker tag -f $testimage:latest $testimage:$release_maj
   docker tag -f $testimage:latest $testimage:$release_min
 else
-  docker build -t $testimage:$branch .
+  docker build -t $testimage:$branch $repo
 fi
-
-cd $start

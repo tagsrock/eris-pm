@@ -2,7 +2,6 @@ package commands
 
 import (
 	"github.com/eris-ltd/eris-pm/packages"
-	// "github.com/eris-ltd/eris-pm/util"
 
 	. "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"

@@ -1,13 +1,15 @@
 package util
 
 import (
+	"github.com/eris-ltd/eris-pm/definitions"
+
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
 	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core_client"
 )
 
-func ChainStatus(nodeAddr, field string) (string, error) {
+func ChainStatus(field string, do *definitions.Do) (string, error) {
 	var client cclient.Client
-	client = cclient.NewClient(nodeAddr, "HTTP")
+	client = cclient.NewClient(do.Chain, "HTTP")
 
 	r, err := client.Status()
 	if err != nil {

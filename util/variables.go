@@ -36,7 +36,7 @@ func PreProcess(toProcess string, do *definitions.Do) (string, error) {
 }
 
 func replaceBlockVariable(toReplace string, do *definitions.Do) (string, error) {
-	block, err := ChainStatus(do.Chain, "latest_block_height")
+	block, err := ChainStatus("latest_block_height", do)
 	if err != nil {
 		return "", err
 	}

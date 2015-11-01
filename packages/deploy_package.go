@@ -7,9 +7,10 @@ import (
 )
 
 func Deploy(do *definitions.Do) error {
-	// check if Do struct has Package added (via possible marshalling from Tests). If not then load.
+	var err error
+
+	// Load the package if it doesn't exist (as will happen with testing)
 	if do.Package == nil {
-		var err error
 		do.Package, err = LoadPackage(do.YAMLPath)
 		if err != nil {
 			return err
@@ -18,7 +19,5 @@ func Deploy(do *definitions.Do) error {
 		util.PrintPathPackage(do)
 	}
 
-	perform.RunDeployJobs(do)
-
-	return nil
+	return perform.RunDeployJobs(do)
 }

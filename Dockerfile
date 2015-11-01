@@ -14,14 +14,11 @@ RUN apt-get update && \
 
 # set the repo and install epm
 ENV REPO $GOPATH/src/github.com/eris-ltd/eris-pm
+COPY tests/test_tool.sh /home/$USER/test_tool.sh
 COPY . $REPO
 WORKDIR $REPO/cmd/epm
 RUN go build -o /usr/local/bin/epm
-
-#-----------------------------------------------------------------------------
-# cleanup
-
-RUN rm -rf $GOPATH/src/*
+RUN chown --recursive $USER:$USER $REPO
 
 #-----------------------------------------------------------------------------
 # root dir

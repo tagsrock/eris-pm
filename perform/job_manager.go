@@ -62,6 +62,8 @@ func RunDeployJobs(do *definitions.Do) error {
 		if err = util.WriteJobResult(job.JobName, job.JobResult); err != nil {
 			return err
 		}
+
+		logger.Infoln("Job Completed")
 	}
 
 	return nil
