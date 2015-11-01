@@ -47,9 +47,9 @@ do
   cd $app
   if [[ "$1" == "local" ]]
   then
-    epm deploy -s localhost:4767 -c localhost:46657 -i testChain
+    epm test -s localhost:4767 -c localhost:46657 -i testChain
   else
-    epm deploy -i $CHAINID
+    epm test -i $CHAINID
   fi
 
   # Set exit code properly

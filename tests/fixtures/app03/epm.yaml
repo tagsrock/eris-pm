@@ -56,3 +56,29 @@ jobs:
       action: set_global
       permission: call
       value: "true"
+
+- name: queryPerm1
+  job:
+    query-account:
+      account: $account_tgt
+      field: permissions.roles
+
+- name: assertPerm1
+  job:
+    assert:
+      key: $queryPerm1
+      relation: eq
+      val: ""
+
+- name: queryPerm2
+  job:
+    query-account:
+      account: $account_tgt
+      field: permissions.base
+
+- name: assertPerm2
+  job:
+    assert:
+      key: $queryPerm2
+      relation: eq
+      val: "4"

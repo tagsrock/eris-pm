@@ -39,3 +39,29 @@ jobs:
     register:
       name: marmots
       data: love_eris
+
+- name: queryReg1
+  job:
+    query-name:
+      name: $val1
+      field: data
+
+- name: nameRegAssert1
+  job:
+    assert:
+      key: $queryReg1
+      relation: eq
+      val: $val2
+
+- name: queryReg2
+  job:
+    query-name:
+      name: marmots
+      field: data
+
+- name: nameRegAssert1
+  job:
+    assert:
+      key: $queryReg2
+      relation: eq
+      val: love_eris

@@ -51,3 +51,27 @@ jobs:
     rebond:
       account: $bond_account
       height: $block+2
+
+- name: queryBonded
+  job:
+    query-vals:
+      field: bonded_validators
+
+- name: queryUnbonding
+  job:
+    query-vals:
+      field: unbonding_validators
+
+- name: assertBonded
+  job:
+    assert:
+      key: "1040E6521541DAB4E7EE57F21226DD17CE9F0FB7,58FD1799AA32DED3F6EAC096A1DC77834A446B9C"
+      relation: eq
+      val: $queryBonded
+
+- name: assertUnbonded
+  job:
+    assert:
+      key: ""
+      relation: eq
+      val: $queryUnbonding

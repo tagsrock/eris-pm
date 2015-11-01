@@ -114,16 +114,27 @@ type RestoreState struct {
 // ------------------------------------------------------------------------
 
 // aka. Simulated Call. Only exposed for testing
-type Query struct {
+type QueryContract struct {
 	Source      string   `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
 	Destination string   `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
 	Data        []string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
 }
 
 // Only exposed for testing
-type GetNameEntry struct {
-	Name string `mapstructure:"name" json:"name" yaml:"name" toml:"name"`
-	Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+type QueryAccount struct {
+	Account string `mapstructure:"account" json:"account" yaml:"account" toml:"account"`
+	Field   string `mapstructure:"field" json:"field" yaml:"field" toml:"field"`
+}
+
+// Only exposed for testing
+type QueryName struct {
+	Name  string `mapstructure:"name" json:"name" yaml:"name" toml:"name"`
+	Field string `mapstructure:"field" json:"field" yaml:"field" toml:"field"`
+}
+
+// Only exposed for testing
+type QueryVals struct {
+	Field string `mapstructure:"field" json:"field" yaml:"field" toml:"field"`
 }
 
 // Only exposed for testing

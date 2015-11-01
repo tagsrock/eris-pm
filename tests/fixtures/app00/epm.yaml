@@ -12,13 +12,13 @@ jobs:
 - name: receipient
   job:
     set:
-      val: 58FD1799AA32DED3F6EAC096A1DC77834A446B9C
+      val: 6A3AFFB16BFB95AA547930572D71C460EFBCD857
 
 - name: sendTxTest1
   job:
     send:
       source: $account1
-      destination: 6A3AFFB16BFB95AA547930572D71C460EFBCD857
+      destination: 58FD1799AA32DED3F6EAC096A1DC77834A446B9C
       amount: $val1
 
 - name: sendTxTest2
@@ -26,3 +26,29 @@ jobs:
     send:
       destination: $receipient
       amount: $val1
+
+- name: sendTxQuery1
+  job:
+    query-account:
+      account: $receipient
+      field: balance
+
+- name: sendTxQuery2
+  job:
+    query-account:
+      account: 58FD1799AA32DED3F6EAC096A1DC77834A446B9C
+      field: balance
+
+- name: sendTxAssert1
+  job:
+    assert:
+      key: $sendTxQuery1
+      relation: eq
+      val: 110000001234
+
+- name: sendTxAssert2
+  job:
+    assert:
+      key: $sendTxQuery2
+      relation: eq
+      val: 110000001234

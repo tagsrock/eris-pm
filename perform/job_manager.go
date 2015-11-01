@@ -7,51 +7,54 @@ import (
 
 func RunDeployJobs(do *definitions.Do) error {
 	for _, job := range do.Package.Jobs {
-		logger.Printf("Executing Job Named =>\t\t%s\n", job.JobName)
 		var err error
 		switch {
+
 		// Util jobs
 		case job.Job.Account != nil:
-			logger.Infof("\tType =>\t\t\tAccount\n")
+			announce(job.JobName, "Account")
 			job.JobResult, err = SetAccountJob(job.Job.Account, do)
 		case job.Job.Set != nil:
-			logger.Infof("\tType =>\t\t\tSet\n")
+			announce(job.JobName, "Set")
 			job.JobResult, err = SetValJob(job.Job.Set, do)
+
 		// Transaction jobs
 		case job.Job.Send != nil:
-			logger.Infof("\tType =>\t\t\tSend\n")
+			announce(job.JobName, "Sent")
 			job.JobResult, err = SendJob(job.Job.Send, do)
 		case job.Job.RegisterName != nil:
-			logger.Infof("\tType =>\t\t\tRegisterName\n")
+			announce(job.JobName, "RegisterName")
 			job.JobResult, err = RegisterNameJob(job.Job.RegisterName, do)
 		case job.Job.Permission != nil:
-			logger.Infof("\tType =>\t\t\tPermission\n")
+			announce(job.JobName, "Permission")
 			job.JobResult, err = PermissionJob(job.Job.Permission, do)
 		case job.Job.Bond != nil:
-			logger.Infof("\tType =>\t\t\tBond\n")
+			announce(job.JobName, "Bond")
 			job.JobResult, err = BondJob(job.Job.Bond, do)
 		case job.Job.Unbond != nil:
-			logger.Infof("\tType =>\t\t\tUnbond\n")
+			announce(job.JobName, "Unbond")
 			job.JobResult, err = UnbondJob(job.Job.Unbond, do)
 		case job.Job.Rebond != nil:
-			logger.Infof("\tType =>\t\t\tRebond\n")
+			announce(job.JobName, "Rebond")
 			job.JobResult, err = RebondJob(job.Job.Rebond, do)
+
 		// Contracts jobs
 		case job.Job.Deploy != nil:
-			logger.Infof("\tType =>\t\t\tDeploy\n")
+			announce(job.JobName, "Deploy")
 			job.JobResult, err = DeployJob(job.Job.Deploy, do)
 		case job.Job.PackageDeploy != nil:
-			logger.Infof("\tType =>\t\t\tPackageDeploy\n")
+			announce(job.JobName, "PackageDeploy")
 			job.JobResult, err = PackageDeployJob(job.Job.PackageDeploy, do)
 		case job.Job.Call != nil:
-			logger.Infof("\tType =>\t\t\tCall\n")
+			announce(job.JobName, "Call")
 			job.JobResult, err = CallJob(job.Job.Call, do)
+
 		// State jobs
 		case job.Job.RestoreState != nil:
-			logger.Infof("\tType =>\t\t\tRestoreState\n")
+			announce(job.JobName, "RestoreState")
 			job.JobResult, err = RestoreStateJob(job.Job.RestoreState, do)
 		case job.Job.DumpState != nil:
-			logger.Infof("\tType =>\t\t\tDumpState\n")
+			announce(job.JobName, "DumpState")
 			job.JobResult, err = DumpStateJob(job.Job.DumpState, do)
 		}
 
@@ -63,7 +66,7 @@ func RunDeployJobs(do *definitions.Do) error {
 			return err
 		}
 
-		logger.Infoln("Job Completed")
+		logger.Debugln("Job Completed")
 	}
 
 	return nil
@@ -71,18 +74,23 @@ func RunDeployJobs(do *definitions.Do) error {
 
 func RunTestJobs(do *definitions.Do) error {
 	for _, job := range do.Package.Jobs {
-		logger.Printf("Executing Job Named =>\t\t%s\n", job.JobName)
 		var err error
 		switch {
-		case job.Job.Query != nil:
-			logger.Infof("\tType =>\t\t\tQuery\n")
-			job.JobResult, err = QueryJob(job.Job.Query)
-		case job.Job.GetNameEntry != nil:
-			logger.Infof("\tType =>\t\t\tGetNameEntry\n")
-			job.JobResult, err = GetNameEntryJob(job.Job.GetNameEntry)
+		case job.Job.QueryAccount != nil:
+			announce(job.JobName, "QueryAccount")
+			job.JobResult, err = QueryAccountJob(job.Job.QueryAccount, do)
+		case job.Job.QueryContract != nil:
+			announce(job.JobName, "QueryContract")
+			job.JobResult, err = QueryContractJob(job.Job.QueryContract, do)
+		case job.Job.QueryName != nil:
+			announce(job.JobName, "QueryName")
+			job.JobResult, err = QueryNameJob(job.Job.QueryName, do)
+		case job.Job.QueryVals != nil:
+			announce(job.JobName, "QueryVals")
+			job.JobResult, err = QueryValsJob(job.Job.QueryVals, do)
 		case job.Job.Assert != nil:
-			logger.Infof("\tType =>\t\t\tAssert\n")
-			job.JobResult, err = AssertJob(job.Job.Assert)
+			announce(job.JobName, "Assert")
+			job.JobResult, err = AssertJob(job.Job.Assert, do)
 		}
 
 		if err != nil {
@@ -95,4 +103,9 @@ func RunTestJobs(do *definitions.Do) error {
 	}
 
 	return nil
+}
+
+func announce(job, typ string) {
+	logger.Printf("Executing Job Named =>\t\t%s\n", job)
+	logger.Infof("\tType =>\t\t\t%s\n", typ)
 }

@@ -37,9 +37,11 @@ type Job struct {
 	RestoreState *RestoreState `mapstructure:"restore-state" json:"restore-state" yaml:"restore-state" toml:"restore-state"`
 
 	// Used for Tests Only
-	Query        *Query        `mapstructure:"query" json:"query" yaml:"query" toml:"query"`
-	GetNameEntry *GetNameEntry `mapstructure:"query-name" json:"query-name" yaml:"query-name" toml:"query-name"`
-	Assert       *Assert       `mapstructure:"assert" json:"assert" yaml:"assert" toml:"assert"`
+	QueryContract *QueryContract `mapstructure:"query-contract" json:"query-contract" yaml:"query-contract" toml:"query-contract"`
+	QueryAccount  *QueryAccount  `mapstructure:"query-account" json:"query-account" yaml:"query-account" toml:"query-account"`
+	QueryName     *QueryName     `mapstructure:"query-name" json:"query-name" yaml:"query-name" toml:"query-name"`
+	QueryVals     *QueryVals     `mapstructure:"query-vals" json:"query-vals" yaml:"query-vals" toml:"query-vals"`
+	Assert        *Assert        `mapstructure:"assert" json:"assert" yaml:"assert" toml:"assert"`
 }
 
 func BlankPackage() *Package {
