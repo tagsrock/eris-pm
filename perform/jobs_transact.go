@@ -26,7 +26,7 @@ func SendJob(send *definitions.Send, do *definitions.Do) (string, error) {
 	logger.Infof("Sending Transaction =>\t\t%s:%s:%s\n", send.Source, send.Destination, send.Amount)
 	tx, err := core.Send(do.Chain, do.Signer, do.PublicKey, send.Source, send.Destination, send.Amount, send.Nonce)
 	if err != nil {
-		logger.Errorf("ERROR =>\t\t\t%v\n", err)
+		logger.Errorf("ERROR =>\n")
 		return "", err
 	}
 
@@ -46,7 +46,7 @@ func RegisterNameJob(name *definitions.RegisterName, do *definitions.Do) (string
 		// open the file and use a reader
 		fileReader, err := os.Open(name.DataFile)
 		if err != nil {
-			logger.Errorf("ERROR =>\t\t\t%v\n", err)
+			logger.Errorf("ERROR =>\n")
 			return "", err
 		}
 
@@ -63,7 +63,7 @@ func RegisterNameJob(name *definitions.RegisterName, do *definitions.Do) (string
 				break
 			}
 			if err != nil {
-				logger.Errorf("ERROR =>\t\t\t%v\n", err)
+				logger.Errorf("ERROR =>\n")
 				return "", err
 			}
 
@@ -86,13 +86,13 @@ func RegisterNameJob(name *definitions.RegisterName, do *definitions.Do) (string
 			}, do)
 
 			if err != nil {
-				logger.Errorf("ERROR =>\t\t\t%v\n", err)
+				logger.Errorf("ERROR =>\n")
 				return "", err
 			}
 
 			n := fmt.Sprintf("%s:%s", record[0], record[1])
 			if err = util.WriteJobResult(n, r); err != nil {
-				logger.Errorf("ERROR =>\t\t\t%v\n", err)
+				logger.Errorf("ERROR =>\n")
 				return "", err
 			}
 		}
@@ -125,7 +125,7 @@ func registerNameTx(name *definitions.RegisterName, do *definitions.Do) (string,
 	logger.Infof("NameReg Transaction =>\t\t%s:%s:%s\n", name.Name, name.Data, name.Amount)
 	tx, err := core.Name(do.Chain, do.Signer, do.PublicKey, name.Source, name.Amount, name.Nonce, name.Fee, name.Name, name.Data)
 	if err != nil {
-		logger.Errorf("ERROR =>\t\t\t%v\n", err)
+		logger.Errorf("ERROR =>\n")
 		return "", err
 	}
 
@@ -162,7 +162,7 @@ func PermissionJob(perm *definitions.Permission, do *definitions.Do) (string, er
 	logger.Infof("Setting Permissions =>\t\t%s:%v\n", perm.Action, args)
 	tx, err := core.Permissions(do.Chain, do.Signer, do.PublicKey, perm.Source, perm.Nonce, perm.Action, args)
 	if err != nil {
-		logger.Errorf("ERROR =>\t\t\t%v\n", err)
+		logger.Errorf("ERROR =>\n")
 		return "", err
 	}
 
@@ -184,7 +184,7 @@ func BondJob(bond *definitions.Bond, do *definitions.Do) (string, error) {
 	logger.Infof("Bond Transaction =>\t\t%s:%s\n", do.PublicKey, bond.Amount)
 	tx, err := core.Bond(do.Chain, do.Signer, do.PublicKey, bond.Account, bond.Amount, bond.Nonce)
 	if err != nil {
-		logger.Errorf("ERROR =>\t\t\t%v\n", err)
+		logger.Errorf("ERROR =>\n")
 		return "", err
 	}
 
@@ -204,7 +204,7 @@ func UnbondJob(unbond *definitions.Unbond, do *definitions.Do) (string, error) {
 	logger.Infof("Unbond Transaction =>\t\t%s:%s\n", unbond.Account, unbond.Height)
 	tx, err := core.Unbond(unbond.Account, unbond.Height)
 	if err != nil {
-		logger.Errorf("ERROR =>\t\t\t%v\n", err)
+		logger.Errorf("ERROR =>\n")
 		return "", err
 	}
 
@@ -224,7 +224,7 @@ func RebondJob(rebond *definitions.Rebond, do *definitions.Do) (string, error) {
 	logger.Infof("Rebond Transaction =>\t\t%s:%s\n", rebond.Account, rebond.Height)
 	tx, err := core.Rebond(rebond.Account, rebond.Height)
 	if err != nil {
-		logger.Errorf("ERROR =>\t\t\t%v\n", err)
+		logger.Errorf("ERROR =>\n")
 		return "", err
 	}
 
@@ -237,12 +237,12 @@ func txFinalize(do *definitions.Do, tx interface{}, wait bool) (string, error) {
 
 	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx.(types.Tx), true, true, wait)
 	if err != nil {
-		logger.Errorf("ERROR =>\t\t\t%v\n", err)
+		logger.Errorf("ERROR =>\n")
 		return "", err
 	}
 
 	if err := util.UnpackSignAndBroadcast(res, err); err != nil {
-		logger.Errorf("ERROR =>\t\t\t%v\n", err)
+		logger.Errorf("ERROR =>\n")
 		return "", err
 	}
 
