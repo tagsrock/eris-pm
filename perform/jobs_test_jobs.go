@@ -2,15 +2,17 @@ package perform
 
 import (
 	"fmt"
+	"encoding/hex"
 	"strconv"
+	// "strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
+
+	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core_client"
 )
 
 func QueryAccountJob(query *definitions.QueryAccount, do *definitions.Do) (string, error) {
-	var result string
-
 	// Preprocess variables
 	query.Account, _ = util.PreProcess(query.Account, do)
 	query.Field, _ = util.PreProcess(query.Field, do)
@@ -27,8 +29,6 @@ func QueryAccountJob(query *definitions.QueryAccount, do *definitions.Do) (strin
 }
 
 func QueryNameJob(query *definitions.QueryName, do *definitions.Do) (string, error) {
-	var result string
-
 	// Preprocess variables
 	query.Name, _ = util.PreProcess(query.Name, do)
 	query.Field, _ = util.PreProcess(query.Field, do)
@@ -44,8 +44,54 @@ func QueryNameJob(query *definitions.QueryName, do *definitions.Do) (string, err
 }
 
 func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (string, error) {
-	var result string
+	// Preprocess variables
+	query.Source, _ = util.PreProcess(query.Source, do)
+	query.Destination, _ = util.PreProcess(query.Destination, do)
 
+	// Set the from and the to
+	fromAddrBytes, err := hex.DecodeString(query.Source)
+	if err != nil {
+		return "", err
+	}
+	toAddrBytes, err := hex.DecodeString(query.Destination)
+	if err != nil {
+		return "", err
+	}
+
+	// Get the packed data from the ABI functions
+	data, err := packArgsABI(query.Destination, query.Data, do)
+	if err != nil {
+		return "", err
+	}
+	dataBytes, err := hex.DecodeString(data)
+	if err != nil {
+		return "", err
+	}
+
+	// Call the client
+	client := cclient.NewClient(do.Chain, "HTTP")
+	r, err := client.Call(fromAddrBytes, toAddrBytes, dataBytes)
+	logger.Debugf("Returned Result =>\t\t%v\n", r)
+
+	// Preprocess the return
+	result, err := util.FormatOutput([]string{"return"}, 0, r)
+	if err != nil {
+		return "", err
+	}
+	result, err = strconv.Unquote(result)
+	if err != nil {
+		return "", err
+	}
+	// result = strings.Replace(result, "00", "", -1)
+	logger.Debugf("Decoding Result =>\t\t%s\n", result)
+
+	// Final processing of the return
+	// r2, err := hex.DecodeString(result)
+	// if err != nil {
+	// 	return "", err
+	// }
+	// result = string(r2)
+	logger.Debugf("Decoded Result =>\t\t%s\n", result)
 	return result, nil
 }
 

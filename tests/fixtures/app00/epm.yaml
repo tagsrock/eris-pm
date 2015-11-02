@@ -20,12 +20,14 @@ jobs:
       source: $account1
       destination: 58FD1799AA32DED3F6EAC096A1DC77834A446B9C
       amount: $val1
+      wait: true
 
 - name: sendTxTest2
   job:
     send:
       destination: $receipient
       amount: $val1
+      wait: true
 
 - name: sendTxQuery1
   job:

@@ -27,3 +27,4 @@ docs/eris-cli
 .goxc.local.json
 builds
 epm.log
+abi

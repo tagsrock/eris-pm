@@ -69,6 +69,7 @@ func AddCommands() {
 func AddGlobalFlags() {
 	EPMCmd.PersistentFlags().StringVarP(&do.YAMLPath, "file", "f", "./epm.yaml", "path to package file which EPM should use")
 	EPMCmd.PersistentFlags().StringVarP(&do.ContractsPath, "contracts-path", "p", ".", "path to the contracts EPM should use")
+	EPMCmd.PersistentFlags().StringVarP(&do.ABIPath, "abi-path", "a", "./abi", "path to the abi directory EPM should use")
 	EPMCmd.PersistentFlags().StringVarP(&do.Chain, "chain", "c", "chain:46657", "<ip:port> of chain which EPM should use")
 	EPMCmd.PersistentFlags().StringVarP(&do.Signer, "sign", "s", "keys:4767", "<ip:port> of signer daemon which EPM should use")
 	EPMCmd.PersistentFlags().StringVarP(&do.Compiler, "compiler", "m", "compilers.eris.industries:8091", "<ip:port> of compiler which EPM should use")

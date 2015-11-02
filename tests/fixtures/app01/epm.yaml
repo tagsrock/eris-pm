@@ -33,12 +33,14 @@ jobs:
       data: $val2
       amount: $to_save
       fee: $MinersFee
+      wait: true
 
 - name: nameRegTest2
   job:
     register:
       name: marmots
       data: love_eris
+      wait: true
 
 - name: queryReg1
   job:

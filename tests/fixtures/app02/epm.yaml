@@ -22,12 +22,14 @@ jobs:
       data_file: names1.csv
       amount: $to_save
       fee: $MinersFee
+      wait: true
 
 - name: nameRegTestDataFile2
   job:
     register:
       data_file: ./names2.csv
       fee: $MinersFee
+      wait: true
 
 - name: queryReg1
   job:

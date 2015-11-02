@@ -1,6 +1,6 @@
 {
 	"ImportPath": "github.com/eris-ltd/eris-pm",
-	"GoVersion": "go1.4.2",
+	"GoVersion": "go1.5",
 	"Packages": [
 		"./..."
 	],
@@ -20,9 +20,18 @@
 			"Rev": "d2b94fd789ea21d12fac1a4443dd3a3f79cda72c"
 		},
 		{
+			"ImportPath": "github.com/codegangsta/inject",
+			"Comment": "v1.0-rc1-4-g4b81725",
+			"Rev": "4b8172520a03fa190f427bbd284db01b459bfce7"
+		},
+		{
 			"ImportPath": "github.com/cpuguy83/go-md2man/md2man",
 			"Comment": "v1.0.4",
 			"Rev": "71acacd42f85e5e82f70a55327789582a5200a90"
+		},
+		{
+			"ImportPath": "github.com/ebuchman/go-shell-pipes",
+			"Rev": "83e1324808622485314bff0fd97b8b944200a7a4"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/common/go/common",
@@ -33,12 +42,30 @@
 			"Rev": "4b5ae105fa10e99c71e0c4f17f1039e8c09560dd"
 		},
 		{
+			"ImportPath": "github.com/eris-ltd/eris-abi/abi",
+			"Rev": "5324f193466ace1cc4299ae5b51644d88f0c753d"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/lllc-server",
+			"Rev": "6d5fee7433002876b56e211e988c51737339ede6"
+		},
+		{
 			"ImportPath": "github.com/eris-ltd/mint-client/mintx/core",
 			"Rev": "4aa5182051a4a4e8e0235b129a062fbebab3ebdc"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/mint-client/utils",
 			"Rev": "4aa5182051a4a4e8e0235b129a062fbebab3ebdc"
+		},
+		{
+			"ImportPath": "github.com/ethereum/go-ethereum/crypto/sha3",
+			"Comment": "v1.0.1.1-3-g99216f4",
+			"Rev": "99216f4ab85d3015d53223f3af639553cece4b5d"
+		},
+		{
+			"ImportPath": "github.com/go-martini/martini",
+			"Comment": "v1.0-119-gc657c03",
+			"Rev": "c657c03d1add219e93d48ffa493052c9a79c11b2"
 		},
 		{
 			"ImportPath": "github.com/gorilla/websocket",
@@ -59,6 +86,10 @@
 			"Rev": "76626ae9c91c4f2a10f34cad8ce83ea42c93bb75"
 		},
 		{
+			"ImportPath": "github.com/jehiah/go-strftime",
+			"Rev": "834e15c05a45371503440cc195bbd05c9a0968d9"
+		},
+		{
 			"ImportPath": "github.com/kr/pretty",
 			"Comment": "go.weekly.2011-12-22-26-gcb0850c",
 			"Rev": "cb0850c1681cbca3233e84f7e6ec3e4c3f352085"
@@ -71,6 +102,14 @@
 			"ImportPath": "github.com/magiconair/properties",
 			"Comment": "v1.5.2",
 			"Rev": "d5929c67198951106f49f7ea425198d0f1a08f7f"
+		},
+		{
+			"ImportPath": "github.com/martini-contrib/gorelic",
+			"Rev": "f8b0843aa3ab66d8734aa7d9acf399bdc197c65d"
+		},
+		{
+			"ImportPath": "github.com/martini-contrib/secure",
+			"Rev": "de8e19a0490b816696d093388d53f2e1f0c08b7d"
 		},
 		{
 			"ImportPath": "github.com/mattn/go-colorable",
@@ -96,6 +135,11 @@
 			"ImportPath": "github.com/russross/blackfriday",
 			"Comment": "v1.2-80-g8cec3a8",
 			"Rev": "8cec3a854e68dba10faabbe31c089abf4a3e57a6"
+		},
+		{
+			"ImportPath": "github.com/segmentio/analytics-go",
+			"Comment": "v2.0.0-2-g0f10a19",
+			"Rev": "0f10a1942c812a6dc8b4978ed8a80cfc42e8a617"
 		},
 		{
 			"ImportPath": "github.com/shurcooL/sanitized_anchor_name",
@@ -202,6 +246,23 @@
 			"ImportPath": "github.com/tendermint/tendermint/wire",
 			"Comment": "0.1-29-gb59ed8c",
 			"Rev": "b59ed8c9d2881f5a62a60a9cf5c350d9f00f27e0"
+		},
+		{
+			"ImportPath": "github.com/xtgo/uuid",
+			"Rev": "a0b114877d4caeffbd7f87e3757c17fce570fea7"
+		},
+		{
+			"ImportPath": "github.com/yvasiyarov/go-metrics",
+			"Rev": "c25f46c4b94079672242ec48a545e7ca9ebe3aec"
+		},
+		{
+			"ImportPath": "github.com/yvasiyarov/gorelic",
+			"Comment": "v0.0.6-24-g1c0ed4e",
+			"Rev": "1c0ed4e38e62548df0051140795e569d35cf2ded"
+		},
+		{
+			"ImportPath": "github.com/yvasiyarov/newrelic_platform_go",
+			"Rev": "cef0ebd22fb48453114ba645d0fb80fea6e670de"
 		},
 		{
 			"ImportPath": "golang.org/x/crypto/ripemd160",

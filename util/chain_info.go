@@ -169,8 +169,8 @@ func UnpackSignAndBroadcast(result *core.TxResult, err error) error {
 		logger.Infof("Contract Address =>\t\t%X\n", result.Address)
 	}
 	if result.Return != nil {
-		logger.Debugf("Block Hash =>\t\t%X\n", result.BlockHash)
-		logger.Debugf("Return Value =>\t\t%X\n", result.Return)
+		logger.Debugf("Block Hash =>\t\t\t%X\n", result.BlockHash)
+		logger.Debugf("Return Value =>\t\t\t%X\n", result.Return)
 		logger.Debugf("Exception =>\t\t\t%s\n", result.Exception)
 	}
 

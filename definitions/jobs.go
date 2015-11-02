@@ -72,7 +72,13 @@ type Rebond struct {
 // ------------------------------------------------------------------------
 
 type Deploy struct {
-	// TODO
+	Source   string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	Contract string `mapstructure:"contract" json:"contract" yaml:"contract" toml:"contract"`
+	Amount   string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
+	Nonce    string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
+	Fee      string `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
+	Gas      string `mapstructure:"gas" json:"gas" yaml:"gas" toml:"gas"`
+	Wait     bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
 type PackageDeploy struct {
@@ -115,9 +121,9 @@ type RestoreState struct {
 
 // aka. Simulated Call. Only exposed for testing
 type QueryContract struct {
-	Source      string   `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
-	Destination string   `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
-	Data        []string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+	Source      string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	Destination string `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
+	Data        string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
 }
 
 // Only exposed for testing

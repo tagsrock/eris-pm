@@ -28,6 +28,7 @@ jobs:
       target: $account_tgt
       permission: $perm
       value: "true"
+      wait: true
 
 - name: permTest2
   job:
@@ -35,6 +36,7 @@ jobs:
       action: unset_base
       target: $account_tgt
       permission: $perm
+      wait: true
 
 - name: permTest3
   job:
@@ -42,6 +44,7 @@ jobs:
       action: add_role
       target: $account_tgt
       role: $role
+      wait: true
 
 - name: permTest4
   job:
@@ -49,6 +52,7 @@ jobs:
       action: rm_role
       target: $account_tgt
       role: $role
+      wait: true
 
 - name: permTest5
   job:
@@ -56,6 +60,7 @@ jobs:
       action: set_global
       permission: call
       value: "true"
+      wait: true
 
 - name: queryPerm1
   job:

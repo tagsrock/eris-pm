@@ -17,6 +17,7 @@ jobs:
       target: $bond_account
       permission: bond
       value: "true"
+      wait: true
 
 - name: bond_pub_key
   job:
@@ -39,18 +40,21 @@ jobs:
       pub_key: $bond_pub_key
       account: $bond_account
       amount: $bond_amount
+      wait: false
 
 - name: bondTest2
   job:
     unbond:
       account: $bond_account
       height: $block
+      wait: false
 
 - name: bondTest3
   job:
     rebond:
       account: $bond_account
       height: $block+2
+      wait: false
 
 - name: queryBonded
   job:
@@ -65,7 +69,7 @@ jobs:
 - name: assertBonded
   job:
     assert:
-      key: "1040E6521541DAB4E7EE57F21226DD17CE9F0FB7,58FD1799AA32DED3F6EAC096A1DC77834A446B9C"
+      key: $account
       relation: eq
       val: $queryBonded
 

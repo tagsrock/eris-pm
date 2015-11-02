@@ -66,7 +66,7 @@ func RunDeployJobs(do *definitions.Do) error {
 			return err
 		}
 
-		logger.Debugln("Job Completed")
+		// logger.Debugln("Job Completed")
 	}
 
 	return nil
