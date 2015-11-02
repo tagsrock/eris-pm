@@ -85,6 +85,9 @@ if [ "$circle" = true ]
 then
   export ERIS_PULL_APPROVE="true"
   eris init --yes --skip-pull 1>/dev/null
+  # by default the keys daemon does not export its port to the host
+  # for this sequencing to work properly it needs to be exported.
+  # this is a hack.
   echo 'ports = [ "4767:4767" ]' >> ~/.eris/services/keys.toml
 fi
 
@@ -92,16 +95,15 @@ is_it_running keys
 if [ $? -eq 0 ]
 then
   eris services start keys 1>/dev/null
-  keysHost=$(eris services inspect keys NetworkSettings.IPAddress)
-  eris-keys import "$key1" --no-pass --host $keysHost 1>/dev/null
-  eris-keys import "$key2" --no-pass --host $keysHost 1>/dev/null
-else
-  eris-keys import "$key1" --no-pass 1>/dev/null
-  eris-keys import "$key2" --no-pass 1>/dev/null
+  sleep 3 # boot time
 fi
 
+keysHost=$(eris services inspect keys NetworkSettings.IPAddress)
+eris-keys import "$key1" --no-pass --host $keysHost 1>/dev/null
+eris-keys import "$key2" --no-pass --host $keysHost 1>/dev/null
+
 eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata 1>/dev/null
-sleep 5
+sleep 5 # boot time
 echo "Setup complete"
 
 echo ""
