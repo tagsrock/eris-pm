@@ -56,6 +56,7 @@ do
   test_exit=$?
   if [ $test_exit -ne 0 ]
   then
+    failing_dir=`pwd`
     break
   fi
 
@@ -66,6 +67,11 @@ done
 # ---------------------------------------------------------
 # Cleanup
 
+if [ $test_exit -ne 0 ]
+then
+  echo "EPM Log on Failed Test."
+  cat $failing_dir/epm.log
+fi
 echo ""
 echo "Done. Exiting with code: $test_exit"
 cd $start

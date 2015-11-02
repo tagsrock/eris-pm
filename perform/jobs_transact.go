@@ -241,7 +241,7 @@ func txFinalize(do *definitions.Do, tx interface{}, wait bool) (string, error) {
 		return "", err
 	}
 
-	if err := util.UnpackSignAndBroadcast(res, err); err != nil {
+	if err := util.ReadTxSignAndBroadcast(res, err); err != nil {
 		logger.Errorf("ERROR =>\n")
 		return "", err
 	}

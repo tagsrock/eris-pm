@@ -4,13 +4,66 @@ import (
 	"fmt"
 	"encoding/hex"
 	"strconv"
-	// "strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
 
 	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core_client"
 )
+
+func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (string, error) {
+	// Preprocess variables. We don't preprocess data as it is processed by ReadAbiFormulateCall
+	query.Source, _ = util.PreProcess(query.Source, do)
+	query.Destination, _ = util.PreProcess(query.Destination, do)
+
+	// Set the from and the to
+	fromAddrBytes, err := hex.DecodeString(query.Source)
+	if err != nil {
+		return "", err
+	}
+	toAddrBytes, err := hex.DecodeString(query.Destination)
+	if err != nil {
+		return "", err
+	}
+
+	// Get the packed data from the ABI functions
+	data, err := util.ReadAbiFormulateCall(query.Destination, query.Data, do)
+	if err != nil {
+		return "", err
+	}
+	dataBytes, err := hex.DecodeString(data)
+	if err != nil {
+		return "", err
+	}
+
+	// Call the client
+	client := cclient.NewClient(do.Chain, "HTTP")
+	retrn, err := client.Call(fromAddrBytes, toAddrBytes, dataBytes)
+	if err != nil {
+		return "", err
+	}
+
+	// Preprocess return
+	result, err := util.FormatOutput([]string{"return"}, 0, retrn)
+	if err != nil {
+		return "", err
+	}
+	result, err = strconv.Unquote(result)
+	if err != nil {
+		return "", err
+	}
+
+	// Formally process the return
+	logger.Debugf("Decoding Raw Result =>\t\t%s\n", result)
+	result, err = util.ReadAndDecodeContractReturn(query.Destination, query.Data, result, do)
+	if err != nil {
+		return "", err
+	}
+
+	// Finalize
+	logger.Infof("Decoded Result =>\t\t%s\n", result)
+	return result, nil
+}
 
 func QueryAccountJob(query *definitions.QueryAccount, do *definitions.Do) (string, error) {
 	// Preprocess variables
@@ -43,55 +96,19 @@ func QueryNameJob(query *definitions.QueryName, do *definitions.Do) (string, err
 	return result, nil
 }
 
-func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (string, error) {
+func QueryValsJob(query *definitions.QueryVals, do *definitions.Do) (string, error) {
+	var result string
+
 	// Preprocess variables
-	query.Source, _ = util.PreProcess(query.Source, do)
-	query.Destination, _ = util.PreProcess(query.Destination, do)
+	query.Field, _ = util.PreProcess(query.Field, do)
 
-	// Set the from and the to
-	fromAddrBytes, err := hex.DecodeString(query.Source)
-	if err != nil {
-		return "", err
-	}
-	toAddrBytes, err := hex.DecodeString(query.Destination)
+	// Peform query
+	logger.Infof("Querying Vals =>\t\t%s\n", query.Field)
+	result, err := util.ValidatorsInfo(query.Field, do)
 	if err != nil {
 		return "", err
 	}
 
-	// Get the packed data from the ABI functions
-	data, err := packArgsABI(query.Destination, query.Data, do)
-	if err != nil {
-		return "", err
-	}
-	dataBytes, err := hex.DecodeString(data)
-	if err != nil {
-		return "", err
-	}
-
-	// Call the client
-	client := cclient.NewClient(do.Chain, "HTTP")
-	r, err := client.Call(fromAddrBytes, toAddrBytes, dataBytes)
-	logger.Debugf("Returned Result =>\t\t%v\n", r)
-
-	// Preprocess the return
-	result, err := util.FormatOutput([]string{"return"}, 0, r)
-	if err != nil {
-		return "", err
-	}
-	result, err = strconv.Unquote(result)
-	if err != nil {
-		return "", err
-	}
-	// result = strings.Replace(result, "00", "", -1)
-	logger.Debugf("Decoding Result =>\t\t%s\n", result)
-
-	// Final processing of the return
-	// r2, err := hex.DecodeString(result)
-	// if err != nil {
-	// 	return "", err
-	// }
-	// result = string(r2)
-	logger.Debugf("Decoded Result =>\t\t%s\n", result)
 	return result, nil
 }
 
@@ -157,22 +174,6 @@ func AssertJob(assertion *definitions.Assert, do *definitions.Do) (string, error
 		} else {
 			return assertFail(assertion.Key, assertion.Value)
 		}
-	}
-
-	return result, nil
-}
-
-func QueryValsJob(query *definitions.QueryVals, do *definitions.Do) (string, error) {
-	var result string
-
-	// Preprocess variables
-	query.Field, _ = util.PreProcess(query.Field, do)
-
-	// Peform query
-	logger.Infof("Querying Vals =>\t\t%s\n", query.Field)
-	result, err := util.ValidatorsInfo(query.Field, do)
-	if err != nil {
-		return "", err
 	}
 
 	return result, nil

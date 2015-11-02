@@ -2,12 +2,10 @@ package abi
 
 import (
 	"fmt"
-	"math/big"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-abi/utils/common"
 	"reflect"
 	"regexp"
 	"strconv"
-
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 )
 
 const (
@@ -26,10 +24,6 @@ type Type struct {
 	Size       int
 	T          byte   // Our own type checking
 	stringKind string // holds the unparsed string for deriving signatures
-}
-
-func (t Type) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf(`"%s"`, t.stringKind)), nil
 }
 
 // New type returns a fully parsed Type given by the input string or an error if it  can't be parsed.
@@ -191,9 +185,9 @@ func (t Type) pack(v interface{}) ([]byte, error) {
 		return packed, nil
 	case reflect.Bool:
 		if value.Bool() {
-			return common.LeftPadBytes(big.NewInt(1).Bytes(), 32), nil
+			return common.LeftPadBytes(common.Big1.Bytes(), 32), nil
 		} else {
-			return common.LeftPadBytes(big.NewInt(0).Bytes(), 32), nil
+			return common.LeftPadBytes(common.Big0.Bytes(), 32), nil
 		}
 	}
 

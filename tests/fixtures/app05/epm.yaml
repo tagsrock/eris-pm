@@ -8,7 +8,7 @@ jobs:
 - name: setStorage
   job:
     set:
-      val: "0x5"
+      val: 0x5
 
 - name: deployStorageK
   job:
@@ -34,5 +34,4 @@ jobs:
     assert:
       key: $queryStorage
       relation: eq
-      # val: $setStorage
-      val: "0000000000000000000000000000000000000000000000000000000000000005"
+      val: $setStorage

@@ -9,7 +9,6 @@ import (
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
 	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core_client"
 )
 
@@ -151,28 +150,3 @@ func ValidatorsInfo(field string, do *definitions.Do) (string, error) {
 	return s, nil
 }
 
-// This is a closer function which is called by most of the tx_run functions
-func UnpackSignAndBroadcast(result *core.TxResult, err error) error {
-	// if there's an error just return.
-	if err != nil {
-		return err
-	}
-
-	// if there is nothing to unpack then just return.
-	if result == nil {
-		return nil
-	}
-
-	// Unpack and display for the user.
-	logger.Printf("Transaction Hash =>\t\t%X\n", result.Hash)
-	if result.Address != nil {
-		logger.Infof("Contract Address =>\t\t%X\n", result.Address)
-	}
-	if result.Return != nil {
-		logger.Debugf("Block Hash =>\t\t\t%X\n", result.BlockHash)
-		logger.Debugf("Return Value =>\t\t\t%X\n", result.Return)
-		logger.Debugf("Exception =>\t\t\t%s\n", result.Exception)
-	}
-
-	return nil
-}

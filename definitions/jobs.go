@@ -71,6 +71,10 @@ type Rebond struct {
 // Contracts Jobs
 // ------------------------------------------------------------------------
 
+type PackageDeploy struct {
+	// TODO
+}
+
 type Deploy struct {
 	Source   string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
 	Contract string `mapstructure:"contract" json:"contract" yaml:"contract" toml:"contract"`
@@ -79,10 +83,6 @@ type Deploy struct {
 	Fee      string `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
 	Gas      string `mapstructure:"gas" json:"gas" yaml:"gas" toml:"gas"`
 	Wait     bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
-}
-
-type PackageDeploy struct {
-	// TODO
 }
 
 type Call struct {
