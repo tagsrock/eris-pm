@@ -28,6 +28,30 @@ func ChainStatus(field string, do *definitions.Do) (string, error) {
 	return s, nil
 }
 
+func GetChainID(do *definitions.Do) error {
+	if do.ChainID == "" {
+		status, err := ChainStatus("node_info", do)
+		if err != nil {
+			return err
+		}
+
+		// Wrangle these returns
+		type NodeInfo struct {
+			ChainID  string `mapstructure:"chain_id" json:"chain_id"`
+		}
+		var ret NodeInfo
+		err = json.Unmarshal([]byte(status), &ret)
+		if err != nil {
+			return err
+		}
+
+		do.ChainID = ret.ChainID
+		logger.Infof("Using ChainID from Node =>\t%s\n", do.ChainID)
+	}
+
+	return nil
+}
+
 func AccountsInfo(account, field string, do *definitions.Do) (string, error) {
 	client := cclient.NewClient(do.Chain, "HTTP")
 

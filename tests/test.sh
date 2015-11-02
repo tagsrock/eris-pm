@@ -133,11 +133,12 @@ then
     eris services stop -rx keys
   fi
 fi
+echo ""
 if [ "$test_exit" -eq 0 ]
 then
-  echo "Tests complete! Tests are Green"
+  echo "Tests complete! Tests are Green. :)"
 else
-  echo "Tests complete. Tests are red :("
+  echo "Tests complete. Tests are Red. :("
 fi
 cd $start
 exit $test_exit

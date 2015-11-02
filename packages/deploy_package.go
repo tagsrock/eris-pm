@@ -3,7 +3,6 @@ package packages
 import (
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/perform"
-	"github.com/eris-ltd/eris-pm/util"
 )
 
 func Deploy(do *definitions.Do) error {
@@ -15,8 +14,6 @@ func Deploy(do *definitions.Do) error {
 		if err != nil {
 			return err
 		}
-		util.BundleHttpPathCorrect(do)
-		util.PrintPathPackage(do)
 	}
 
 	return perform.RunDeployJobs(do)

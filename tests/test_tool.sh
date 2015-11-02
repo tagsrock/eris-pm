@@ -47,9 +47,9 @@ do
   cd $app
   if [[ "$1" == "local" ]]
   then
-    epm test -s localhost:4767 -c localhost:46657 -i testChain
+    epm test
   else
-    epm test -i $CHAINID
+    epm --chain chain:46657 --sign keys:4767 test
   fi
 
   # Set exit code properly

@@ -7,6 +7,7 @@ import (
 	"github.com/eris-ltd/eris-pm/util"
 	"github.com/eris-ltd/eris-pm/version"
 
+	. "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/log"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
 	cfg "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/config"
@@ -36,10 +37,13 @@ Complete documentation is available at https://docs.erisindustries.com
 		}
 
 		log.SetLoggers(logLevel, os.Stdout, os.Stderr) // TODO: make this better....
+		logger.Infoln("Hello! I'm EPM.")
 
+		util.BundleHttpPathCorrect(do)
+		util.PrintPathPackage(do)
 		util.ClearJobResults()
+		IfExit(util.GetChainID(do))
 
-		// TODO: get chainid from node endpoint
 		config.Set("chain_id", do.ChainID)
 		config.Set("log_level", "error")
 		cfg.ApplyConfig(config)
@@ -70,8 +74,8 @@ func AddGlobalFlags() {
 	EPMCmd.PersistentFlags().StringVarP(&do.YAMLPath, "file", "f", "./epm.yaml", "path to package file which EPM should use")
 	EPMCmd.PersistentFlags().StringVarP(&do.ContractsPath, "contracts-path", "p", ".", "path to the contracts EPM should use")
 	EPMCmd.PersistentFlags().StringVarP(&do.ABIPath, "abi-path", "a", "./abi", "path to the abi directory EPM should use")
-	EPMCmd.PersistentFlags().StringVarP(&do.Chain, "chain", "c", "chain:46657", "<ip:port> of chain which EPM should use")
-	EPMCmd.PersistentFlags().StringVarP(&do.Signer, "sign", "s", "keys:4767", "<ip:port> of signer daemon which EPM should use")
+	EPMCmd.PersistentFlags().StringVarP(&do.Chain, "chain", "c", "localhost:46657", "<ip:port> of chain which EPM should use")
+	EPMCmd.PersistentFlags().StringVarP(&do.Signer, "sign", "s", "localhost:4767", "<ip:port> of signer daemon which EPM should use")
 	EPMCmd.PersistentFlags().StringVarP(&do.Compiler, "compiler", "m", "compilers.eris.industries:8091", "<ip:port> of compiler which EPM should use")
 	EPMCmd.PersistentFlags().StringVarP(&do.PublicKey, "key", "k", "", "full public key to use by default")
 	EPMCmd.PersistentFlags().StringVarP(&do.ChainID, "chain-id", "i", "", "identifier of the chain to work against")

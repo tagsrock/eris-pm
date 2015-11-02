@@ -10,7 +10,7 @@ import (
 )
 
 func LoadPackage(fileName string) (*definitions.Package, error) {
-	logger.Infoln("Hello! Loading EPM Package Definition.")
+	logger.Infoln("Loading EPM Package Definition.")
 	var pkg = definitions.BlankPackage()
 	var epmJobs = viper.New()
 
