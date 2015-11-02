@@ -9,6 +9,7 @@ import (
 
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/log"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
+	cfg "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/config"
 )
 
 const VERSION = version.VERSION
@@ -33,12 +34,15 @@ Complete documentation is available at https://docs.erisindustries.com
 		} else if do.Debug {
 			logLevel = 3
 		}
+
 		log.SetLoggers(logLevel, os.Stdout, os.Stderr) // TODO: make this better....
 
 		util.ClearJobResults()
 
 		// TODO: get chainid from node endpoint
 		config.Set("chain_id", do.ChainID)
+		config.Set("log_level", "error")
+		cfg.ApplyConfig(config)
 	},
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		log.Flush()

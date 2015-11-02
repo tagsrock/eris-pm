@@ -516,7 +516,7 @@ func subscribeAndWait(tx types.Tx, chainID, nodeAddr string, inputAddr []byte) (
 			// if its a block, remember the block hash
 			blockData, ok := result.Data.(types.EventDataNewBlock)
 			if ok {
-				logger.Println(blockData.Block)
+				logger.Infoln(blockData.Block)
 				latestBlockHash = blockData.Block.Hash()
 				continue
 			}
