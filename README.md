@@ -10,7 +10,7 @@ The Eris Package Manager Deploys and Tests Smart Contract Systems
 
 EPM is a high level tool which provides easy access to most of the eris:db tooling. EPM is used to deploy and test suites of smart contracts. In general it will wrap the mint-client tooling, along with eris-keys and eris-compilers to provide a harmonized interface to the modular components of the [eris](https://docs.erisindustries.com) open source platform.
 
-EPM uses an **epm definition file** to tell the package manager what jobs should be ran and in what order.
+EPM is closer to an ansible or chef like tool than it is NPM in that it is a deployment sequence and testing tool. EPM uses an **epm definition file** to tell the package manager what jobs should be ran and in what order.
 
 In EPM a *job* is a single action which is performed (such as a transaction, a contract deployment, a call to a smart contract, or a query of information). The results of these jobs are then kept in variables and may be used in later jobs.
 
