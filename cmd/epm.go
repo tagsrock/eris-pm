@@ -86,7 +86,7 @@ func AddGlobalFlags() {
 	EPMCmd.PersistentFlags().StringVarP(&do.ABIPath, "abi-path", "a", defaultContracts(), "path to the abi directory EPM should use when saving ABIs after the compile process; default respects $EPM_ABI_PATH")
 	EPMCmd.PersistentFlags().StringVarP(&do.Chain, "chain", "c", defaultChain(), "<ip:port> of chain which EPM should use; default respects $EPM_CHAIN_ADDR")
 	EPMCmd.PersistentFlags().StringVarP(&do.Signer, "sign", "s", defaultSigner(), "<ip:port> of signer daemon which EPM should use; default respects $EPM_SIGNER_ADDR")
-	EPMCmd.PersistentFlags().UintVarP(&do.DefaultGas, "gas", "g", defaultGas(), "default gas to use; can be overridden for any single job; default respects $EPM_GAS")
+	EPMCmd.PersistentFlags().StringVarP(&do.DefaultGas, "gas", "g", defaultGas(), "default gas to use; can be overridden for any single job; default respects $EPM_GAS")
 	EPMCmd.PersistentFlags().StringVarP(&do.Compiler, "compiler", "m", defaultCompiler(), "<ip:port> of compiler which EPM should use; default respects $EPM_COMPILER_ADDR")
 	EPMCmd.PersistentFlags().StringVarP(&do.DefaultAddr, "address", "r", defaultAddr(), "default address to use; operates the same way as the [account] job, only before the epm file is ran; default respects $EPM_ADDRESS")
 	EPMCmd.PersistentFlags().StringSliceVarP(&do.DefaultSets, "set", "e", defaultSets(), "default sets to use; operates the same way as the [set] jobs, only before the epm file is ran (and after default address; default respects $EPM_SETS")
@@ -146,8 +146,8 @@ func defaultSets() []string {
 	return setDefaultStringSlice("EPM_SETS", []string{})
 }
 
-func defaultGas() uint {
-	return setDefaultUInt("EPM_GAS", 1111111111)
+func defaultGas() string {
+	return setDefaultString("EPM_GAS", "1111111111")
 }
 
 func defaultVerbose() bool {
@@ -179,15 +179,6 @@ func setDefaultStringSlice(envVar string, def []string) []string {
 	env := os.Getenv(envVar)
 	if env != "" {
 		return strings.Split(env, ";")
-	}
-	return def
-}
-
-func setDefaultUInt(envVar string, def uint) uint {
-	env := os.Getenv(envVar)
-	if env != "" {
-		i, _ := strconv.Atoi(env)
-		return uint(i)
 	}
 	return def
 }

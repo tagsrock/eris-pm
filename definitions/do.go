@@ -11,7 +11,7 @@ type Do struct {
 	Compiler      string   `mapstructure:"," json:"," yaml:"," toml:","`
 	PublicKey     string   `mapstructure:"," json:"," yaml:"," toml:","`
 	ChainID       string   `mapstructure:"," json:"," yaml:"," toml:","`
-	DefaultGas    uint     `mapstructure:"," json:"," yaml:"," toml:","`
+	DefaultGas    string   `mapstructure:"," json:"," yaml:"," toml:","`
 	DefaultAddr   string   `mapstructure:"," json:"," yaml:"," toml:","`
 	DefaultAmount string   `mapstructure:"," json:"," yaml:"," toml:","`
 	DefaultFee    string   `mapstructure:"," json:"," yaml:"," toml:","`
