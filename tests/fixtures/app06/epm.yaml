@@ -16,11 +16,13 @@ jobs:
       contract: storage.sol
       wait: true
 
+# data: set $setStorage
+#NOTE THIS NEEDS TO TAKE THE DATA ARGUMENT
 - name: setStorage
   job:
     call:
       destination: $deployStorageK
-      data: set $setStorage
+      data: $setStorage
       wait: true
 
 - name: queryStorage
