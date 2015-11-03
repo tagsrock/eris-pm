@@ -3,11 +3,11 @@ package perform
 import (
 	"encoding/hex"
 	"fmt"
+	"github.com/eris-ltd/eris-pm/definitions"
+	"github.com/eris-ltd/eris-pm/util"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"github.com/eris-ltd/eris-pm/definitions"
-	"github.com/eris-ltd/eris-pm/util"
 
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/lllc-server"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
@@ -53,6 +53,13 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (string, error) {
 	logger.Debugf("Abi spec =>\t\t\t%s\n", string(abiSpec))
 	contractCode := hex.EncodeToString(bytecode)
 
+	// Don't use pubKey if account override
+	var oldKey string
+	if deploy.Source != do.Package.Account {
+		oldKey = do.PublicKey
+		do.PublicKey = ""
+	}
+
 	// Deploy contract
 	logger.Infof("Deploying Contract =>\t\t%s:%v\n", deploy.Source, contractCode)
 	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, deploy.Source, "", deploy.Amount, deploy.Nonce, deploy.Gas, deploy.Fee, contractCode)
@@ -74,6 +81,11 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (string, error) {
 	logger.Debugf("Saving ABI =>\t\t\t%s\n", abiLocation)
 	if err := ioutil.WriteFile(abiLocation, []byte(abiSpec), 0664); err != nil {
 		return "", err
+	}
+
+	// Don't use pubKey if account override
+	if deploy.Source != do.Package.Account {
+		do.PublicKey = oldKey
 	}
 
 	return result, nil
@@ -100,10 +112,22 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 		return "", err
 	}
 
+	// Don't use pubKey if account override
+	var oldKey string
+	if call.Source != do.Package.Account {
+		oldKey = do.PublicKey
+		do.PublicKey = ""
+	}
+
 	logger.Infof("Calling =>\t\t\t%s:%v\n", call.Destination, call.Data)
 	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, call.Source, call.Destination, call.Amount, call.Nonce, call.Gas, call.Fee, call.Data)
 	if err != nil {
 		return "", err
+	}
+
+	// Don't use pubKey if account override
+	if call.Source != do.Package.Account {
+		do.PublicKey = oldKey
 	}
 
 	// Sign, broadcast, display

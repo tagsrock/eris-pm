@@ -112,9 +112,9 @@ fi
 
 ensure_running keys
 
-# keysHost=$(eris services inspect keys NetworkSettings.IPAddress)
-eris-keys import "$key1" --no-pass 1>/dev/null #--host $keysHost 1>/dev/null
-eris-keys import "$key2" --no-pass 1>/dev/null #--host $keysHost 1>/dev/null
+keysHost=$(eris services inspect keys NetworkSettings.IPAddress)
+eris-keys import "$key1" --no-pass --host $keysHost 1>/dev/null
+eris-keys import "$key2" --no-pass --host $keysHost 1>/dev/null
 
 # check keys were properly imported
 eris-keys pub --addr "$key1_addr" 1>/dev/null
@@ -122,9 +122,8 @@ early_exit
 eris-keys pub --addr "$key2_addr" 1>/dev/null
 early_exit
 
-eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata #1>/dev/null
+eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata 1>/dev/null
 sleep 5 # boot time
-eris chains plop "epm-tests-$uuid" genesis
 echo "Setup complete"
 
 echo ""

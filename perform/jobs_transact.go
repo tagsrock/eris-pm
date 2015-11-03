@@ -14,6 +14,7 @@ import (
 )
 
 func SendJob(send *definitions.Send, do *definitions.Do) (string, error) {
+
 	// Process Variables
 	send.Source, _ = util.PreProcess(send.Source, do)
 	send.Destination, _ = util.PreProcess(send.Destination, do)
@@ -22,12 +23,24 @@ func SendJob(send *definitions.Send, do *definitions.Do) (string, error) {
 	// Use Default
 	send.Source = useDefault(send.Source, do.Package.Account)
 
+	// Don't use pubKey if account override
+	var oldKey string
+	if send.Source != do.Package.Account {
+		oldKey = do.PublicKey
+		do.PublicKey = ""
+	}
+
 	// Formulate tx
 	logger.Infof("Sending Transaction =>\t\t%s:%s:%s\n", send.Source, send.Destination, send.Amount)
 	tx, err := core.Send(do.Chain, do.Signer, do.PublicKey, send.Source, send.Destination, send.Amount, send.Nonce)
 	if err != nil {
 		logger.Errorf("ERROR =>\n")
 		return "", err
+	}
+
+	// Don't use pubKey if account override
+	if send.Source != do.Package.Account {
+		do.PublicKey = oldKey
 	}
 
 	// Sign, broadcast, display
@@ -121,12 +134,24 @@ func registerNameTx(name *definitions.RegisterName, do *definitions.Do) (string,
 	name.Fee = useDefault(name.Fee, "1234")       // TODO: less hackify this.
 	name.Amount = useDefault(name.Amount, "9999") // TODO: less hackify this.
 
+	// Don't use pubKey if account override
+	var oldKey string
+	if name.Source != do.Package.Account {
+		oldKey = do.PublicKey
+		do.PublicKey = ""
+	}
+
 	// Formulate tx
 	logger.Infof("NameReg Transaction =>\t\t%s:%s:%s\n", name.Name, name.Data, name.Amount)
 	tx, err := core.Name(do.Chain, do.Signer, do.PublicKey, name.Source, name.Amount, name.Nonce, name.Fee, name.Name, name.Data)
 	if err != nil {
 		logger.Errorf("ERROR =>\n")
 		return "", err
+	}
+
+	// Don't use pubKey if account override
+	if name.Source != do.Package.Account {
+		do.PublicKey = oldKey
 	}
 
 	// Sign, broadcast, display
@@ -158,12 +183,24 @@ func PermissionJob(perm *definitions.Permission, do *definitions.Do) (string, er
 		args = []string{perm.Target, perm.Role}
 	}
 
+	// Don't use pubKey if account override
+	var oldKey string
+	if perm.Source != do.Package.Account {
+		oldKey = do.PublicKey
+		do.PublicKey = ""
+	}
+
 	// Formulate tx
 	logger.Infof("Setting Permissions =>\t\t%s:%v\n", perm.Action, args)
 	tx, err := core.Permissions(do.Chain, do.Signer, do.PublicKey, perm.Source, perm.Nonce, perm.Action, args)
 	if err != nil {
 		logger.Errorf("ERROR =>\n")
 		return "", err
+	}
+
+	// Don't use pubKey if account override
+	if perm.Source != do.Package.Account {
+		do.PublicKey = oldKey
 	}
 
 	// Sign, broadcast, display
@@ -200,12 +237,24 @@ func UnbondJob(unbond *definitions.Unbond, do *definitions.Do) (string, error) {
 	// Use defaults
 	unbond.Account = useDefault(unbond.Account, do.Package.Account)
 
+	// Don't use pubKey if account override
+	var oldKey string
+	if unbond.Account != do.Package.Account {
+		oldKey = do.PublicKey
+		do.PublicKey = ""
+	}
+
 	// Formulate tx
 	logger.Infof("Unbond Transaction =>\t\t%s:%s\n", unbond.Account, unbond.Height)
 	tx, err := core.Unbond(unbond.Account, unbond.Height)
 	if err != nil {
 		logger.Errorf("ERROR =>\n")
 		return "", err
+	}
+
+	// Don't use pubKey if account override
+	if unbond.Account != do.Package.Account {
+		do.PublicKey = oldKey
 	}
 
 	// Sign, broadcast, display
@@ -220,12 +269,24 @@ func RebondJob(rebond *definitions.Rebond, do *definitions.Do) (string, error) {
 	// Use defaults
 	rebond.Account = useDefault(rebond.Account, do.Package.Account)
 
+	// Don't use pubKey if account override
+	var oldKey string
+	if rebond.Account != do.Package.Account {
+		oldKey = do.PublicKey
+		do.PublicKey = ""
+	}
+
 	// Formulate tx
 	logger.Infof("Rebond Transaction =>\t\t%s:%s\n", rebond.Account, rebond.Height)
 	tx, err := core.Rebond(rebond.Account, rebond.Height)
 	if err != nil {
 		logger.Errorf("ERROR =>\n")
 		return "", err
+	}
+
+	// Don't use pubKey if account override
+	if rebond.Account != do.Package.Account {
+		do.PublicKey = oldKey
 	}
 
 	// Sign, broadcast, display

@@ -85,7 +85,7 @@ func AddGlobalFlags() {
 	EPMCmd.PersistentFlags().StringVarP(&do.Chain, "chain", "c", "localhost:46657", "<ip:port> of chain which EPM should use")
 	EPMCmd.PersistentFlags().StringVarP(&do.Signer, "sign", "s", "localhost:4767", "<ip:port> of signer daemon which EPM should use")
 	EPMCmd.PersistentFlags().StringVarP(&do.Compiler, "compiler", "m", "compilers.eris.industries:8091", "<ip:port> of compiler which EPM should use")
-	EPMCmd.PersistentFlags().StringVarP(&do.PublicKey, "key", "k", "", "full public key to use by default")
+	// EPMCmd.PersistentFlags().StringVarP(&do.PublicKey, "key", "k", "", "full public key to use by default")
 	EPMCmd.PersistentFlags().StringVarP(&do.ChainID, "chain-id", "i", "", "identifier of the chain to work against")
 	EPMCmd.PersistentFlags().UintVarP(&do.DefaultGas, "gas", "g", 1111111111, "default gas to use; can be overridden for a single job")
 	EPMCmd.PersistentFlags().BoolVarP(&do.Verbose, "verbose", "v", false, "verbose output")

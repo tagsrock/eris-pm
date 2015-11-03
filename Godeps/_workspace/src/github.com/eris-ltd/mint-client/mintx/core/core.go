@@ -581,7 +581,7 @@ func checkCommon(nodeAddr, signAddr, pubkey, addr, amtS, nonceS string) (pub acc
 		if addr != "" {
 			// NOTE: if --addr given byt MINTX_PUBKEY is set, the pubkey still wins
 			// TODO: fix this
-			logger.Errorln("you have specified both a pubkey and an address. the pubkey takes precedent")
+			//logger.Errorln("you have specified both a pubkey and an address. the pubkey takes precedent")
 		}
 		pubKeyBytes, err = hex.DecodeString(pubkey)
 		if err != nil {
