@@ -86,14 +86,16 @@ func AddGlobalFlags() {
 	EPMCmd.PersistentFlags().StringVarP(&do.ABIPath, "abi-path", "a", defaultContracts(), "path to the abi directory EPM should use when saving ABIs after the compile process; default respects $EPM_ABI_PATH")
 	EPMCmd.PersistentFlags().StringVarP(&do.Chain, "chain", "c", defaultChain(), "<ip:port> of chain which EPM should use; default respects $EPM_CHAIN_ADDR")
 	EPMCmd.PersistentFlags().StringVarP(&do.Signer, "sign", "s", defaultSigner(), "<ip:port> of signer daemon which EPM should use; default respects $EPM_SIGNER_ADDR")
-	EPMCmd.PersistentFlags().StringVarP(&do.Compiler, "compiler", "m", defaultCompiler(), "<ip:port> of compiler which EPM should use; default respects $EPM_COMPILER_ADDR")
-	// EPMCmd.PersistentFlags().StringVarP(&do.PublicKey, "key", "k", "", "full public key to use by default; default respects $") // [csk]: currently not using as we use the defaultAddr and then pull the publicKey from eris-keys. This reduces the cognitive overload in learning.
-	EPMCmd.PersistentFlags().StringVarP(&do.DefaultAddr, "address", "r", defaultAddr(), "default address to use; operates the same way as the [account] job, only before the epm file is ran; default respects $EPM_ADDRESS")
-	EPMCmd.PersistentFlags().StringSliceVarP(&do.DefaultSets, "set", "e", defaultSets(), "Default sets to use; operates the same way as the [set] jobs, only before the epm file is ran (and after default address; default respects $EPM_SETS")
-	// EPMCmd.PersistentFlags().StringVarP(&do.ChainID, "chain-id", "i", "", "id of the chain to work against; default respects $") // [csk]: currently not exposing this as a cmd line flag as it is automatically retrieved from the chain
 	EPMCmd.PersistentFlags().UintVarP(&do.DefaultGas, "gas", "g", defaultGas(), "default gas to use; can be overridden for any single job; default respects $EPM_GAS")
+	EPMCmd.PersistentFlags().StringVarP(&do.Compiler, "compiler", "m", defaultCompiler(), "<ip:port> of compiler which EPM should use; default respects $EPM_COMPILER_ADDR")
+	EPMCmd.PersistentFlags().StringVarP(&do.DefaultAddr, "address", "r", defaultAddr(), "default address to use; operates the same way as the [account] job, only before the epm file is ran; default respects $EPM_ADDRESS")
+	EPMCmd.PersistentFlags().StringSliceVarP(&do.DefaultSets, "set", "e", defaultSets(), "default sets to use; operates the same way as the [set] jobs, only before the epm file is ran (and after default address; default respects $EPM_SETS")
+	EPMCmd.PersistentFlags().StringVarP(&do.DefaultFee, "fee", "n", defaultFee(), "default fee to use; default respects $EPM_FEE")
+	EPMCmd.PersistentFlags().StringVarP(&do.DefaultAmount, "amount", "u", defaultAmount(), "default amount to use; default respects $EPM_AMOUNT")
 	EPMCmd.PersistentFlags().BoolVarP(&do.Verbose, "verbose", "v", defaultVerbose(), "verbose output; more output than no output flags; less output than debug level; default respects $EPM_VERBOSE")
 	EPMCmd.PersistentFlags().BoolVarP(&do.Debug, "debug", "d", defaultDebug(), "debug level output; the most output available for epm; if it is too chatty use verbose flag; default respects $EPM_DEBUG")
+	// EPMCmd.PersistentFlags().StringVarP(&do.ChainID, "chain-id", "i", "", "id of the chain to work against; default respects $") // [csk]: currently not exposing this as a cmd line flag as it is automatically retrieved from the chain
+	// EPMCmd.PersistentFlags().StringVarP(&do.PublicKey, "key", "k", "", "full public key to use by default; default respects $") // [csk]: currently not using as we use the defaultAddr and then pull the publicKey from eris-keys. This reduces the cognitive overload in learning.
 }
 
 //----------------------------------------------------
@@ -130,6 +132,14 @@ func defaultCompiler() string {
 
 func defaultAddr() string {
 	return setDefaultString("EPM_ADDRESS", "")
+}
+
+func defaultFee() string {
+	return setDefaultString("EPM_FEE", "1234")
+}
+
+func defaultAmount() string {
+	return setDefaultString("EPM_AMOUNT", "9999")
 }
 
 func defaultSets() []string {

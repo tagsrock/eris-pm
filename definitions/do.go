@@ -13,6 +13,8 @@ type Do struct {
 	ChainID       string   `mapstructure:"," json:"," yaml:"," toml:","`
 	DefaultGas    uint     `mapstructure:"," json:"," yaml:"," toml:","`
 	DefaultAddr   string   `mapstructure:"," json:"," yaml:"," toml:","`
+	DefaultAmount string   `mapstructure:"," json:"," yaml:"," toml:","`
+	DefaultFee    string   `mapstructure:"," json:"," yaml:"," toml:","`
 	DefaultSets   []string `mapstructure:"," json:"," yaml:"," toml:","`
 
 	Package *Package

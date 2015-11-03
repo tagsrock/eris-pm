@@ -131,8 +131,8 @@ func registerNameTx(name *definitions.RegisterName, do *definitions.Do) (string,
 
 	// Set Defaults
 	name.Source = useDefault(name.Source, do.Package.Account)
-	name.Fee = useDefault(name.Fee, "1234")       // TODO: less hackify this.
-	name.Amount = useDefault(name.Amount, "9999") // TODO: less hackify this.
+	name.Fee = useDefault(name.Fee, do.DefaultFee)
+	name.Amount = useDefault(name.Amount, do.DefaultAmount)
 
 	// Don't use pubKey if account override
 	var oldKey string

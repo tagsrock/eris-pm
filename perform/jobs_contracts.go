@@ -32,9 +32,9 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (string, error) {
 
 	// Use default
 	deploy.Source = useDefault(deploy.Source, do.Package.Account)
-	deploy.Amount = useDefault(deploy.Amount, "9999") // TODO: less hackify this.
-	deploy.Fee = useDefault(deploy.Fee, "1234")       // TODO: less hackify this.
-	deploy.Gas = useDefault(deploy.Gas, "999999999")  // TODO: less hackify this.
+	deploy.Amount = useDefault(deploy.Amount, do.DefaultAmount)
+	deploy.Fee = useDefault(deploy.Fee, do.DefaultFee)
+	deploy.Gas = useDefault(deploy.Gas, do.DefaultGas)
 
 	// assemble contract
 	var p string
@@ -102,9 +102,9 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 
 	// Use default
 	call.Source = useDefault(call.Source, do.Package.Account)
-	call.Amount = useDefault(call.Amount, "9999") // TODO: less hackify this.
-	call.Fee = useDefault(call.Fee, "1234")       // TODO: less hackify this.
-	call.Gas = useDefault(call.Gas, "999999999")  // TODO: less hackify this.
+	call.Amount = useDefault(call.Amount, do.DefaultAmount)
+	call.Fee = useDefault(call.Fee, do.DefaultFee)
+	call.Gas = useDefault(call.Gas, do.DefaultGas)
 
 	var err error
 	call.Data, err = util.ReadAbiFormulateCall(call.Destination, call.Data, do)
