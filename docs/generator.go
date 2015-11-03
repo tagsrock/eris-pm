@@ -198,10 +198,10 @@ func GenerateSpecs(dir string) []string {
 }
 
 func main() {
-	eris := commands.EPMCmd
-	commands.InitializeConfig()
-	commands.AddGlobalFlags()
-	commands.AddCommands()
+	eris := cmd.EPMCmd
+	// cmd.InitializeConfig()
+	cmd.AddGlobalFlags()
+	// cmd.AddCommands()
 	specs := GenerateSpecs(SPECS_DIR)
 	GenerateTree(eris, RENDER_DIR, specs)
 }

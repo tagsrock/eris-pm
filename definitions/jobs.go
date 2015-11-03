@@ -5,10 +5,16 @@ package definitions
 // ------------------------------------------------------------------------
 
 type Account struct {
+	// (Required) address of the account which should be used as the default (if source) is
+	// not given for future transactions. Will make sure the eris-keys has the public key
+	// for the account. Generally account should be the first job called unless it is used
+	// via a flag or environment variables to establish what default to use.
 	Address string `mapstructure:"address" json:"address" yaml:"address" toml:"address"`
 }
 
 type Set struct {
+	// (Required) value which should be saved along with the jobName (which will be the key)
+	// this is useful to set variables which can be used throughout the epm definition file
 	Value string `mapstructure:"val" json:"val" yaml:"val" toml:"val"`
 }
 
@@ -17,54 +23,95 @@ type Set struct {
 // ------------------------------------------------------------------------
 
 type Send struct {
-	Source      string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	// (Optional, if account job or global account set) address of the account from which to send (the
+	// public key for the account must be available to eris-keys)
+	Source string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	// (Required) address of the account to send the tokens
 	Destination string `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
-	Amount      string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
-	Nonce       string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
-	Wait        bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+	// (Required) amount of tokens to send from the `source` to the `destination`
+	Amount string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
+	// (Optional, advanced only) nonce to use when eris-keys signs the transaction (do not use unless you
+	// know what you're doing)
+	Nonce string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
+	// (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
+	Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
 type RegisterName struct {
-	Source   string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
-	Name     string `mapstructure:"name" json:"name" yaml:"name" toml:"name"`
-	Data     string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+	// (Optional, if account job or global account set) address of the account from which to send (the
+	// public key for the account must be available to eris-keys)
+	Source string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	// (Required) name which will be registered
+	Name string `mapstructure:"name" json:"name" yaml:"name" toml:"name"`
+	// (Optional, if data_file is used; otherwise required) data which will be stored at the `name` key
+	Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+	// (Optional) csv file in the form (name,data[,amount]) which can be used to bulk register names
 	DataFile string `mapstructure:"data_file" json:"data_file" yaml:"data_file" toml:"data_file"`
-	Amount   string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
-	Fee      string `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
-	Nonce    string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
-	Wait     bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+	// (Optional) amount of blocks which the name entry will be reserved for the registering user
+	Amount string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
+	// (Optional) validators' fee
+	Fee string `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
+	// (Optional, advanced only) nonce to use when eris-keys signs the transaction (do not use unless you
+	// know what you're doing)
+	Nonce string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
+	// (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
+	Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
-// Action: "set_base", "unset_base", "set_global", "add_role" "rm_role"
 type Permission struct {
-	Source         string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
-	Action         string `mapstructure:"action" json:"action" yaml:"action" toml:"action"`
+	// (Optional, if account job or global account set) address of the account from which to send (the
+	// public key for the account must be available to eris-keys)
+	Source string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	// (Required) actions must be in the set ["set_base", "unset_base", "set_global", "add_role" "rm_role"]
+	Action string `mapstructure:"action" json:"action" yaml:"action" toml:"action"`
+	// (Required, unless add_role or rm_role action selected) the name of the permission flag which is to
+	// be updated
 	PermissionFlag string `mapstructure:"permission" json:"permission" yaml:"permission" toml:"permission"`
-	Value          string `mapstructure:"value" json:"value" yaml:"value" toml:"value"`
-	Target         string `mapstructure:"target" json:"target" yaml:"target" toml:"target"`
-	Role           string `mapstructure:"role" json:"role" yaml:"role" toml:"role"`
-	Nonce          string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
-	Wait           bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+	// (Required) the value of the permission or role which is to be updated
+	Value string `mapstructure:"value" json:"value" yaml:"value" toml:"value"`
+	// (Required) the target account which is to be updated
+	Target string `mapstructure:"target" json:"target" yaml:"target" toml:"target"`
+	// (Required, if add_role or rm_role action selected) the role which should be given to the account
+	Role string `mapstructure:"role" json:"role" yaml:"role" toml:"role"`
+	// (Optional, advanced only) nonce to use when eris-keys signs the transaction (do not use unless you
+	// know what you're doing)
+	Nonce string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
+	// (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
+	Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
 type Bond struct {
+	// (Required) public key of the address which will be bonded
 	PublicKey string `mapstructure:"pub_key" json:"pub_key" yaml:"pub_key" toml:"pub_key"`
-	Account   string `mapstructure:"account" json:"account" yaml:"account" toml:"account"`
-	Amount    string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
-	Nonce     string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
-	Wait      bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+	// (Required) address of the account which will be bonded
+	Account string `mapstructure:"account" json:"account" yaml:"account" toml:"account"`
+	// (Required) amount of tokens which will be bonded
+	Amount string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
+	// (Optional, advanced only) nonce to use when eris-keys signs the transaction (do not use unless you
+	// know what you're doing)
+	Nonce string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
+	// (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
+	Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
 type Unbond struct {
+	// (Required) address of the account which to unbond
 	Account string `mapstructure:"account" json:"account" yaml:"account" toml:"account"`
-	Height  string `mapstructure:"height" json:"height" yaml:"height" toml:"height"`
-	Wait    bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+	// (Required) block on which the unbonding will take place (users may unbond at any
+	// time >= currentBlock)
+	Height string `mapstructure:"height" json:"height" yaml:"height" toml:"height"`
+	// (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
+	Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
 type Rebond struct {
+	// (Required) address of the account which to rebond
 	Account string `mapstructure:"account" json:"account" yaml:"account" toml:"account"`
-	Height  string `mapstructure:"height" json:"height" yaml:"height" toml:"height"`
-	Wait    bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+	// (Required) block on which the rebonding will take place (users may rebond at any
+	// time >= (unbondBlock || currentBlock))
+	Height string `mapstructure:"height" json:"height" yaml:"height" toml:"height"`
+	// (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
+	Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
 // ------------------------------------------------------------------------
@@ -76,26 +123,49 @@ type PackageDeploy struct {
 }
 
 type Deploy struct {
-	Source   string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	// (Optional, if account job or global account set) address of the account from which to send (the
+	// public key for the account must be available to eris-keys)
+	Source string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	// (Required) the filepath to the contract file. this should be relative to the current path **or**
+	// relative to the contracts path established via the --contracts-path flag or the $EPM_CONTRACTS_PATH
+	// environment variable
 	Contract string `mapstructure:"contract" json:"contract" yaml:"contract" toml:"contract"`
-	// TODO: additional arguments
-	Data     string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
-	Amount   string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
-	Nonce    string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
-	Fee      string `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
-	Gas      string `mapstructure:"gas" json:"gas" yaml:"gas" toml:"gas"`
-	Wait     bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+	// (Optional) TODO: additional arguments to send along with the contract code
+	Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+	// (Optional) amount of tokens to send to the contract which will (after deployment) reside in the
+	// contract's account
+	Amount string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
+	// (Optional) validators' fee
+	Fee string `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
+	// (Optional) amount of gas which should be sent along with the contract deployment transaction
+	Gas string `mapstructure:"gas" json:"gas" yaml:"gas" toml:"gas"`
+	// (Optional, advanced only) nonce to use when eris-keys signs the transaction (do not use unless you
+	// know what you're doing)
+	Nonce string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
+	// (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
+	Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
 type Call struct {
-	Source      string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	// (Optional, if account job or global account set) address of the account from which to send (the
+	// public key for the account must be available to eris-keys)
+	Source string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	// (Required) address of the contract which should be called
 	Destination string `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
-	Data        string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
-	Amount      string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
-	Nonce       string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
-	Fee         string `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
-	Gas         string `mapstructure:"gas" json:"gas" yaml:"gas" toml:"gas"`
-	Wait        bool   `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+	// (Required) data which should be called. will use the eris-abi tooling under the hood to formalize the
+	// transaction
+	Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+	// (Optional) amount of tokens to send to the contract
+	Amount string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
+	// (Optional) validators' fee
+	Fee string `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
+	// (Optional) amount of gas which should be sent along with the call transaction
+	Gas string `mapstructure:"gas" json:"gas" yaml:"gas" toml:"gas"`
+	// (Optional, advanced only) nonce to use when eris-keys signs the transaction (do not use unless you
+	// know what you're doing)
+	Nonce string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
+	// (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
+	Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
 
 // ------------------------------------------------------------------------
@@ -121,33 +191,52 @@ type RestoreState struct {
 // Testing Jobs
 // ------------------------------------------------------------------------
 
-// aka. Simulated Call. Only exposed for testing
+// aka. Simulated Call.
 type QueryContract struct {
-	Source      string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	// (Optional, if account job or global account set) address of the account from which to send (the
+	// public key for the account must be available to eris-keys)
+	Source string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
+	// (Required) address of the contract which should be called
 	Destination string `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
-	Data        string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+	// (Required) data which should be called. will use the eris-abi tooling under the hood to formalize the
+	// transaction. QueryContract will usually be used with "accessor" functions in contracts
+	Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
 }
 
-// Only exposed for testing
 type QueryAccount struct {
+	// (Required) address of the account which should be queried
 	Account string `mapstructure:"account" json:"account" yaml:"account" toml:"account"`
-	Field   string `mapstructure:"field" json:"field" yaml:"field" toml:"field"`
+	// (Required) field which should be queried. If users are trying to query the permissions of the
+	// account one can get either the `permissions.base` which will return the base permission of the
+	// account, or one can get the `permissions.set` which will return the setBit of the account.
+	Field string `mapstructure:"field" json:"field" yaml:"field" toml:"field"`
 }
 
-// Only exposed for testing
 type QueryName struct {
-	Name  string `mapstructure:"name" json:"name" yaml:"name" toml:"name"`
+	// (Required) name which should be queried
+	Name string `mapstructure:"name" json:"name" yaml:"name" toml:"name"`
+	// (Required) field which should be quiried (generally will be "data" to get the registered "name")
 	Field string `mapstructure:"field" json:"field" yaml:"field" toml:"field"`
 }
 
-// Only exposed for testing
 type QueryVals struct {
+	// (Required) should be of the set ["bonded_validators" or "unbonding_validators"] and it will
+	// return a comma separated listing of the addresses which fall into one of those categories
 	Field string `mapstructure:"field" json:"field" yaml:"field" toml:"field"`
 }
 
-// Only exposed for testing
 type Assert struct {
-	Key      string `mapstructure:"key" json:"key" yaml:"key" toml:"key"`
+	// (Required) key which should be used for the assertion. This is usually known as the "expected"
+	// value in most testing suites
+	Key string `mapstructure:"key" json:"key" yaml:"key" toml:"key"`
+	// (Required) must be of the set ["eq", "ne", "ge", "gt", "le", "lt", "==", "!=", ">=", ">", "<=", "<"]
+	// establishes the relation to be tested by the assertion. If a strings key:value pair is being used
+	// only the equals or not-equals relations may be used as the key:value will try to be converted to
+	// ints for the remainder of the relations. if strings are passed to them then eris:pm will return an
+	// error
 	Relation string `mapstructure:"relation" json:"relation" yaml:"relation" toml:"relation"`
-	Value    string `mapstructure:"val" json:"val" yaml:"val" toml:"val"`
+	// (Required) value which should be used for the assertion. This is usually known as the "given"
+	// value in most testing suites. Generally it will be a variable expansion from one of the query
+	// jobs.
+	Value string `mapstructure:"val" json:"val" yaml:"val" toml:"val"`
 }
