@@ -5,7 +5,7 @@ import (
 	"github.com/eris-ltd/eris-pm/util"
 )
 
-func RunDeployJobs(do *definitions.Do) error {
+func RunJobs(do *definitions.Do) error {
 	for _, job := range do.Package.Jobs {
 		var err error
 		switch {
@@ -56,24 +56,8 @@ func RunDeployJobs(do *definitions.Do) error {
 		case job.Job.DumpState != nil:
 			announce(job.JobName, "DumpState")
 			job.JobResult, err = DumpStateJob(job.Job.DumpState, do)
-		}
 
-		if err != nil {
-			return err
-		}
-
-		if err = util.WriteJobResult(job.JobName, job.JobResult); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-func RunTestJobs(do *definitions.Do) error {
-	for _, job := range do.Package.Jobs {
-		var err error
-		switch {
+		// Test jobs
 		case job.Job.QueryAccount != nil:
 			announce(job.JobName, "QueryAccount")
 			job.JobResult, err = QueryAccountJob(job.Job.QueryAccount, do)
@@ -89,6 +73,7 @@ func RunTestJobs(do *definitions.Do) error {
 		case job.Job.Assert != nil:
 			announce(job.JobName, "Assert")
 			job.JobResult, err = AssertJob(job.Job.Assert, do)
+
 		}
 
 		if err != nil {

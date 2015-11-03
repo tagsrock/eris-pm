@@ -5,10 +5,10 @@ import (
 	"github.com/eris-ltd/eris-pm/perform"
 )
 
-func Deploy(do *definitions.Do) error {
+func RunPackage(do *definitions.Do) error {
 	var err error
 
-	// Load the package if it doesn't exist (as will happen with testing)
+	// Load the package if it doesn't exist
 	if do.Package == nil {
 		do.Package, err = LoadPackage(do.YAMLPath)
 		if err != nil {
@@ -16,5 +16,5 @@ func Deploy(do *definitions.Do) error {
 		}
 	}
 
-	return perform.RunDeployJobs(do)
+	return perform.RunJobs(do)
 }

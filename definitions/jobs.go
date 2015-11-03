@@ -78,6 +78,8 @@ type PackageDeploy struct {
 type Deploy struct {
 	Source   string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
 	Contract string `mapstructure:"contract" json:"contract" yaml:"contract" toml:"contract"`
+	// TODO: additional arguments
+	Data     string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
 	Amount   string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
 	Nonce    string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
 	Fee      string `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`

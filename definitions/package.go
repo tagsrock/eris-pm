@@ -19,8 +19,8 @@ type Job struct {
 	Set *Set `mapstructure:"set" json:"set" yaml:"set" toml:"set"`
 
 	// Contract compile and send to the chain functions
-	// @dennismckinnon working on these
 	Deploy        *Deploy        `mapstructure:"deploy" json:"deploy" yaml:"deploy" toml:"deploy"`
+	// @dennismckinnon working on this
 	PackageDeploy *PackageDeploy `mapstructure:"package-deploy" json:"package-deploy" yaml:"package-deploy" toml:"package-deploy"`
 
 	// Wrapper for mintx

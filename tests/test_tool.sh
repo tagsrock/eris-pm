@@ -47,9 +47,9 @@ do
   cd $app
   if [[ "$1" == "local" ]]
   then
-    epm test
+    epm
   else
-    epm --chain chain:46657 --sign keys:4767 test
+    epm --chain chain:46657 --sign keys:4767
   fi
 
   # Set exit code properly
@@ -69,7 +69,9 @@ done
 
 if [ $test_exit -ne 0 ]
 then
+  echo ""
   echo "EPM Log on Failed Test."
+  echo ""
   cat $failing_dir/epm.log
 fi
 echo ""

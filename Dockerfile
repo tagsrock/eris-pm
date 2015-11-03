@@ -28,4 +28,4 @@ RUN chown --recursive $USER:$USER /home/$USER
 VOLUME /home/$USER/.eris
 WORKDIR /home/$USER/.eris
 USER $USER
-ENTRYPOINT ["epm"]
+CMD ["epm", "--chain", "chain:46657", "--sign", "keys:4767" ]
