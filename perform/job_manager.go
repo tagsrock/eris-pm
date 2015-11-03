@@ -1,13 +1,27 @@
 package perform
 
 import (
+	"strings"
+
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
 )
 
 func RunJobs(do *definitions.Do) error {
+	var err error
+
+	// ADD DefaultAddr and DefaultSet to jobs array....
+	// These work in reverse order and the addendums to the
+	// the ordering from the loading process is lifo
+	if len(do.DefaultSets) >= 1 {
+		defaultSetJobs(do)
+	}
+
+	if do.DefaultAddr != "" {
+		defaultAddrJob(do)
+	}
+
 	for _, job := range do.Package.Jobs {
-		var err error
 		switch {
 
 		// Util jobs
@@ -91,4 +105,39 @@ func RunJobs(do *definitions.Do) error {
 func announce(job, typ string) {
 	logger.Printf("Executing Job Named =>\t\t%s\n", job)
 	logger.Infof("\tType =>\t\t\t%s\n", typ)
+}
+
+func defaultAddrJob(do *definitions.Do) {
+	oldJobs := do.Package.Jobs
+
+	newJob := &definitions.Jobs{
+		JobName: "defaultAddr",
+		Job: &definitions.Job{
+			Account: &definitions.Account{
+				Address: do.DefaultAddr,
+			},
+		},
+	}
+
+	do.Package.Jobs = append([]*definitions.Jobs{newJob}, oldJobs...)
+}
+
+func defaultSetJobs(do *definitions.Do) {
+	oldJobs := do.Package.Jobs
+
+	newJobs := []*definitions.Jobs{}
+
+	for _, setr := range do.DefaultSets {
+		blowdUp := strings.Split(setr, ",")
+		newJobs = append(newJobs, &definitions.Jobs{
+			JobName: blowdUp[0],
+			Job: &definitions.Job{
+				Set: &definitions.Set{
+					Value: blowdUp[1],
+				},
+			},
+		})
+	}
+
+	do.Package.Jobs = append(newJobs, oldJobs...)
 }

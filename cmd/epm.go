@@ -2,6 +2,8 @@ package commands
 
 import (
 	"os"
+	"strconv"
+	"strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/packages"
@@ -21,7 +23,7 @@ var do *definitions.Do
 
 // Defining the root command
 var EPMCmd = &cobra.Command{
-	Use:   "epm [flags]",
+	Use:   "epm",
 	Short: "The Eris Package Manager Deploys and Tests Smart Contract Systems",
 	Long: `The Eris Package Manager Deploys and Tests Smart Contract Systems
 
@@ -79,20 +81,103 @@ func Execute() {
 // Flags that are to be used by commands are handled by the Do struct
 // Define the persistent commands (globals)
 func AddGlobalFlags() {
-	EPMCmd.PersistentFlags().StringVarP(&do.YAMLPath, "file", "f", "./epm.yaml", "path to package file which EPM should use")
-	EPMCmd.PersistentFlags().StringVarP(&do.ContractsPath, "contracts-path", "p", "./contracts", "path to the contracts EPM should use")
-	EPMCmd.PersistentFlags().StringVarP(&do.ABIPath, "abi-path", "a", "./abi", "path to the abi directory EPM should use")
-	EPMCmd.PersistentFlags().StringVarP(&do.Chain, "chain", "c", "localhost:46657", "<ip:port> of chain which EPM should use")
-	EPMCmd.PersistentFlags().StringVarP(&do.Signer, "sign", "s", "localhost:4767", "<ip:port> of signer daemon which EPM should use")
-	EPMCmd.PersistentFlags().StringVarP(&do.Compiler, "compiler", "m", "compilers.eris.industries:8091", "<ip:port> of compiler which EPM should use")
-	// EPMCmd.PersistentFlags().StringVarP(&do.PublicKey, "key", "k", "", "full public key to use by default")
-	EPMCmd.PersistentFlags().StringVarP(&do.ChainID, "chain-id", "i", "", "identifier of the chain to work against")
-	EPMCmd.PersistentFlags().UintVarP(&do.DefaultGas, "gas", "g", 1111111111, "default gas to use; can be overridden for a single job")
-	EPMCmd.PersistentFlags().BoolVarP(&do.Verbose, "verbose", "v", false, "verbose output")
-	EPMCmd.PersistentFlags().BoolVarP(&do.Debug, "debug", "d", false, "debug level output")
+	EPMCmd.PersistentFlags().StringVarP(&do.YAMLPath, "file", "f", defaultFile(), "path to package file which EPM should use; default respects $EPM_FILE")
+	EPMCmd.PersistentFlags().StringVarP(&do.ContractsPath, "contracts-path", "p", defaultContracts(), "path to the contracts EPM should use; default respects $EPM_CONTRACTS_PATH")
+	EPMCmd.PersistentFlags().StringVarP(&do.ABIPath, "abi-path", "a", defaultContracts(), "path to the abi directory EPM should use when saving ABIs after the compile process; default respects $EPM_ABI_PATH")
+	EPMCmd.PersistentFlags().StringVarP(&do.Chain, "chain", "c", defaultChain(), "<ip:port> of chain which EPM should use; default respects $EPM_CHAIN_ADDR")
+	EPMCmd.PersistentFlags().StringVarP(&do.Signer, "sign", "s", defaultSigner(), "<ip:port> of signer daemon which EPM should use; default respects $EPM_SIGNER_ADDR")
+	EPMCmd.PersistentFlags().StringVarP(&do.Compiler, "compiler", "m", defaultCompiler(), "<ip:port> of compiler which EPM should use; default respects $EPM_COMPILER_ADDR")
+	// EPMCmd.PersistentFlags().StringVarP(&do.PublicKey, "key", "k", "", "full public key to use by default; default respects $") // [csk]: currently not using as we use the defaultAddr and then pull the publicKey from eris-keys. This reduces the cognitive overload in learning.
+	EPMCmd.PersistentFlags().StringVarP(&do.DefaultAddr, "address", "r", defaultAddr(), "default address to use; operates the same way as the [account] job, only before the epm file is ran; default respects $EPM_ADDRESS")
+	EPMCmd.PersistentFlags().StringSliceVarP(&do.DefaultSets, "set", "e", defaultSets(), "Default sets to use; operates the same way as the [set] jobs, only before the epm file is ran (and after default address; default respects $EPM_SETS")
+	// EPMCmd.PersistentFlags().StringVarP(&do.ChainID, "chain-id", "i", "", "id of the chain to work against; default respects $") // [csk]: currently not exposing this as a cmd line flag as it is automatically retrieved from the chain
+	EPMCmd.PersistentFlags().UintVarP(&do.DefaultGas, "gas", "g", defaultGas(), "default gas to use; can be overridden for any single job; default respects $EPM_GAS")
+	EPMCmd.PersistentFlags().BoolVarP(&do.Verbose, "verbose", "v", defaultVerbose(), "verbose output; more output than no output flags; less output than debug level; default respects $EPM_VERBOSE")
+	EPMCmd.PersistentFlags().BoolVarP(&do.Debug, "debug", "d", defaultDebug(), "debug level output; the most output available for epm; if it is too chatty use verbose flag; default respects $EPM_DEBUG")
 }
 
 //----------------------------------------------------
 func RunPackage(cmd *cobra.Command, args []string) {
 	IfExit(packages.RunPackage(do))
+}
+
+// ---------------------------------------------------
+// Defaults
+
+func defaultFile() string {
+	return setDefaultString("EPM_FILE", "./epm.yaml")
+}
+
+func defaultContracts() string {
+	return setDefaultString("EPM_CONTRACTS_PATH", "./contracts")
+}
+
+func defaultAbi() string {
+	return setDefaultString("EPM_ABI_PATH", "./abi")
+}
+
+func defaultChain() string {
+	return setDefaultString("EPM_CHAIN_ADDR", "localhost:46657")
+}
+
+func defaultSigner() string {
+	return setDefaultString("EPM_SIGNER_ADDR", "localhost:4767")
+}
+
+func defaultCompiler() string {
+	return setDefaultString("EPM_COMPILER_ADDR", "compilers.eris.industries:8091")
+}
+
+func defaultAddr() string {
+	return setDefaultString("EPM_ADDRESS", "")
+}
+
+func defaultSets() []string {
+	return setDefaultStringSlice("EPM_SETS", []string{})
+}
+
+func defaultGas() uint {
+	return setDefaultUInt("EPM_GAS", 1111111111)
+}
+
+func defaultVerbose() bool {
+	return setDefaultBool("EPM_VERBOSE", false)
+}
+
+func defaultDebug() bool {
+	return setDefaultBool("EPM_DEBUG", false)
+}
+
+func setDefaultBool(envVar string, def bool) bool {
+	env := os.Getenv(envVar)
+	if env != "" {
+		i, _ := strconv.ParseBool(env)
+		return i
+	}
+	return def
+}
+
+func setDefaultString(envVar, def string) string {
+	env := os.Getenv(envVar)
+	if env != "" {
+		return env
+	}
+	return def
+}
+
+func setDefaultStringSlice(envVar string, def []string) []string {
+	env := os.Getenv(envVar)
+	if env != "" {
+		return strings.Split(env, ";")
+	}
+	return def
+}
+
+func setDefaultUInt(envVar string, def uint) uint {
+	env := os.Getenv(envVar)
+	if env != "" {
+		i, _ := strconv.Atoi(env)
+		return uint(i)
+	}
+	return def
 }
