@@ -32,9 +32,9 @@ branch=${CIRCLE_BRANCH:=master}
 branch=${branch/-/_}
 
 # Define now the tool tests within the Docker container will be booted from docker run
-entrypoint="/home/eris/test_tool.sh"
-testimage=quay.io/eris/epm
-testuser=eris
+# entrypoint="/home/eris/test_tool.sh"
+# testimage=quay.io/eris/epm
+# testuser=eris
 
 # Key variables
 key1_addr="1040E6521541DAB4E7EE57F21226DD17CE9F0FB7"
@@ -76,10 +76,99 @@ early_exit(){
   exit 1
 }
 
+test_setup(){
+  echo "Getting Setup"
+  if [ "$circle" = true ]
+  then
+    export ERIS_PULL_APPROVE="true"
+    eris init --yes --skip-pull 1>/dev/null
+
+    # by default the keys daemon does not export its port to the host
+    # for this sequencing to work properly it needs to be exported.
+    # this is a hack.
+    echo 'ports = [ "4767:4767" ]' >> ~/.eris/services/keys.toml
+  fi
+
+  ensure_running keys
+  eris services exec keys "eris-keys import $(cat tests/fixtures/keys/$key1_addr) --no-pass" 1>/dev/null
+  eris services exec keys "eris-keys import $(cat tests/fixtures/keys/$key2_addr) --no-pass" 1>/dev/null
+
+  # check keys were properly imported
+  eris services exec keys "eris-keys pub --addr $key1_addr" 1>/dev/null
+  early_exit
+  eris services exec keys "eris-keys pub --addr $key2_addr" 1>/dev/null
+  early_exit
+
+  eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata 1>/dev/null
+  sleep 5 # boot time
+  echo "Setup complete"
+}
+
+perform_tests(){
+  echo ""
+  cd $repo/tests/fixtures
+  apps=(app*/)
+  for app in "${apps[@]}"
+  do
+    echo ""
+    echo -e "Testing EPM using fixture =>\t${app%/}"
+
+    # Run the epm deploy
+    cd $app
+    if [ "$circle" = false ]
+    then
+      eris contracts test --chain "epm-tests-$uuid"
+    else
+      echo "In circle. Not removing container."
+      eris contracts test --chain "epm-tests-$uuid" --rm
+    fi
+
+    # Set exit code properly
+    test_exit=$?
+    if [ $test_exit -ne 0 ]
+    then
+      failing_dir=`pwd`
+      break
+    fi
+
+    # Reset for next run
+    cd ..
+  done
+}
+
+test_teardown(){
+  if [ $test_exit -ne 0 ]
+  then
+    echo ""
+    echo "EPM Log on Failed Test."
+    cat $failing_dir/epm.log
+  fi
+  if [ "$circle" = false ]
+  then
+    echo ""
+    eris chains stop -rxf epm-tests-$uuid 1>/dev/null
+    eris chains rm -f epm-tests-$uuid 1>/dev/null
+    rm -rf ~/.eris/data/epm-tests-*
+    if [ "$was_running" -eq 0 ]
+    then
+      eris services stop -rx keys
+    fi
+  fi
+  echo ""
+  if [ "$test_exit" -eq 0 ]
+  then
+    echo "Tests complete! Tests are Green. :)"
+  else
+    echo "Tests complete. Tests are Red. :("
+  fi
+  cd $start
+  exit $test_exit
+}
+
 # ---------------------------------------------------------------------------
 # Get the things build and dependencies turned on
 
-echo "Hello! I'm the testing suite for epm."
+echo "Hello! I'm the marmot that tests the epm tooling."
 echo ""
 echo "Building epm in a docker container."
 start=`pwd`
@@ -94,91 +183,22 @@ echo "Build complete."
 echo ""
 
 # ---------------------------------------------------------------------------
+# Setup
+
+test_setup
+
+# ---------------------------------------------------------------------------
 # Go!
 
-echo "Getting Setup"
-if [ "$circle" = true ]
+if [[ "$1" != "setup" ]]
 then
-  export ERIS_PULL_APPROVE="true"
-  eris init --yes --skip-pull 1>/dev/null
-
-  # by default the keys daemon does not export its port to the host
-  # for this sequencing to work properly it needs to be exported.
-  # this is a hack.
-  echo 'ports = [ "4767:4767" ]' >> ~/.eris/services/keys.toml
+  perform_tests
 fi
-
-ensure_running keys
-eris services exec keys "eris-keys import $(cat tests/fixtures/keys/$key1_addr) --no-pass" 1>/dev/null
-eris services exec keys "eris-keys import $(cat tests/fixtures/keys/$key2_addr) --no-pass" 1>/dev/null
-
-# check keys were properly imported
-eris services exec keys "eris-keys pub --addr $key1_addr" 1>/dev/null
-early_exit
-eris services exec keys "eris-keys pub --addr $key2_addr" 1>/dev/null
-early_exit
-
-eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata 1>/dev/null
-sleep 5 # boot time
-echo "Setup complete"
-
-echo ""
-echo "Hello! I'm the marmot that tests the epm tooling."
-cd $repo/tests/fixtures
-apps=(app*/)
-for app in "${apps[@]}"
-do
-  echo ""
-  echo -e "Testing EPM using fixture =>\t${app%/}"
-
-  # Run the epm deploy
-  cd $app
-  if [ "$circle" = false ]
-  then
-    eris contracts test --chain "epm-tests-$uuid"
-  else
-    echo "In circle. Not removing container."
-    eris contracts test --chain "epm-tests-$uuid" --rm
-  fi
-
-  # Set exit code properly
-  test_exit=$?
-  if [ $test_exit -ne 0 ]
-  then
-    failing_dir=`pwd`
-    break
-  fi
-
-  # Reset for next run
-  cd ..
-done
 
 # ---------------------------------------------------------------------------
 # Cleaning up
 
-if [ $test_exit -ne 0 ]
+if [[ "$1" != "setup" ]]
 then
-  echo ""
-  echo "EPM Log on Failed Test."
-  echo ""
-  cat $failing_dir/epm.log
+  test_teardown
 fi
-if [ "$circle" = false ]
-then
-  eris chains stop -rxf epm-tests-$uuid 1>/dev/null
-  eris chains rm -f epm-tests-$uuid 1>/dev/null
-  rm -rf ~/.eris/data/epm-tests-*
-  if [ "$was_running" -eq 0 ]
-  then
-    eris services stop -rx keys
-  fi
-fi
-echo ""
-if [ "$test_exit" -eq 0 ]
-then
-  echo "Tests complete! Tests are Green. :)"
-else
-  echo "Tests complete. Tests are Red. :("
-fi
-cd $start
-exit $test_exit

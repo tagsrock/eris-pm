@@ -60,7 +60,6 @@ Complete documentation is available at https://docs.erisindustries.com
 		config.Set("chain_id", do.ChainID)
 		config.Set("log_level", "error")
 		cfg.ApplyConfig(config)
-
 	},
 
 	Run: RunPackage,
