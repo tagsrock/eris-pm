@@ -40,10 +40,10 @@ testuser=eris
 # Key shit variables
 # key1="46AB0C9688DB87D4705145537C85EF2E006AE0FCD8C46DCD35E0F5794582531C82DADAE153406412833F8098439ED4B5DCC26C0B43C2775EFFE8B911B49D0182"
 # key2="7320259F11DE51108980D48F35E6B76938E648877431F2B290047F89244DD7DD77D803D934A3351444E6BC757CDF0EB476CE0F56F975E776BEE1DB6A082E2AF9"
-key1="RqsMlojbh9RwUUVTfIXvLgBq4PzYxG3NNeD1eUWCUxyC2trhU0BkEoM/gJhDntS13MJsC0PCd17/6LkRtJ0Bgg=="
-key1=`echo -n "$key1" | base64 -d | hexdump -ve '1/1 "%.2X"'`
-key2="cyAlnxHeURCJgNSPNea3aTjmSId0MfKykAR/iSRN19132APZNKM1FETmvHV83w60ds4PVvl153a+4dtqCC4q+Q=="
-key2=`echo -n "$key2" | base64 -d | hexdump -ve '1/1 "%.2X"'`
+# key1="RqsMlojbh9RwUUVTfIXvLgBq4PzYxG3NNeD1eUWCUxyC2trhU0BkEoM/gJhDntS13MJsC0PCd17/6LkRtJ0Bgg=="
+# key1=`echo -n "$key1" | base64 -d | hexdump -ve '1/1 "%.2X"'`
+# key2="cyAlnxHeURCJgNSPNea3aTjmSId0MfKykAR/iSRN19132APZNKM1FETmvHV83w60ds4PVvl153a+4dtqCC4q+Q=="
+# key2=`echo -n "$key2" | base64 -d | hexdump -ve '1/1 "%.2X"'`
 key1_addr="1040E6521541DAB4E7EE57F21226DD17CE9F0FB7"
 key2_addr="58FD1799AA32DED3F6EAC096A1DC77834A446B9C"
 
@@ -113,8 +113,8 @@ fi
 ensure_running keys
 
 keysHost=$(eris services inspect keys NetworkSettings.IPAddress)
-eris-keys import "$key1" --no-pass --host $keysHost 1>/dev/null
-eris-keys import "$key2" --no-pass --host $keysHost 1>/dev/null
+eris-keys import tests/fixtures/chaindata/$key1_addr --no-pass --host $keysHost 1>/dev/null
+eris-keys import tests/fixtures/chaindata/$key2_addr --no-pass --host $keysHost 1>/dev/null
 
 # check keys were properly imported
 eris-keys pub --addr "$key1_addr" 1>/dev/null
