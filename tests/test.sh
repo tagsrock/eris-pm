@@ -137,6 +137,7 @@ do
   then
     eris contracts test --chain "epm-tests-$uuid"
   else
+    echo "In circle. Not removing container."
     eris contracts test --chain "epm-tests-$uuid" --rm
   fi
 
