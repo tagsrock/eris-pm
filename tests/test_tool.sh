@@ -2,9 +2,7 @@
 # ----------------------------------------------------------
 # PURPOSE
 
-# This is the test tool for epm. It should be ran (typically)
-# from *inside* a docker container with chains and keys
-# turned on and managed by test.sh
+# ********DEPRECATED*******************
 
 # ----------------------------------------------------------
 # REQUIREMENTS

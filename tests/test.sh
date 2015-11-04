@@ -9,7 +9,6 @@
 # REQUIREMENTS
 
 # eris installed locally
-# eris-keys installed locally
 
 # ----------------------------------------------------------
 # USAGE
@@ -37,13 +36,7 @@ entrypoint="/home/eris/test_tool.sh"
 testimage=quay.io/eris/epm
 testuser=eris
 
-# Key shit variables
-# key1="46AB0C9688DB87D4705145537C85EF2E006AE0FCD8C46DCD35E0F5794582531C82DADAE153406412833F8098439ED4B5DCC26C0B43C2775EFFE8B911B49D0182"
-# key2="7320259F11DE51108980D48F35E6B76938E648877431F2B290047F89244DD7DD77D803D934A3351444E6BC757CDF0EB476CE0F56F975E776BEE1DB6A082E2AF9"
-# key1="RqsMlojbh9RwUUVTfIXvLgBq4PzYxG3NNeD1eUWCUxyC2trhU0BkEoM/gJhDntS13MJsC0PCd17/6LkRtJ0Bgg=="
-# key1=`echo -n "$key1" | base64 -d | hexdump -ve '1/1 "%.2X"'`
-# key2="cyAlnxHeURCJgNSPNea3aTjmSId0MfKykAR/iSRN19132APZNKM1FETmvHV83w60ds4PVvl153a+4dtqCC4q+Q=="
-# key2=`echo -n "$key2" | base64 -d | hexdump -ve '1/1 "%.2X"'`
+# Key variables
 key1_addr="1040E6521541DAB4E7EE57F21226DD17CE9F0FB7"
 key2_addr="58FD1799AA32DED3F6EAC096A1DC77834A446B9C"
 
@@ -70,10 +63,15 @@ early_exit(){
     return 0
   fi
 
-  echo "There was an error duing setup. Exiting."
+  echo "There was an error duing setup; keys were not properly imported. Exiting."
   if [ "$was_running" -eq 0 ]
   then
-    eris services stop -rx keys
+    if [ "$circle" = true ]
+    then
+      eris services stop keys
+    else
+      eris services stop -rx keys
+    fi
   fi
   exit 1
 }
@@ -111,15 +109,13 @@ then
 fi
 
 ensure_running keys
-
-keysHost=$(eris services inspect keys NetworkSettings.IPAddress)
-eris-keys import tests/fixtures/chaindata/$key1_addr --no-pass --host $keysHost 1>/dev/null
-eris-keys import tests/fixtures/chaindata/$key2_addr --no-pass --host $keysHost 1>/dev/null
+eris services exec keys "eris-keys import $(cat tests/fixtures/keys/$key1_addr) --no-pass" 1>/dev/null
+eris services exec keys "eris-keys import $(cat tests/fixtures/keys/$key2_addr) --no-pass" 1>/dev/null
 
 # check keys were properly imported
-eris-keys pub --addr "$key1_addr" 1>/dev/null
+eris services exec keys "eris-keys pub --addr $key1_addr" 1>/dev/null
 early_exit
-eris-keys pub --addr "$key2_addr" 1>/dev/null
+eris services exec keys "eris-keys pub --addr $key2_addr" 1>/dev/null
 early_exit
 
 eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata 1>/dev/null
@@ -127,21 +123,40 @@ sleep 5 # boot time
 echo "Setup complete"
 
 echo ""
-if [ "$circle" = true ]
-then
-  if [[ "$branch" = "master" ]]
+echo "Hello! I'm the marmot that tests the epm tooling."
+cd $repo/tests/fixtures
+apps=(app*/)
+for app in "${apps[@]}"
+do
+  echo ""
+  echo -e "Testing EPM using fixture =>\t${app%/}"
+
+  # Run the epm deploy
+  cd $app
+  eris contracts test --chain "epm-tests-$uuid"
+
+  # Set exit code properly
+  test_exit=$?
+  if [ $test_exit -ne 0 ]
   then
-    branch="latest"
+    failing_dir=`pwd`
+    break
   fi
-  docker run --link eris_service_keys_1:keys --link eris_chain_epm-tests-"$uuid"_1:chain --user $testuser $testimage:$branch $entrypoint
-else
-  docker run --rm --link eris_service_keys_1:keys --link eris_chain_epm-tests-"$uuid"_1:chain --user $testuser $testimage $entrypoint
-fi
-test_exit=$?
+
+  # Reset for next run
+  cd ..
+done
 
 # ---------------------------------------------------------------------------
 # Cleaning up
 
+if [ $test_exit -ne 0 ]
+then
+  echo ""
+  echo "EPM Log on Failed Test."
+  echo ""
+  cat $failing_dir/epm.log
+fi
 if [ "$circle" = false ]
 then
   eris chains stop -rxf epm-tests-$uuid 1>/dev/null
