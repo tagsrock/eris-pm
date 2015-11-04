@@ -133,7 +133,12 @@ do
 
   # Run the epm deploy
   cd $app
-  eris contracts test --chain "epm-tests-$uuid"
+  if [ "$circle" = false ]
+  then
+    eris contracts test --chain "epm-tests-$uuid"
+  else
+    eris contracts test --chain "epm-tests-$uuid" --rm
+  fi
 
   # Set exit code properly
   test_exit=$?
