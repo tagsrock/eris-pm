@@ -13,17 +13,32 @@ import (
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/wire"
 )
 
-const logFileName = "epm.log"
+const LogFileNameCSV = "epm.csv"
+const LogFileNameJSON = "epm.json"
 
 // ------------------------------------------------------------------------
 // Logging
 // ------------------------------------------------------------------------
 
-// WriteJobResult takes two strings and writes those to the delineated log
+func ClearJobResults() error {
+	if err := os.Remove(setJsonPath()); err != nil {
+		return err
+	}
+
+	return os.Remove(setCsvPath())
+}
+
+func PrintPathPackage(do *definitions.Do) {
+	logger.Infof("Using Compiler at =>\t\t%s\n", do.Compiler)
+	logger.Infof("Using Chain at =>\t\t%s\n", do.Chain)
+	logger.Debugf("\twith ChainID =>\t\t%s\n", do.ChainID)
+	logger.Infof("Using Signer at =>\t\t%s\n", do.Signer)
+}
+
+// WriteJobResultCSV takes two strings and writes those to the delineated log
 // file, which is currently epm.log in the same directory as the epm.yaml
-func WriteJobResult(name, result string) error {
-	// TODO: add logging path besides pwd
-	logFile := setPath()
+func WriteJobResultCSV(name, result string) error {
+	logFile := setCsvPath()
 
 	var file *os.File
 	var err error
@@ -48,21 +63,32 @@ func WriteJobResult(name, result string) error {
 	return nil
 }
 
-func ClearJobResults() error {
-	// TODO: add logging path besides pwd
-	return os.Remove(setPath())
+func WriteJobResultJSON(results map[string]string) error {
+	logFile := setJsonPath()
+
+	file, err := os.Create(logFile)
+	defer file.Close()
+
+	res, err := json.MarshalIndent(results, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	if _, err = file.Write(res); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func PrintPathPackage(do *definitions.Do) {
-	logger.Infof("Using Compiler at =>\t\t%s\n", do.Compiler)
-	logger.Infof("Using Chain at =>\t\t%s\n", do.Chain)
-	logger.Debugf("\twith ChainID =>\t\t%s\n", do.ChainID)
-	logger.Infof("Using Signer at =>\t\t%s\n", do.Signer)
-}
-
-func setPath() string {
+func setJsonPath() string {
 	pwd, _ := os.Getwd()
-	return filepath.Join(pwd, logFileName)
+	return filepath.Join(pwd, LogFileNameJSON)
+}
+
+func setCsvPath() string {
+	pwd, _ := os.Getwd()
+	return filepath.Join(pwd, LogFileNameCSV)
 }
 
 // ------------------------------------------------------------------------

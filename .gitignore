@@ -27,4 +27,5 @@ docs/eris-cli
 .goxc.local.json
 builds
 epm.log
+epm.json
 tests/fixtures/*/abi

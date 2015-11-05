@@ -94,11 +94,9 @@ func RunJobs(do *definitions.Do) error {
 			return err
 		}
 
-		if err = util.WriteJobResult(job.JobName, job.JobResult); err != nil {
-			return err
-		}
 	}
 
+	postProcess(do)
 	return nil
 }
 
@@ -140,4 +138,27 @@ func defaultSetJobs(do *definitions.Do) {
 	}
 
 	do.Package.Jobs = append(newJobs, oldJobs...)
+}
+
+func postProcess(do *definitions.Do) error {
+	switch do.DefaultOutput {
+	case "csv":
+		for _, job := range do.Package.Jobs {
+			if err := util.WriteJobResultCSV(job.JobName, job.JobResult); err != nil {
+				return err
+			}
+		}
+	case "json":
+		results := make(map[string]string)
+		for _, job := range do.Package.Jobs {
+			results[job.JobName] = job.JobResult
+		}
+		return util.WriteJobResultJSON(results)
+	}
+
+	if do.SummaryTable {
+		// TableWriter goes here.
+	}
+
+	return nil
 }

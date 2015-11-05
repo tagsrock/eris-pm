@@ -91,6 +91,8 @@ func AddGlobalFlags() {
 	EPMCmd.PersistentFlags().StringSliceVarP(&do.DefaultSets, "set", "e", defaultSets(), "default sets to use; operates the same way as the [set] jobs, only before the epm file is ran (and after default address; default respects $EPM_SETS")
 	EPMCmd.PersistentFlags().StringVarP(&do.DefaultFee, "fee", "n", defaultFee(), "default fee to use; default respects $EPM_FEE")
 	EPMCmd.PersistentFlags().StringVarP(&do.DefaultAmount, "amount", "u", defaultAmount(), "default amount to use; default respects $EPM_AMOUNT")
+	EPMCmd.PersistentFlags().StringVarP(&do.DefaultOutput, "output", "o", defaultOutput(), "output format which epm should use [csv,json]; default respects $EPM_OUTPUT_FORMAT")
+	EPMCmd.PersistentFlags().BoolVarP(&do.SummaryTable, "summary", "t", defaultSummaryTable(), "output a table summarizing epm jobs; default respects $EPM_SUMMARY_TABLE")
 	EPMCmd.PersistentFlags().BoolVarP(&do.Verbose, "verbose", "v", defaultVerbose(), "verbose output; more output than no output flags; less output than debug level; default respects $EPM_VERBOSE")
 	EPMCmd.PersistentFlags().BoolVarP(&do.Debug, "debug", "d", defaultDebug(), "debug level output; the most output available for epm; if it is too chatty use verbose flag; default respects $EPM_DEBUG")
 	// EPMCmd.PersistentFlags().StringVarP(&do.ChainID, "chain-id", "i", "", "id of the chain to work against; default respects $") // [csk]: currently not exposing this as a cmd line flag as it is automatically retrieved from the chain
@@ -147,6 +149,14 @@ func defaultSets() []string {
 
 func defaultGas() string {
 	return setDefaultString("EPM_GAS", "1111111111")
+}
+
+func defaultOutput() string {
+	return setDefaultString("EPM_OUTPUT_FORMAT", "csv")
+}
+
+func defaultSummaryTable() bool {
+	return setDefaultBool("EPM_SUMMARY_TABLE", true)
 }
 
 func defaultVerbose() bool {
