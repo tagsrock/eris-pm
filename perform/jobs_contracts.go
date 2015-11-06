@@ -8,7 +8,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/lllc-server"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/types"
@@ -58,6 +60,20 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (string, error) {
 	if deploy.Source != do.Package.Account {
 		oldKey = do.PublicKey
 		do.PublicKey = ""
+	}
+
+	// additional data may be sent along with the contract
+	// these are naively added to the end of the contract code using standard
+	// mint packing
+	if deploy.Data != "" {
+		splitout := strings.Split(deploy.Data, " ")
+		for _, s := range splitout {
+			s, _ = util.PreProcess(s, do)
+			addOns := common.LeftPadString(common.StripHex(common.Coerce2Hex(s)), 64)
+			logger.Debugf("Contract Code =>\t\t%s\n", contractCode)
+			logger.Debugf("\tAdditional Data =>\t%s\n", addOns)
+			contractCode = contractCode + addOns
+		}
 	}
 
 	// Deploy contract

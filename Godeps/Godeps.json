@@ -40,11 +40,11 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/common/go/common",
-			"Rev": "4b5ae105fa10e99c71e0c4f17f1039e8c09560dd"
+			"Rev": "fcc50742e71bfcde78d2abd72bac329f4f5eea42"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/common/go/log",
-			"Rev": "4b5ae105fa10e99c71e0c4f17f1039e8c09560dd"
+			"Rev": "fcc50742e71bfcde78d2abd72bac329f4f5eea42"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-abi",
@@ -60,7 +60,7 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/lllc-server",
-			"Rev": "6d5fee7433002876b56e211e988c51737339ede6"
+			"Rev": "2a77f4f831ec8b08c2797df4e79a6126e948d3c7"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/mint-client/mintx/core",

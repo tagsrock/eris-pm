@@ -1,4 +1,4 @@
-FROM ubuntu:14.04
+FROM quay.io/eris/ubuntu
 MAINTAINER Eris Industries <support@erisindustries.com>
 
 # Install Golang

@@ -91,7 +91,9 @@ test_setup(){
 
   ensure_running keys
   eris services exec keys "eris-keys import $(cat tests/fixtures/keys/$key1_addr) --no-pass" 1>/dev/null
+  early_exit
   eris services exec keys "eris-keys import $(cat tests/fixtures/keys/$key2_addr) --no-pass" 1>/dev/null
+  early_exit
 
   # check keys were properly imported
   eris services exec keys "eris-keys pub --addr $key1_addr" 1>/dev/null

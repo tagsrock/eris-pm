@@ -104,11 +104,15 @@ var Languages = map[string]LangConfig{
 		},
 	},
 	"sol": {
-		URL:             DefaultUrl,
-		Net:             true,
-		Extensions:      []string{"sol"},
-		IncludeRegexes:  []string{},
-		IncludeReplaces: [][]string{},
+		URL:        DefaultUrl,
+		Net:        true,
+		Extensions: []string{"sol"},
+		IncludeRegexes: []string{
+			`include "(.+?)";`,
+		},
+		IncludeReplaces: [][]string{
+			{`include "`, `.sol";`},
+		},
 		CompileCmd: []string{
 			"solc",
 			"_",
