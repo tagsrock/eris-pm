@@ -82,7 +82,7 @@ func Execute() {
 func AddGlobalFlags() {
 	EPMCmd.PersistentFlags().StringVarP(&do.YAMLPath, "file", "f", defaultFile(), "path to package file which EPM should use; default respects $EPM_FILE")
 	EPMCmd.PersistentFlags().StringVarP(&do.ContractsPath, "contracts-path", "p", defaultContracts(), "path to the contracts EPM should use; default respects $EPM_CONTRACTS_PATH")
-	EPMCmd.PersistentFlags().StringVarP(&do.ABIPath, "abi-path", "a", defaultContracts(), "path to the abi directory EPM should use when saving ABIs after the compile process; default respects $EPM_ABI_PATH")
+	EPMCmd.PersistentFlags().StringVarP(&do.ABIPath, "abi-path", "a", defaultAbi(), "path to the abi directory EPM should use when saving ABIs after the compile process; default respects $EPM_ABI_PATH")
 	EPMCmd.PersistentFlags().StringVarP(&do.Chain, "chain", "c", defaultChain(), "<ip:port> of chain which EPM should use; default respects $EPM_CHAIN_ADDR")
 	EPMCmd.PersistentFlags().StringVarP(&do.Signer, "sign", "s", defaultSigner(), "<ip:port> of signer daemon which EPM should use; default respects $EPM_SIGNER_ADDR")
 	EPMCmd.PersistentFlags().StringVarP(&do.DefaultGas, "gas", "g", defaultGas(), "default gas to use; can be overridden for any single job; default respects $EPM_GAS")

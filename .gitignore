@@ -26,6 +26,7 @@ _testmain.go
 docs/eris-cli
 .goxc.local.json
 builds
+epm.csv
 epm.log
 epm.json
 tests/fixtures/*/abi

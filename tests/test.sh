@@ -86,7 +86,7 @@ test_setup(){
     # by default the keys daemon does not export its port to the host
     # for this sequencing to work properly it needs to be exported.
     # this is a hack.
-    echo 'ports = [ "4767:4767" ]' >> ~/.eris/services/keys.toml
+    # echo 'ports = [ "4767:4767" ]' >> ~/.eris/services/keys.toml
   fi
 
   ensure_running keys
