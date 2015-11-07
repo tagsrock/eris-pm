@@ -245,7 +245,7 @@ type Deploy struct {
   // relative to the contracts path established via the --contracts-path flag or the $EPM_CONTRACTS_PATH
   // environment variable
   Contract string `mapstructure:"contract" json:"contract" yaml:"contract" toml:"contract"`
-  // (Optional) TODO: additional arguments to send along with the contract code
+  // (Optional) additional arguments to send along with the contract code
   Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
   // (Optional) amount of tokens to send to the contract which will (after deployment) reside in the
   // contract's account
