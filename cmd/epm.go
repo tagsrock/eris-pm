@@ -71,10 +71,13 @@ Complete documentation is available at https://docs.erisindustries.com
 }
 
 func Execute() {
-	do = definitions.NowDo()
+	InitEPM()
 	AddGlobalFlags()
-	// AddCommands()
 	EPMCmd.Execute()
+}
+
+func InitEPM() {
+	do = definitions.NowDo()
 }
 
 // Flags that are to be used by commands are handled by the Do struct
@@ -95,8 +98,6 @@ func AddGlobalFlags() {
 	EPMCmd.PersistentFlags().BoolVarP(&do.SummaryTable, "summary", "t", defaultSummaryTable(), "output a table summarizing epm jobs; default respects $EPM_SUMMARY_TABLE")
 	EPMCmd.PersistentFlags().BoolVarP(&do.Verbose, "verbose", "v", defaultVerbose(), "verbose output; more output than no output flags; less output than debug level; default respects $EPM_VERBOSE")
 	EPMCmd.PersistentFlags().BoolVarP(&do.Debug, "debug", "d", defaultDebug(), "debug level output; the most output available for epm; if it is too chatty use verbose flag; default respects $EPM_DEBUG")
-	// EPMCmd.PersistentFlags().StringVarP(&do.ChainID, "chain-id", "i", "", "id of the chain to work against; default respects $") // [csk]: currently not exposing this as a cmd line flag as it is automatically retrieved from the chain
-	// EPMCmd.PersistentFlags().StringVarP(&do.PublicKey, "key", "k", "", "full public key to use by default; default respects $") // [csk]: currently not using as we use the defaultAddr and then pull the publicKey from eris-keys. This reduces the cognitive overload in learning.
 }
 
 //----------------------------------------------------

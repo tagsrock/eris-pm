@@ -10,15 +10,16 @@ import (
 	"strings"
 
 	commands "github.com/eris-ltd/eris-pm/cmd"
+	"github.com/eris-ltd/eris-pm/version"
 
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
 )
 
-const RENDER_DIR = "./docs/eris-pm/"
+var RENDER_DIR = fmt.Sprintf("./docs/eris-pm/%s/", version.VERSION)
 
-const SPECS_DIR = "./docs/"
+var SPECS_DIR = "./docs/"
 
-const BASE_URL = "https://docs.erisindustries.com/documentation/eris-pm/"
+var BASE_URL = fmt.Sprintf("https://docs.erisindustries.com/documentation/eris-pm/%s/", version.VERSION)
 
 const FRONT_MATTER = `---
 
@@ -184,10 +185,15 @@ func GenerateSpecs(dir string) []string {
 
 		out := append(pre, txt...)
 
+		if _, err := os.Stat(RENDER_DIR); os.IsNotExist(err) {
+			os.MkdirAll(RENDER_DIR, 0755)
+		}
+
 		outFile := RENDER_DIR + fileBase
 		err = ioutil.WriteFile(outFile, out, 0644)
 		if err != nil {
 			fmt.Println(err)
+			fmt.Println("Failed here!")
 			os.Exit(1)
 		}
 
@@ -198,10 +204,9 @@ func GenerateSpecs(dir string) []string {
 }
 
 func main() {
-	eris := commands.EPMCmd
-	// commands.InitializeConfig()
+	epm := commands.EPMCmd
+	commands.InitEPM()
 	commands.AddGlobalFlags()
-	// commands.AddCommands()
 	specs := GenerateSpecs(SPECS_DIR)
-	GenerateTree(eris, RENDER_DIR, specs)
+	GenerateTree(epm, RENDER_DIR, specs)
 }
