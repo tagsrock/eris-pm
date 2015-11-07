@@ -84,12 +84,12 @@ type Job struct {
 
 Transaction jobs exposed through eris:pm are available in the following job types:
 
-* `[send](#sendJob)`: a transaction which sends tokens from one account to another
-* `[register](#registerJob)`: register a name in the native name registry
-* `[permission](#permJob)`: update an account's permissions or roles (must be sent from an account which has root permissions on the chain)
-* `[bond](#bondJob)`: a bonding transaction ("make me a part of the validator pool")
-* `[unbond](#unbondJob)`: an unbonding transaction ("I want to leave the validator pool")
-* `[rebond](#rebondJob)`: a rebonding transaction ("oops. I actually don't want to leave the validator pool. Please add me back.")
+* [send](#sendJob): a transaction which sends tokens from one account to another
+* [register](#registerJob): register a name in the native name registry
+* [permission](#permJob): update an account's permissions or roles (must be sent from an account which has root permissions on the chain)
+* [bond](#bondJob): a bonding transaction ("make me a part of the validator pool")
+* [unbond](#unbondJob): an unbonding transaction ("I want to leave the validator pool")
+* [rebond](#rebondJob): a rebonding transaction ("oops. I actually don't want to leave the validator pool. Please add me back.")
 
 ### <a name="sendJob"></a>Send Jobs
 
@@ -229,8 +229,8 @@ type Rebond struct {
 
 Contracts jobs exposed through eris:pm are available in the following job types:
 
-* `[deploy](#deployJob)`: deploy a single contract
-* `[call](#callJob)`: send a transaction to a contract (can only be sent to existing contracts)
+* [deploy](#deployJob): deploy a single contract
+* [call](#callJob): send a transaction to a contract (can only be sent to existing contracts)
 
 ### <a name="deployJob"></a>Deploy Jobs
 
@@ -293,11 +293,11 @@ type Call struct {
 
 Test jobs exposed through eris:pm are available in the following job types:
 
-* `[query-account](#queryAccountJob)`: get information about an account on the blockchain
-* `[query-contract](#queryContractJob)`: perform a simulated call against a specific contract (usually used to trigger accessor functions which retrieve information from a return variable of a contract's function)
-* `[query-name](#queryNameJob)`: get information about a registered name using eris:db's name registry functionaltiy
-* `[query-vals](#queryValsJob)`: get information about the validator set
-* `[assert](#assertJob)`: assert a relationship between a key and a value (useful for testing purposes to make sure everything deployed properly and/or is working as it should)
+* [query-account](#queryAccountJob): get information about an account on the blockchain
+* [query-contract](#queryContractJob): perform a simulated call against a specific contract (usually used to trigger accessor functions which retrieve information from a return variable of a contract's function)
+* [query-name](#queryNameJob): get information about a registered name using eris:db's name registry functionaltiy
+* [query-vals](#queryValsJob): get information about the validator set
+* [assert](#assertJob): assert a relationship between a key and a value (useful for testing purposes to make sure everything deployed properly and/or is working as it should)
 
 ### <a name="queryAccountJob"></a>QueryAccount Jobs
 
@@ -388,8 +388,8 @@ type Assert struct {
 
 Other jobs exposed through eris:pm are available in the following job types:
 
-* `[account](#accountJob)`: set the account to use
-* `[set](#setJob)`: set the value of a variable
+* [account](#accountJob): set the account to use
+* [set](#setJob): set the value of a variable
 
 ### <a name="accountJob"></a>Account Jobs
 
