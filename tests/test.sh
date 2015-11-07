@@ -143,7 +143,7 @@ test_teardown(){
   then
     echo ""
     echo "EPM Log on Failed Test."
-    cat $failing_dir/epm.log
+    cat $failing_dir/epm.csv
   fi
   if [ "$circle" = false ]
   then

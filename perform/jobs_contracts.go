@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/lllc-server"
+	compilers "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/lllc-server"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/types"
 )
@@ -47,8 +47,16 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (string, error) {
 	}
 	logger.Debugf("Contract path =>\t\t%s\n", p)
 
+	// use the proper compiler
+	if do.Compiler != "" {
+		logger.Debugf("Setting compiler path =>\t%s\n", do.Compiler)
+		if err := setCompiler(do, p); err != nil {
+			return "", err
+		}
+	}
+
 	// compile
-	bytecode, abiSpec, err := lllcserver.Compile(p)
+	bytecode, abiSpec, err := compilers.Compile(p)
 	if err != nil {
 		return "", err
 	}
@@ -148,6 +156,17 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 
 	// Sign, broadcast, display
 	return txFinalize(do, tx, call.Wait)
+}
+
+func setCompiler(do *definitions.Do, tocompile string) error {
+	lang, err := compilers.LangFromFile(tocompile)
+	if err != nil {
+		return err
+	}
+
+	url := do.Compiler + "/" + "compile"
+	compilers.SetLanguageURL(lang, url)
+	return nil
 }
 
 func deployFinalize(do *definitions.Do, tx interface{}, wait bool) (string, error) {

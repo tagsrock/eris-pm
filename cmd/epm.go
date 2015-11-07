@@ -128,7 +128,7 @@ func defaultSigner() string {
 }
 
 func defaultCompiler() string {
-	return setDefaultString("EPM_COMPILER_ADDR", "compilers.eris.industries:8091")
+	return setDefaultString("EPM_COMPILER_ADDR", "https://compilers.eris.industries:9090")
 }
 
 func defaultAddr() string {
