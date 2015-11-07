@@ -7,5 +7,5 @@ import (
 var logger *Logger
 
 func init() {
-	logger = AddLogger("mintx")
+	logger = AddLogger("mintx-core")
 }

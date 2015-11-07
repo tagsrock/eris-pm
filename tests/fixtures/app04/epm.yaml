@@ -1,0 +1,81 @@
+jobs:
+
+- name: account
+  job:
+    account:
+      address: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
+
+- name: bond_account
+  job:
+    set:
+      val: 58FD1799AA32DED3F6EAC096A1DC77834A446B9C
+
+- name: bondPerm
+  job:
+    permission:
+      action: set_base
+      target: $bond_account
+      permission: bond
+      value: "true"
+      wait: true
+
+- name: bond_pub_key
+  job:
+    set:
+      val: 77D803D934A3351444E6BC757CDF0EB476CE0F56F975E776BEE1DB6A082E2AF9
+
+- name: account
+  job:
+    account:
+      address: $bond_account
+
+- name: bond_amount
+  job:
+    set:
+      val: 1234
+
+- name: bondTest1
+  job:
+    bond:
+      pub_key: $bond_pub_key
+      account: $bond_account
+      amount: $bond_amount
+      wait: false
+
+- name: bondTest2
+  job:
+    unbond:
+      account: $bond_account
+      height: $block
+      wait: false
+
+- name: bondTest3
+  job:
+    rebond:
+      account: $bond_account
+      height: $block+2
+      wait: false
+
+- name: queryBonded
+  job:
+    query-vals:
+      field: bonded_validators
+
+- name: queryUnbonding
+  job:
+    query-vals:
+      field: unbonding_validators
+
+- name: assertBonded
+  job:
+    assert:
+      key: $account
+      relation: eq
+      val: $queryBonded
+
+- name: assertUnbonded
+  job:
+    assert:
+      key: ""
+      relation: eq
+      val: $queryUnbonding

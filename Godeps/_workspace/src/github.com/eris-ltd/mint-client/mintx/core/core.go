@@ -11,79 +11,23 @@ import (
 	"strings"
 	"time"
 
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/gorilla/websocket"
-
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/account"
 	ptypes "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/permission/types"
 	rtypes "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core/types"
 	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core_client"
-	rpctypes "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/types"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/types"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/wire"
+)
+
+var (
+	MaxCommitWaitTimeSeconds = 10
 )
 
 //------------------------------------------------------------------------------------
 // core functions with string args.
 // validates strings and forms transaction
 
-func Output(addr, amtS string) ([]byte, error) {
-	if amtS == "" {
-		return nil, fmt.Errorf("output must specify an amount with the --amt flag")
-	}
-
-	if addr == "" {
-		return nil, fmt.Errorf("output must specify an addr with the --addr flag")
-	}
-
-	addrBytes, err := hex.DecodeString(addr)
-	if err != nil {
-		return nil, fmt.Errorf("addr is bad hex: %v", err)
-	}
-
-	amt, err := strconv.ParseInt(amtS, 10, 64)
-	if err != nil {
-		return nil, fmt.Errorf("amt is misformatted: %v", err)
-	}
-	// TODO: validate amt!
-
-	txOutput := types.TxOutput{
-		Address: addrBytes,
-		Amount:  amt,
-	}
-
-	n, errPtr := new(int64), new(error)
-	buf := new(bytes.Buffer)
-	txOutput.WriteSignBytes(buf, n, errPtr)
-	if *errPtr != nil {
-		return nil, *errPtr
-	}
-	return buf.Bytes(), nil
-}
-
-func Input(nodeAddr, pubkey, amtS, nonceS, addr string) ([]byte, error) {
-	pub, addrBytes, amt, nonce, err := checkCommon(nodeAddr, pubkey, addr, amtS, nonceS)
-	if err != nil {
-		return nil, err
-	}
-
-	txInput := types.TxInput{
-		Address:  addrBytes,
-		Amount:   amt,
-		Sequence: int(nonce),
-		PubKey:   pub,
-	}
-
-	n, errPtr := new(int64), new(error)
-	buf := new(bytes.Buffer)
-	txInput.WriteSignBytes(buf, n, errPtr)
-	if *errPtr != nil {
-		return nil, *errPtr
-	}
-	return buf.Bytes(), nil
-}
-
-func Send(nodeAddr, pubkey, addr, toAddr, amtS, nonceS string) (*types.SendTx, error) {
-	pub, addrBytes, amt, nonce, err := checkCommon(nodeAddr, pubkey, addr, amtS, nonceS)
+func Send(nodeAddr, signAddr, pubkey, addr, toAddr, amtS, nonceS string) (*types.SendTx, error) {
+	pub, amt, nonce, err := checkCommon(nodeAddr, signAddr, pubkey, addr, amtS, nonceS)
 	if err != nil {
 		return nil, err
 	}
@@ -98,15 +42,14 @@ func Send(nodeAddr, pubkey, addr, toAddr, amtS, nonceS string) (*types.SendTx, e
 	}
 
 	tx := types.NewSendTx()
-	_ = addrBytes // TODO!
 	tx.AddInputWithNonce(pub, amt, int(nonce))
 	tx.AddOutput(toAddrBytes, amt)
 
 	return tx, nil
 }
 
-func Call(nodeAddr, pubkey, addr, toAddr, amtS, nonceS, gasS, feeS, data string) (*types.CallTx, error) {
-	pub, _, amt, nonce, err := checkCommon(nodeAddr, pubkey, addr, amtS, nonceS)
+func Call(nodeAddr, signAddr, pubkey, addr, toAddr, amtS, nonceS, gasS, feeS, data string) (*types.CallTx, error) {
+	pub, amt, nonce, err := checkCommon(nodeAddr, signAddr, pubkey, addr, amtS, nonceS)
 	if err != nil {
 		return nil, err
 	}
@@ -135,8 +78,8 @@ func Call(nodeAddr, pubkey, addr, toAddr, amtS, nonceS, gasS, feeS, data string)
 	return tx, nil
 }
 
-func Name(nodeAddr, pubkey, addr, amtS, nonceS, feeS, name, data string) (*types.NameTx, error) {
-	pub, _, amt, nonce, err := checkCommon(nodeAddr, pubkey, addr, amtS, nonceS)
+func Name(nodeAddr, signAddr, pubkey, addr, amtS, nonceS, feeS, name, data string) (*types.NameTx, error) {
+	pub, amt, nonce, err := checkCommon(nodeAddr, signAddr, pubkey, addr, amtS, nonceS)
 	if err != nil {
 		return nil, err
 	}
@@ -150,8 +93,21 @@ func Name(nodeAddr, pubkey, addr, amtS, nonceS, feeS, name, data string) (*types
 	return tx, nil
 }
 
-func Permissions(nodeAddr, pubkey, addrS, nonceS, permFunc string, argsS []string) (*types.PermissionsTx, error) {
-	pub, _, _, nonce, err := checkCommon(nodeAddr, pubkey, addrS, "0", "0")
+type PermFunc struct {
+	Name string
+	Args string
+}
+
+var PermsFuncs = []PermFunc{
+	PermFunc{"set_base", "address, permission flag, value"},
+	PermFunc{"unset_base", "address, permission flag"},
+	PermFunc{"set_global", "permission flag, value"},
+	PermFunc{"add_role", "address, role"},
+	PermFunc{"rm_role", "address, role"},
+}
+
+func Permissions(nodeAddr, signAddr, pubkey, addrS, nonceS, permFunc string, argsS []string) (*types.PermissionsTx, error) {
+	pub, _, nonce, err := checkCommon(nodeAddr, signAddr, pubkey, addrS, "0", nonceS)
 	if err != nil {
 		return nil, err
 	}
@@ -238,7 +194,7 @@ func (n NameGetter) GetNameRegEntry(name string) *types.NameRegEntry {
 
 /*
 func coreNewAccount(nodeAddr, pubkey, chainID string) (*types.NewAccountTx, error) {
-	pub, _, _, _, err := checkCommon(nodeAddr, pubkey, "", "0", "0")
+	pub, _, _, err := checkCommon(nodeAddr, pubkey, "", "0", "0")
 	if err != nil {
 		return nil, err
 	}
@@ -248,8 +204,8 @@ func coreNewAccount(nodeAddr, pubkey, chainID string) (*types.NewAccountTx, erro
 }
 */
 
-func Bond(nodeAddr, pubkey, unbondAddr, amtS, nonceS string) (*types.BondTx, error) {
-	pub, addrBytes, amt, nonce, err := checkCommon(nodeAddr, pubkey, "", amtS, nonceS)
+func Bond(nodeAddr, signAddr, pubkey, unbondAddr, amtS, nonceS string) (*types.BondTx, error) {
+	pub, amt, nonce, err := checkCommon(nodeAddr, signAddr, pubkey, "", amtS, nonceS)
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +228,6 @@ func Bond(nodeAddr, pubkey, unbondAddr, amtS, nonceS string) (*types.BondTx, err
 	if err != nil {
 		return nil, err
 	}
-	_ = addrBytes
 	tx.AddInputWithNonce(pub, amt, int(nonce))
 	tx.AddOutput(unbondAddrBytes, amt)
 
@@ -324,27 +279,26 @@ func Rebond(addrS, heightS string) (*types.RebondTx, error) {
 //------------------------------------------------------------------------------------
 // sign and broadcast
 
+func Pub(addr, rpcAddr string) (pubBytes []byte, err error) {
+	args := map[string]string{
+		"addr": addr,
+	}
+	pubS, err := RequestResponse(rpcAddr, "pub", args)
+	if err != nil {
+		return
+	}
+	return hex.DecodeString(pubS)
+}
+
 func Sign(signBytes, signAddr, signRPC string) (sig [64]byte, err error) {
 	args := map[string]string{
-		"hash": signBytes,
+		"msg":  signBytes,
+		"hash": signBytes, // backwards compatibility
 		"addr": signAddr,
 	}
-	b, err := json.Marshal(args)
+	sigS, err := RequestResponse(signRPC, "sign", args)
 	if err != nil {
 		return
-	}
-	logger.Debugln("Sending request body:", string(b))
-	req, err := http.NewRequest("POST", signRPC+"/sign", bytes.NewBuffer(b))
-	if err != nil {
-		return
-	}
-	req.Header.Add("Content-Type", "application/json")
-	sigS, errS, err := requestResponse(req)
-	if err != nil {
-		return sig, fmt.Errorf("Error calling signing daemon: %s", err.Error())
-	}
-	if errS != "" {
-		return sig, fmt.Errorf("Error (string) calling signing daemon: %s", errS)
 	}
 	sigBytes, err := hex.DecodeString(sigS)
 	if err != nil {
@@ -369,6 +323,28 @@ func Broadcast(tx types.Tx, broadcastRPC string) (*rtypes.Receipt, error) {
 type HTTPResponse struct {
 	Response string
 	Error    string
+}
+
+func RequestResponse(addr, method string, args map[string]string) (string, error) {
+	b, err := json.Marshal(args)
+	if err != nil {
+		return "", err
+	}
+	endpoint := fmt.Sprintf("%s/%s", addr, method)
+	logger.Debugf("Sending request body (%s): %s\n", endpoint, string(b))
+	req, err := http.NewRequest("POST", endpoint, bytes.NewBuffer(b))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Add("Content-Type", "application/json")
+	res, errS, err := requestResponse(req)
+	if err != nil {
+		return "", fmt.Errorf("Error calling eris-keys at %s: %s", endpoint, err.Error())
+	}
+	if errS != "" {
+		return "", fmt.Errorf("Error (string) calling eris-keys at %s: %s", endpoint, errS)
+	}
+	return res, nil
 }
 
 func requestResponse(req *http.Request) (string, string, error) {
@@ -399,7 +375,7 @@ func unpackResponse(resp *http.Response) (string, string, error) {
 // sign and broadcast convenience
 
 // tx has either one input or we default to the first one (ie for send/bond)
-// TODO: better support for multisig..
+// TODO: better support for multisig and bonding
 func signTx(signAddr, chainID string, tx_ types.Tx) ([]byte, types.Tx, error) {
 	signBytes := fmt.Sprintf("%X", account.SignBytes(chainID, tx_))
 	var inputAddr []byte
@@ -419,7 +395,10 @@ func signTx(signAddr, chainID string, tx_ types.Tx) ([]byte, types.Tx, error) {
 		defer func(s *account.SignatureEd25519) { tx.Input.Signature = *s }(&sigED)
 	case *types.BondTx:
 		inputAddr = tx.Inputs[0].Address
-		defer func(s *account.SignatureEd25519) { tx.Inputs[0].Signature = *s }(&sigED)
+		defer func(s *account.SignatureEd25519) {
+			tx.Signature = *s
+			tx.Inputs[0].Signature = *s
+		}(&sigED)
 	case *types.UnbondTx:
 		inputAddr = tx.Address
 		defer func(s *account.SignatureEd25519) { tx.Signature = *s }(&sigED)
@@ -438,7 +417,8 @@ func signTx(signAddr, chainID string, tx_ types.Tx) ([]byte, types.Tx, error) {
 }
 
 type TxResult struct {
-	Hash []byte // all txs get a hash
+	BlockHash []byte // all txs get in a block
+	Hash      []byte // all txs get a hash
 
 	// only CallTx
 	Address   []byte // only for new contracts
@@ -476,6 +456,7 @@ func SignAndBroadcast(chainID, nodeAddr, signAddr string, tx types.Tx, sign, bro
 						logger.Infof("Encountered error waiting for event: %v\n", msg.Error)
 						err = msg.Error
 					} else {
+						txResult.BlockHash = msg.BlockHash
 						txResult.Return = msg.Value
 						txResult.Exception = msg.Exception
 					}
@@ -503,6 +484,7 @@ func SignAndBroadcast(chainID, nodeAddr, signAddr string, tx types.Tx, sign, bro
 // wait for events
 
 type Msg struct {
+	BlockHash []byte
 	Value     []byte
 	Exception string
 	Error     error
@@ -512,82 +494,67 @@ func subscribeAndWait(tx types.Tx, chainID, nodeAddr string, inputAddr []byte) (
 	// subscribe to event and wait for tx to be committed
 	wsAddr := strings.TrimPrefix(nodeAddr, "http://")
 	wsAddr = "ws://" + wsAddr + "websocket"
-	logger.Debugln(wsAddr)
-	dialer := websocket.DefaultDialer
-	rHeader := http.Header{}
-	conn, _, err := dialer.Dial(wsAddr, rHeader)
-	if err != nil {
-		return nil, fmt.Errorf("Error establishing websocket connection to wait for tx to get committed: %v", err)
-	}
+	logger.Debugf("Websocket Address %s\n", wsAddr)
+	wsClient := cclient.NewWSClient(wsAddr)
+	wsClient.Start()
 	eid := types.EventStringAccInput(inputAddr)
-
-	if err := conn.WriteJSON(rpctypes.RPCRequest{
-		JSONRPC: "2.0",
-		Id:      "",
-		Method:  "subscribe",
-		Params:  []interface{}{eid},
-	}); err != nil {
+	if err := wsClient.Subscribe(eid); err != nil {
 		return nil, fmt.Errorf("Error subscribing to AccInput event: %v", err)
+	}
+	if err := wsClient.Subscribe(types.EventStringNewBlock()); err != nil {
+		return nil, fmt.Errorf("Error subscribing to NewBlock event: %v", err)
 	}
 
 	resultChan := make(chan Msg, 1)
 
+	var latestBlockHash []byte
+
 	// Read message
 	go func() {
 		for {
-			_, p, err := conn.ReadMessage()
-			if err != nil {
-				resultChan <- Msg{Error: err}
-				break
-			} else {
-				var response rtypes.Response
-				err := new(error)
-				wire.ReadJSON(&response, p, err)
-				if *err != nil {
-					resultChan <- Msg{Error: fmt.Errorf("error unmarshaling event data: %v", *err)}
-					return
-				}
-				if response.Error != "" {
-					resultChan <- Msg{Error: fmt.Errorf("response error: %v", response.Error)}
-					return
-				}
+			result := <-wsClient.EventsCh
+			// if its a block, remember the block hash
+			blockData, ok := result.Data.(types.EventDataNewBlock)
+			if ok {
+				logger.Infoln(blockData.Block)
+				latestBlockHash = blockData.Block.Hash()
+				continue
+			}
 
-				result, ok := response.Result.(*rtypes.ResultEvent)
-				if !ok {
-					resultChan <- Msg{Error: fmt.Errorf("response error: expected result to be *rtypes.ResultEvent ")}
-					return
-				}
+			// we don't accept events unless they came after a new block (ie. in)
+			if latestBlockHash == nil {
+				continue
+			}
 
-				if result.Event != eid {
-					logger.Debugf("received unsolicited event! Got %s, expected %s\n", result.Event, eid)
-					continue
-				}
+			if result.Event != eid {
+				logger.Debugf("received unsolicited event! Got %s, expected %s\n", result.Event, eid)
+				continue
+			}
 
-				data, ok := result.Data.(types.EventDataTx)
-				if !ok {
-					resultChan <- Msg{Error: fmt.Errorf("response error: expected result.Data to be *types.EventDataTx")}
-					return
-				}
-
-				if !bytes.Equal(types.TxID(chainID, data.Tx), types.TxID(chainID, tx)) {
-					logger.Debugf("Received event for same input from another transaction: %X\n", types.TxID(chainID, data.Tx))
-					continue
-				}
-
-				if data.Exception != "" {
-					resultChan <- Msg{Value: data.Return, Exception: data.Exception}
-					return
-				}
-
-				// GOOD!
-				resultChan <- Msg{Value: data.Return}
+			data, ok := result.Data.(types.EventDataTx)
+			if !ok {
+				resultChan <- Msg{Error: fmt.Errorf("response error: expected result.Data to be *types.EventDataTx")}
 				return
 			}
+
+			if !bytes.Equal(types.TxID(chainID, data.Tx), types.TxID(chainID, tx)) {
+				logger.Debugf("Received event for same input from another transaction: %X\n", types.TxID(chainID, data.Tx))
+				continue
+			}
+
+			if data.Exception != "" {
+				resultChan <- Msg{BlockHash: latestBlockHash, Value: data.Return, Exception: data.Exception}
+				return
+			}
+
+			// GOOD!
+			resultChan <- Msg{BlockHash: latestBlockHash, Value: data.Return}
+			return
 		}
 	}()
 
 	// txs should take no more than 10 seconds
-	timeoutTicker := time.Tick(10 * time.Second)
+	timeoutTicker := time.Tick(time.Duration(MaxCommitWaitTimeSeconds) * time.Second)
 
 	go func() {
 		<-timeoutTicker
@@ -600,26 +567,39 @@ func subscribeAndWait(tx types.Tx, chainID, nodeAddr string, inputAddr []byte) (
 //------------------------------------------------------------------------------------
 // convenience function
 
-func checkCommon(nodeAddr, pubkey, addr, amtS, nonceS string) (pub account.PubKey, addrBytes []byte, amt int64, nonce int64, err error) {
+func checkCommon(nodeAddr, signAddr, pubkey, addr, amtS, nonceS string) (pub account.PubKey, amt int64, nonce int64, err error) {
 	if amtS == "" {
 		err = fmt.Errorf("input must specify an amount with the --amt flag")
 		return
 	}
 
+	var pubKeyBytes []byte
 	if pubkey == "" && addr == "" {
 		err = fmt.Errorf("at least one of --pubkey or --addr must be given")
 		return
+	} else if pubkey != "" {
+		if addr != "" {
+			// NOTE: if --addr given byt MINTX_PUBKEY is set, the pubkey still wins
+			// TODO: fix this
+			//logger.Errorln("you have specified both a pubkey and an address. the pubkey takes precedent")
+		}
+		pubKeyBytes, err = hex.DecodeString(pubkey)
+		if err != nil {
+			err = fmt.Errorf("pubkey is bad hex: %v", err)
+			return
+		}
+	} else {
+		// grab the pubkey from eris-keys
+		pubKeyBytes, err = Pub(addr, signAddr)
+		if err != nil {
+			err = fmt.Errorf("failed to fetch pubkey for address (%s): %v", addr, err)
+			return
+		}
+
 	}
 
-	pubKeyBytes, err := hex.DecodeString(pubkey)
-	if err != nil {
-		err = fmt.Errorf("pubkey is bad hex: %v", err)
-		return
-	}
-
-	addrBytes, err = hex.DecodeString(addr)
-	if err != nil {
-		err = fmt.Errorf("addr is bad hex: %v", err)
+	if len(pubKeyBytes) == 0 {
+		err = fmt.Errorf("Error resolving public key")
 		return
 	}
 
@@ -628,12 +608,10 @@ func checkCommon(nodeAddr, pubkey, addr, amtS, nonceS string) (pub account.PubKe
 		err = fmt.Errorf("amt is misformatted: %v", err)
 	}
 
-	if len(pubKeyBytes) > 0 {
-		var pubArray [32]byte
-		copy(pubArray[:], pubKeyBytes)
-		pub = account.PubKeyEd25519(pubArray)
-		addrBytes = pub.Address()
-	}
+	var pubArray [32]byte
+	copy(pubArray[:], pubKeyBytes)
+	pub = account.PubKeyEd25519(pubArray)
+	addrBytes := pub.Address()
 
 	if nonceS == "" {
 		if nodeAddr == "" {

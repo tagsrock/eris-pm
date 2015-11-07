@@ -944,25 +944,14 @@ func (u *UnmarshalString) UnmarshalTOML(data []byte) error {
 	return nil
 }
 
-type testUnmarshalStruct struct {
-	Title  string
-	Author UnmarshalString
-}
-
-func (u *testUnmarshalStruct) UnmarshalTOML(data []byte) error {
-	u.Title = "Unmarshaled: " + string(data)
-	return nil
-}
-
 func TestUnmarshal_WithUnmarshaler(t *testing.T) {
 	type testStruct struct {
-		Title         UnmarshalString
-		MaxConn       UnmarshalString
-		Ports         UnmarshalString
-		Servers       UnmarshalString
-		Table         UnmarshalString
-		Arraytable    UnmarshalString
-		ArrayOfStruct []testUnmarshalStruct
+		Title      UnmarshalString
+		MaxConn    UnmarshalString
+		Ports      UnmarshalString
+		Servers    UnmarshalString
+		Table      UnmarshalString
+		Arraytable UnmarshalString
 	}
 	data := `title = "testtitle"
 max_conn = 777
@@ -974,9 +963,6 @@ name = "alice"
 name = "alice"
 [[arraytable]]
 name = "bob"
-[[array_of_struct]]
-title = "Alice's Adventures in Wonderland"
-author = "Lewis Carroll"
 `
 	var v testStruct
 	if err := toml.Unmarshal([]byte(data), &v); err != nil {
@@ -990,32 +976,6 @@ author = "Lewis Carroll"
 		Servers:    `UnmarshalString: [1, 2, 3]`,
 		Table:      "UnmarshalString: [table]\nname = \"alice\"",
 		Arraytable: "UnmarshalString: [[arraytable]]\nname = \"alice\"\n[[arraytable]]\nname = \"bob\"",
-		ArrayOfStruct: []testUnmarshalStruct{
-			{
-				Title:  "Unmarshaled: [[array_of_struct]]\ntitle = \"Alice's Adventures in Wonderland\"\nauthor = \"Lewis Carroll\"",
-				Author: "",
-			},
-		},
-	}
-	if !reflect.DeepEqual(actual, expect) {
-		t.Errorf(`toml.Unmarshal(data, &v); v => %#v; want %#v`, actual, expect)
-	}
-}
-
-func TestUnmarshal_WithUnmarshalerForTopLevelStruct(t *testing.T) {
-	data := `title = "Alice's Adventures in Wonderland"
-author = "Lewis Carroll"
-`
-	var v testUnmarshalStruct
-	if err := toml.Unmarshal([]byte(data), &v); err != nil {
-		t.Fatal(err)
-	}
-	actual := v
-	expect := testUnmarshalStruct{
-		Title: `Unmarshaled: title = "Alice's Adventures in Wonderland"
-author = "Lewis Carroll"
-`,
-		Author: "",
 	}
 	if !reflect.DeepEqual(actual, expect) {
 		t.Errorf(`toml.Unmarshal(data, &v); v => %#v; want %#v`, actual, expect)

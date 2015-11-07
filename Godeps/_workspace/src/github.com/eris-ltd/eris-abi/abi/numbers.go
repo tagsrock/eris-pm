@@ -1,10 +1,9 @@
 package abi
 
 import (
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-abi/utils/common"
 	"math/big"
 	"reflect"
-
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 )
 
 var big_t = reflect.TypeOf(&big.Int{})
@@ -44,7 +43,7 @@ func U256(n *big.Int) []byte {
 func S256(n *big.Int) []byte {
 	sint := common.S256(n)
 	ret := common.LeftPadBytes(sint.Bytes(), 32)
-	if sint.Cmp(big.NewInt(0)) < 0 {
+	if sint.Cmp(common.Big0) < 0 {
 		for i, b := range ret {
 			if b == 0 {
 				ret[i] = 1

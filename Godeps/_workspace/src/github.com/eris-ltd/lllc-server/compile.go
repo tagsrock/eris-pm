@@ -10,7 +10,7 @@ import (
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 )
 
-var DefaultUrl = "https://compilers.eris.industries:8091/compile"
+var DefaultUrl = "https://compilers.eris.industries:9090/compile"
 
 // Language configuration struct
 // New language capabilities can be added to the server simply by
@@ -34,18 +34,21 @@ func (l LangConfig) Ext(h string) string {
 }
 
 // Fill in the filename and return the command line args
-func (l LangConfig) Cmd(file string) (args []string) {
+func (l LangConfig) Cmd(file string, includes []string) (args []string) {
 	for _, s := range l.CompileCmd {
 		if s == "_" {
 			args = append(args, file)
+		} else if s == "imports" {
+			args = append(args, includes...)
 		} else {
 			args = append(args, s)
 		}
 	}
+	logger.Debugf("Command Compiled =>\t\t%v\n", args)
 	return
 }
 
-func (l LangConfig) Abi(file string) (args []string) {
+func (l LangConfig) Abi(file string, includes []string) (args []string) {
 	if len(l.AbiCmd) < 2 {
 		return
 	}
@@ -53,6 +56,8 @@ func (l LangConfig) Abi(file string) (args []string) {
 	for _, s := range l.AbiCmd {
 		if s == "_" {
 			args = append(args, file)
+		} else if s == "imports" {
+			args = append(args, includes...)
 		} else {
 			args = append(args, s)
 		}
@@ -62,7 +67,7 @@ func (l LangConfig) Abi(file string) (args []string) {
 
 // Global variable mapping languages to their configs
 var Languages = map[string]LangConfig{
-	"lll": LangConfig{
+	"lll": {
 		URL:        DefaultUrl,
 		Net:        true,
 		Extensions: []string{"lll", "def"},
@@ -70,15 +75,15 @@ var Languages = map[string]LangConfig{
 			`\(include "(.+?)"\)`,
 		},
 		IncludeReplaces: [][]string{
-			[]string{`(include "`, `.lll")`},
+			{`(include "`, `.lll")`},
 		},
 		CompileCmd: []string{
-			path.Join(homeDir(), "eris-cpp/build/lllc/lllc"),
+			"lllc",
 			"_",
 		},
 	},
 
-	"se": LangConfig{
+	"se": {
 		URL:        DefaultUrl,
 		Net:        true,
 		Extensions: []string{"se"},
@@ -89,39 +94,57 @@ var Languages = map[string]LangConfig{
 			`create\('(.+?)'\)`,
 		},
 		IncludeReplaces: [][]string{
-			[]string{`create("`, `.se")`},
-			[]string{`create('`, `.se')`},
+			{`create("`, `.se")`},
+			{`create('`, `.se')`},
 		},
 		CompileCmd: []string{
-			"/usr/local/bin/serpent",
+			"sc",
 			"compile",
 			"_",
 		},
 		AbiCmd: []string{
-			"/usr/local/bin/serpent",
+			"sc",
 			"mk_full_signature",
 			"_",
 		},
 	},
-	"sol": LangConfig{
-		URL:             DefaultUrl,
-		Net:             true,
-		Extensions:      []string{"sol"},
-		IncludeRegexes:  []string{},
-		IncludeReplaces: [][]string{},
+	"sol": {
+		URL:        DefaultUrl,
+		Net:        true,
+		Extensions: []string{"sol"},
+		IncludeRegexes: []string{
+			`import "(.+?)";`,
+		},
+		IncludeReplaces: [][]string{
+			{`import "`, `.sol";`},
+		},
 		CompileCmd: []string{
-			path.Join(homeDir(), "cpp-ethereum/build/solc/solc"),
+			"/usr/bin/solc",
+			"--bin",
 			"_",
-			"--binary", "stdout", "|",
-			"grep", "[0-9a-fA-F]", "|",
-			"sort", "-rn", "|",
-			"awk", "{print $1; exit}",
+			"imports",
+			"|",
+			"grep",
+			"Binary",
+			"-A1",
+			"|",
+			"tail",
+			"-n",
+			"1",
 		},
 		AbiCmd: []string{
-			path.Join(homeDir(), "cpp-ethereum/build/solc/solc"),
+			"/usr/bin/solc",
+			"--abi",
 			"_",
-			"--json-abi", "stdout", "|",
-			"awk", "NR >= 4",
+			"imports",
+			"|",
+			"grep",
+			"ABI",
+			"-A1",
+			"|",
+			"tail",
+			"-n",
+			"1",
 		},
 	},
 }

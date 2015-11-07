@@ -3,18 +3,16 @@ package main
 import (
 	"encoding/hex"
 	"fmt"
-	"log"
 	"os"
 	"runtime"
 	"strconv"
 
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/lllc-server"
 
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/codegangsta/cli"
+	"github.com/codegangsta/cli"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/log"
 )
-
-var logger = lllcserver.Logger{}
 
 // simple lllc-server and cli
 func main() {
@@ -28,6 +26,7 @@ func main() {
 
 	app.Action = cliServer
 	app.Before = before
+	app.After = after
 
 	app.Flags = []cli.Flag{
 		securePortFlag,
@@ -42,7 +41,7 @@ func main() {
 	}
 
 	app.Commands = []cli.Command{
-		cli.Command{
+		{
 			Name:   "compile",
 			Usage:  "compile a contract",
 			Action: cliClient,
@@ -53,7 +52,7 @@ func main() {
 				//logFlag,
 			},
 		},
-		cli.Command{
+		{
 			Name:   "proxy",
 			Usage:  "run a proxy server for out of process access",
 			Action: cliProxy,
@@ -67,13 +66,18 @@ func main() {
 }
 
 func before(c *cli.Context) error {
-	lllcserver.DebugMode = c.GlobalInt("log")
+	log.SetLogLevel("lllc-server-cli", c.GlobalInt("log"))
+	return nil
+}
+
+func after(c *cli.Context) error {
+	log.Flush()
 	return nil
 }
 
 func cliClient(c *cli.Context) {
 	if len(c.Args()) == 0 {
-		log.Fatal("Specify a contract to compile")
+		ifExit(fmt.Errorf("Specify a contract to compile"))
 	}
 	tocompile := c.Args()[0]
 
@@ -99,15 +103,15 @@ func cliClient(c *cli.Context) {
 		// force it through the compile pipeline so we get caching
 		b, abi, err := lllcserver.Compile(tocompile)
 		ifExit(err)
-		logger.Warnln("bytecode:", hex.EncodeToString(b))
-		logger.Warnln("abi:", abi)
+		logger.Infoln("bytecode:", hex.EncodeToString(b))
+		logger.Infoln("abi:", abi)
 	} else {
 		code, abi, err := lllcserver.Compile(tocompile)
 		if err != nil {
 			fmt.Println(err)
 		}
-		logger.Warnln("bytecode:", hex.EncodeToString(code))
-		logger.Warnln("abi:", abi)
+		logger.Infoln("bytecode:", hex.EncodeToString(code))
+		logger.Infoln("abi:", abi)
 	}
 }
 
@@ -118,6 +122,7 @@ func cliProxy(c *cli.Context) {
 
 func cliServer(c *cli.Context) {
 
+	common.InitDataDir(lllcserver.ServerCache)
 	addrUnsecure := ""
 	addrSecure := ""
 
@@ -181,7 +186,7 @@ var (
 	logFlag = cli.IntFlag{
 		Name:  "log",
 		Usage: "set the log level",
-		Value: 5,
+		Value: 4,
 	}
 
 	portFlag = cli.IntFlag{
@@ -241,6 +246,7 @@ var (
 func ifExit(err error) {
 	if err != nil {
 		logger.Errorln(err)
+		log.Flush()
 		os.Exit(0)
 	}
 }

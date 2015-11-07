@@ -3,17 +3,20 @@ package core_client
 import (
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/gorilla/websocket"
 	. "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/common"
-	_ "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/config/tendermint_test"
 	ctypes "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core/types"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/types"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/wire"
 )
 
-const wsEventsChannelCapacity = 10
-const wsResultsChannelCapacity = 10
+const (
+	wsEventsChannelCapacity  = 10
+	wsResultsChannelCapacity = 10
+	wsWriteTimeoutSeconds    = 10
+)
 
 type WSClient struct {
 	QuitService
@@ -53,6 +56,14 @@ func (wsc *WSClient) dial() error {
 	if err != nil {
 		return err
 	}
+	// Set the ping/pong handlers
+	con.SetPingHandler(func(m string) error {
+		con.WriteControl(websocket.PongMessage, []byte(m), time.Now().Add(time.Second*wsWriteTimeoutSeconds))
+		return nil
+	})
+	con.SetPongHandler(func(m string) error {
+		return nil
+	})
 	wsc.Conn = con
 	return nil
 }
@@ -65,18 +76,18 @@ func (wsc *WSClient) receiveEventsRoutine() {
 	for {
 		_, data, err := wsc.ReadMessage()
 		if err != nil {
-			log.Info(Fmt("WSClient failed to read message: %v", err))
+			log.Info("WSClient failed to read message", "error", err, "data", string(data))
 			wsc.Stop()
 			break
 		} else {
 			var response ctypes.Response
 			wire.ReadJSON(&response, data, &err)
 			if err != nil {
-				log.Info(Fmt("WSClient failed to parse message: %v", err))
+				log.Info("WSClient failed to parse message", "error", err)
 				wsc.Stop()
 				break
 			}
-			if strings.HasSuffix(response.Id, "#event") {
+			if strings.HasSuffix(response.ID, "#event") {
 				wsc.EventsCh <- *response.Result.(*ctypes.ResultEvent)
 			} else {
 				wsc.ResultsCh <- response.Result
@@ -89,7 +100,7 @@ func (wsc *WSClient) receiveEventsRoutine() {
 func (wsc *WSClient) Subscribe(eventid string) error {
 	err := wsc.WriteJSON(rpctypes.RPCRequest{
 		JSONRPC: "2.0",
-		Id:      "",
+		ID:      "",
 		Method:  "subscribe",
 		Params:  []interface{}{eventid},
 	})
@@ -100,7 +111,7 @@ func (wsc *WSClient) Subscribe(eventid string) error {
 func (wsc *WSClient) Unsubscribe(eventid string) error {
 	err := wsc.WriteJSON(rpctypes.RPCRequest{
 		JSONRPC: "2.0",
-		Id:      "",
+		ID:      "",
 		Method:  "unsubscribe",
 		Params:  []interface{}{eventid},
 	})

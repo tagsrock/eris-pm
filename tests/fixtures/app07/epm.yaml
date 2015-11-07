@@ -1,0 +1,31 @@
+jobs:
+
+- name: account
+  job:
+    account:
+      address: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
+
+- name: setStorage
+  job:
+    set:
+      val: 0x5
+
+- name: deployStorageK
+  job:
+    deploy:
+      contract: ./storage.sol
+      data: $setStorage
+      wait: true
+
+- name: queryStorage
+  job:
+    query-contract:
+      destination: $deployStorageK
+      data: get
+
+- name: assertStorage
+  job:
+    assert:
+      key: $queryStorage
+      relation: eq
+      val: $setStorage
