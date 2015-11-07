@@ -9,7 +9,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/eris-ltd/eris-pm/cmd"
+	commands "github.com/eris-ltd/eris-pm/cmd"
 
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
 )
@@ -198,10 +198,10 @@ func GenerateSpecs(dir string) []string {
 }
 
 func main() {
-	eris := cmd.EPMCmd
-	// cmd.InitializeConfig()
-	cmd.AddGlobalFlags()
-	// cmd.AddCommands()
+	eris := commands.EPMCmd
+	// commands.InitializeConfig()
+	commands.AddGlobalFlags()
+	// commands.AddCommands()
 	specs := GenerateSpecs(SPECS_DIR)
 	GenerateTree(eris, RENDER_DIR, specs)
 }
