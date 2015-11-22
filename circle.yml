@@ -23,4 +23,10 @@ deployment:
     branch: master
     commands:
       - docker push quay.io/eris/epm
+      - docs/build.sh master
+  develop:
+    branch: develop
+    commands:
+      - docker tag quay.io/eris/epm quay.io/eris/epm:develop
+      - docker push quay.io/eris/epm:develop
       - docs/build.sh
