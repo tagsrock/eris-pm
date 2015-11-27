@@ -43,6 +43,7 @@ key2_addr="58FD1799AA32DED3F6EAC096A1DC77834A446B9C"
 # Other variables
 uuid=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 12 | head -n 1)
 was_running=0
+test_exit=0
 
 # ---------------------------------------------------------------------------
 # Needed functionality
@@ -142,7 +143,7 @@ test_teardown(){
   then
     echo ""
     echo "EPM Log on Failed Test."
-    cat $failing_dir/epm.csv
+    cat $failing_dir/epm.json
   fi
   if [ "$circle" = false ]
   then
