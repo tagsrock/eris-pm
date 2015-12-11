@@ -28,13 +28,16 @@ func ReadTxSignAndBroadcast(result *core.TxResult, err error) error {
 	}
 
 	// Unpack and display for the user.
-	logger.Printf("Transaction Hash =>\t\t%X\n", result.Hash)
 	if result.Address != nil {
-		logger.Infof("Contract Address =>\t\t%X\n", result.Address)
+		logger.Printf("Contract Address =>\t\t%X\n", result.Address)
+		logger.Infof("Transaction Hash =>\t\t%X\n", result.Hash)
+	} else {
+		logger.Printf("Transaction Hash =>\t\t%X\n", result.Hash)
 	}
+
 	if result.Return != nil {
+		logger.Printf("Return Value =>\t\t\t%X\n", result.Return)
 		logger.Debugf("Block Hash =>\t\t\t%X\n", result.BlockHash)
-		logger.Debugf("Return Value =>\t\t\t%X\n", result.Return)
 		logger.Debugf("Exception =>\t\t\t%s\n", result.Exception)
 	}
 
