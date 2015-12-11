@@ -1,8 +1,8 @@
 package perform
 
 import (
-	"fmt"
 	"encoding/hex"
+	"fmt"
 	"strconv"
 
 	"github.com/eris-ltd/eris-pm/definitions"
@@ -195,6 +195,7 @@ func bulkConvert(key, value string) (int, int, error) {
 }
 
 func assertPass() (string, error) {
+	logger.Println("Assertion =>\t\t\tSucceeded")
 	return "passed", nil
 }
 
