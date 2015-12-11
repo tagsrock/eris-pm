@@ -61,7 +61,7 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	}
 
 	// Finalize
-	logger.Infof("Decoded Result =>\t\t%s\n", result)
+	logger.Printf("Return Value =>\t\t\t%X\n", result)
 	return result, nil
 }
 
@@ -78,6 +78,7 @@ func QueryAccountJob(query *definitions.QueryAccount, do *definitions.Do) (strin
 	}
 
 	// Result
+	logger.Printf("Return Value =>\t\t\t%X\n", result)
 	return result, nil
 }
 
@@ -93,6 +94,7 @@ func QueryNameJob(query *definitions.QueryName, do *definitions.Do) (string, err
 		return "", err
 	}
 
+	logger.Printf("Return Value =>\t\t\t%X\n", result)
 	return result, nil
 }
 
@@ -109,6 +111,7 @@ func QueryValsJob(query *definitions.QueryVals, do *definitions.Do) (string, err
 		return "", err
 	}
 
+	logger.Printf("Return Value =>\t\t\t%X\n", result)
 	return result, nil
 }
 
