@@ -33,13 +33,13 @@ func ReadTxSignAndBroadcast(result *core.TxResult, err error) error {
 		logger.Infof("Transaction Hash =>\t\t%X\n", result.Hash)
 	} else {
 		logger.Printf("Transaction Hash =>\t\t%X\n", result.Hash)
+		if len(result.Return) != 0 {
+			logger.Printf("Return Value =>\t\t\t%X\n", result.Return)
+			logger.Debugf("Block Hash =>\t\t\t%X\n", result.BlockHash)
+			logger.Debugf("Exception =>\t\t\t%s\n", result.Exception)
+		}
 	}
 
-	if result.Return != nil {
-		logger.Printf("Return Value =>\t\t\t%X\n", result.Return)
-		logger.Debugf("Block Hash =>\t\t\t%X\n", result.BlockHash)
-		logger.Debugf("Exception =>\t\t\t%s\n", result.Exception)
-	}
 
 	return nil
 }
