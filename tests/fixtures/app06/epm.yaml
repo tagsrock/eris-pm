@@ -5,10 +5,35 @@ jobs:
     account:
       address: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
 
-- name: setStorage
+- name: setStorageBaseBool
   job:
     set:
-      val: 0x5
+      val: true
+
+- name: setStorageBaseInt
+  job:
+    set:
+      val: 50000
+
+- name: setStorageBaseUint
+  job:
+    set:
+      val: 9999999
+
+- name: setStorageBaseAddress
+  job:
+    set:
+      val: $account
+
+- name: setStorageBaseBytes
+  job:
+    set:
+      val: marmatoshi
+
+- name: setStorageString
+  job:
+    set:
+      val: nakaburrow
 
 - name: deployStorageK
   job:
@@ -16,22 +41,123 @@ jobs:
       contract: storage.sol
       wait: true
 
-- name: setStorage
+- name: setStorageBool
   job:
     call:
       destination: $deployStorageK
-      data: set $setStorage
+      data: setBool $setStorageBaseBool
       wait: true
 
-- name: queryStorage
+- name: setStorageInt
+  job:
+    call:
+      destination: $deployStorageK
+      data: setInt $setStorageBaseInt
+      wait: true
+
+- name: setStorageUint
+  job:
+    call:
+      destination: $deployStorageK
+      data: setUint $setStorageBaseUint
+      wait: true
+
+- name: setStorageAddress
+  job:
+    call:
+      destination: $deployStorageK
+      data: setAddress $account
+      wait: true
+
+- name: setStorageBytes
+  job:
+    call:
+      destination: $deployStorageK
+      data: setBytes $setStorageBaseBytes
+      wait: true
+
+# - name: setStorageString
+#   job:
+#     call:
+#       destination: $deployStorageK
+#       data: setString $setStorageBaseString
+#       wait: true
+
+- name: queryStorageBool
   job:
     query-contract:
       destination: $deployStorageK
-      data: get
+      data: getBool
 
-- name: assertStorage
+- name: queryStorageInt
+  job:
+    query-contract:
+      destination: $deployStorageK
+      data: getInt
+
+- name: queryStorageUint
+  job:
+    query-contract:
+      destination: $deployStorageK
+      data: getUint
+
+- name: queryStorageAddress
+  job:
+    query-contract:
+      destination: $deployStorageK
+      data: getAddress
+
+- name: queryStorageBytes
+  job:
+    query-contract:
+      destination: $deployStorageK
+      data: getBytes
+
+# - name: queryStorageString
+#   job:
+#     query-contract:
+#       destination: $deployStorageK
+#       data: getString
+
+- name: assertStorageBool
   job:
     assert:
-      key: $queryStorage
+      key: $queryStorageBool
       relation: eq
-      val: $setStorage
+      val: $setStorageBaseBool
+
+- name: assertStorageInt
+  job:
+    assert:
+      key: $queryStorageInt
+      relation: eq
+      val: $setStorageBaseInt
+
+- name: assertStorageUint
+  job:
+    assert:
+      key: $queryStorageUint
+      relation: eq
+      val: $setStorageBaseUint
+
+- name: assertStorageAddress
+  job:
+    assert:
+      key: $queryStorageAddress
+      relation: eq
+      val: $account
+
+- name: assertStorageBytes
+  job:
+    assert:
+      key: $queryStorageBytes
+      relation: eq
+      val: $setStorageBaseBytes
+
+# - name: assertStorageString
+#   job:
+#     assert:
+#       key: $queryStorageString
+#       relation: eq
+#       val: $setStorageBaseString
+

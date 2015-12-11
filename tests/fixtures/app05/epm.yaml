@@ -5,10 +5,10 @@ jobs:
     account:
       address: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
 
-- name: setStorage
+- name: setStorageBase
   job:
     set:
-      val: 0x5
+      val: 5
 
 - name: deployStorageK
   job:
@@ -20,7 +20,7 @@ jobs:
   job:
     call:
       destination: $deployStorageK
-      data: set $setStorage
+      data: set $setStorageBase
       wait: true
 
 - name: queryStorage
@@ -34,4 +34,4 @@ jobs:
     assert:
       key: $queryStorage
       relation: eq
-      val: $setStorage
+      val: $setStorageBase

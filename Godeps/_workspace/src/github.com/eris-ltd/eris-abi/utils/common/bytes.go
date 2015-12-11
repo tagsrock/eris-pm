@@ -1,12 +1,11 @@
 package common
 
 import (
-	"fmt"
 	"bytes"
-	"strings"
-	"math/big"
-	"encoding/hex"
 	"encoding/binary"
+	"encoding/hex"
+	"math/big"
+	"strings"
 )
 
 type Bytes []byte
@@ -32,7 +31,7 @@ func NumberToBytes(num interface{}, bits int) []byte {
 	buf := new(bytes.Buffer)
 	err := binary.Write(buf, binary.BigEndian, num)
 	if err != nil {
-		fmt.Println("NumberToBytes failed:", err)
+		logger.Println("NumberToBytes failed:", err)
 	}
 
 	return buf.Bytes()[buf.Len()-(bits/8):]
@@ -51,7 +50,7 @@ func BytesToNumber(b []byte) uint64 {
 	buf := bytes.NewReader(data)
 	err := binary.Read(buf, binary.BigEndian, &number)
 	if err != nil {
-		fmt.Println("BytesToNumber failed:", err)
+		logger.Println("BytesToNumber failed:", err)
 	}
 
 	return number
@@ -186,15 +185,15 @@ func LeftPadBytes(slice []byte, l int) []byte {
 
 func UnLeftPadBytes(slice []byte) []byte {
 	var l int
-//	for nz, b := range slice {
-//		if (b != byte(0)) {
-//			l = nz
-//			break
-//		}
-//	}
+	//	for nz, b := range slice {
+	//		if (b != byte(0)) {
+	//			l = nz
+	//			break
+	//		}
+	//	}
 	l = 1
-	unpadded := make([]byte,len(slice)-l)
-//	copy(unpadded, slice[l:len(slice)])
+	unpadded := make([]byte, len(slice)-l)
+	//	copy(unpadded, slice[l:len(slice)])
 
 	return unpadded
 }

@@ -20,6 +20,20 @@ The `JobResults` which are able to be retrieved from query functions will vary a
 
 Set variables will take the `JobName` and use the `val` field from the epm file to set the variable.
 
+## <a name="setVars"></a>Variable Types
+
+If you're using solidity then you will be familiar with variable types. Here is how eris:pm deals with variable types:
+
+* `address` - addresses should be given according to the 40 character string **without** the leading `0x`
+  * Example: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
+* `int` && `uint` -- integers (signed and unsigned) should be given according to their plain text rendering of the digits
+  * Example: 99999
+* `bool` - `true` or `false`
+* `string` and `byteX` -- just give it a string
+  * Example: marmatoshi
+
+For a more complete handling of the types, please see the epm.yaml in tests/fixtures/app06 directory of the repository.
+
 ## <a name="reservedVars"></a>Reserved Variables
 
 The following are reserved variables:

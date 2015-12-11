@@ -133,6 +133,7 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 	var err error
 	call.Data, err = util.ReadAbiFormulateCall(call.Destination, call.Data, do)
 	if err != nil {
+		logger.Errorf("Error Formulating Call from ABI.\n")
 		return "", err
 	}
 
