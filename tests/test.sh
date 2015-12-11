@@ -107,8 +107,8 @@ perform_tests(){
     cd $app
     if [ "$circle" = false ]
     then
-      eris contracts test --chain "epm-tests-$uuid" -d
-      # eris contracts test --chain "epm-tests-$uuid"
+      # eris contracts test --chain "epm-tests-$uuid" -d
+      eris contracts test --chain "epm-tests-$uuid"
     else
       eris contracts test --chain "epm-tests-$uuid" --rm
     fi
