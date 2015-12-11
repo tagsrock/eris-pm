@@ -1,20 +1,17 @@
 package util
 
 import (
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
-	"strconv"
 	"strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-abi/abi"
-	ebi "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-abi"
+	ebi "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-abi/core"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
 )
 
@@ -45,34 +42,25 @@ func ReadTxSignAndBroadcast(result *core.TxResult, err error) error {
 }
 
 func ReadAbiFormulateCall(contract, dataRaw string, do *definitions.Do) (string, error) {
-	abiSpec, err := readAbi(do.ABIPath, contract)
+	abiSpecBytes, err := readAbi(do.ABIPath, contract)
 	if err != nil {
 		return "", err
 	}
-	logger.Debugf("ABI Spec =>\t\t\t%s\n", abiSpec)
+	logger.Debugf("ABI Spec =>\t\t\t%s\n", abiSpecBytes)
 
 	// Process and Pack the Call
 	funcName, args := abiPreProcess(dataRaw, do)
 
-	a := []interface{}{}
-	for _, aa := range args {
-		aa = coerceHex(aa, true)
-		bb, _ := hex.DecodeString(common.StripHex(aa))
-		a = append(a, bb)
-	}
+	var totalArgs []string
+	totalArgs = append(totalArgs, funcName)
+	totalArgs = append(totalArgs, args...)
+	logger.Debugf("Packing Call via ABI =>\t\t%v:%v\n", funcName, args)
 
-	packedBytes, err := abiSpec.Pack(funcName, a...)
-	if err != nil {
-		return "", err
-	}
-
-	packed := hex.EncodeToString(packedBytes)
-
-	return packed, nil
+	return ebi.Packer(abiSpecBytes, totalArgs...)
 }
 
 func ReadAndDecodeContractReturn(contract, dataRaw, resultRaw string, do *definitions.Do) (string, error) {
-	abiSpecBytes, err := readAbiRaw(do.ABIPath, contract)
+	abiSpecBytes, err := readAbi(do.ABIPath, contract)
 	if err != nil {
 		return "", err
 	}
@@ -119,21 +107,7 @@ func abiPreProcess(dataRaw string, do *definitions.Do) (string, []string) {
 	return funcName, args
 }
 
-func readAbi(root, contract string) (abi.ABI, error) {
-	b, err := readAbiRaw(root, contract)
-	if err != nil {
-		return abi.NullABI, err
-	}
-
-	a := new(abi.ABI)
-	if err := a.UnmarshalJSON(b); err != nil {
-		return abi.NullABI, fmt.Errorf("Failed to unmarshal ABI =>\t%v", err)
-	}
-
-	return *a, nil
-}
-
-func readAbiRaw(root, contract string) ([]byte, error) {
+func readAbi(root, contract string) ([]byte, error) {
 	p := path.Join(root, common.StripHex(contract))
 	if _, err := os.Stat(p); err != nil {
 		return []byte{}, fmt.Errorf("Abi doesn't exist for =>\t%s", p)
@@ -145,22 +119,4 @@ func readAbiRaw(root, contract string) ([]byte, error) {
 	}
 
 	return b, nil
-}
-
-func coerceHex(aa string, padright bool) string {
-	if !common.IsHex(aa) {
-		//first try and convert to int
-		n, err := strconv.Atoi(aa)
-		if err != nil {
-			// right pad strings
-			if padright {
-				aa = "0x" + fmt.Sprintf("%x", aa) + fmt.Sprintf("%0"+strconv.Itoa(64-len(aa)*2)+"s", "")
-			} else {
-				aa = "0x" + fmt.Sprintf("%x", aa)
-			}
-		} else {
-			aa = "0x" + fmt.Sprintf("%x", n)
-		}
-	}
-	return aa
 }

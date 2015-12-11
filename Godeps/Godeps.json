@@ -40,15 +40,19 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/common/go/common",
-			"Rev": "d399c3ccd993184a393056fcaedd8d1be4e772ad"
+			"Rev": "aa552ea7e0c35a4a31bdd4755e4c8ba6f2602fae"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/common/go/log",
-			"Rev": "d399c3ccd993184a393056fcaedd8d1be4e772ad"
+			"Rev": "aa552ea7e0c35a4a31bdd4755e4c8ba6f2602fae"
 		},
 		{
-			"ImportPath": "github.com/eris-ltd/eris-abi",
-			"Rev": "997d39ef63f11b2c6a4fb1417aff33f369895f39"
+			"ImportPath": "github.com/eris-ltd/eris-abi/abi",
+			"Rev": "f94b2f2c93cbb5168cc95ff31fd4ccffdbf1c8be"
+		},
+		{
+			"ImportPath": "github.com/eris-ltd/eris-abi/core",
+			"Rev": "f94b2f2c93cbb5168cc95ff31fd4ccffdbf1c8be"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-keys/crypto",
@@ -69,6 +73,11 @@
 		{
 			"ImportPath": "github.com/eris-ltd/mint-client/utils",
 			"Rev": "4aa5182051a4a4e8e0235b129a062fbebab3ebdc"
+		},
+		{
+			"ImportPath": "github.com/ethereum/go-ethereum/crypto/sha3",
+			"Comment": "v1.0.1.1-3-g99216f4",
+			"Rev": "99216f4ab85d3015d53223f3af639553cece4b5d"
 		},
 		{
 			"ImportPath": "github.com/go-martini/martini",

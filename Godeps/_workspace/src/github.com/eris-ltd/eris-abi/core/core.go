@@ -2,13 +2,13 @@ package ebi
 
 import (
 	"encoding/hex"
-	"fmt"
-	"github.com/eris-ltd/eris-abi/utils/common"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-abi/abi"
 	"log"
 	"os"
 	"path"
-	"strconv"
+
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-abi/abi"
+
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 )
 
 func PathFromHere(fname string) (string, error) {
@@ -44,46 +44,6 @@ func MakeAbi(abiData []byte) (abi.ABI, error) {
 	return *abiSpec, nil
 }
 
-func PackArgsABI(abiSpec abi.ABI, data ...string) (string, error) {
-
-	funcName := data[0]
-	args := data[1:]
-
-	a := []interface{}{}
-	for _, aa := range args {
-		aa = coerceHex(aa, true)
-		bb, _ := hex.DecodeString(common.StripHex(aa))
-		a = append(a, bb)
-	}
-
-	packedBytes, err := abiSpec.Pack(funcName, a...)
-	if err != nil {
-		return "", err
-	}
-
-	packed := hex.EncodeToString(packedBytes)
-
-	return packed, nil
-}
-
-func coerceHex(aa string, padright bool) string {
-	if !common.IsHex(aa) {
-		//first try and convert to int
-		n, err := strconv.Atoi(aa)
-		if err != nil {
-			// right pad strings
-			if padright {
-				aa = "0x" + fmt.Sprintf("%x", aa) + fmt.Sprintf("%0"+strconv.Itoa(64-len(aa)*2)+"s", "")
-			} else {
-				aa = "0x" + fmt.Sprintf("%x", aa)
-			}
-		} else {
-			aa = "0x" + fmt.Sprintf("%x", n)
-		}
-	}
-	return aa
-}
-
 //Convenience Packing Functions
 func Packer(abiData []byte, data ...string) (string, error) {
 	abiSpec, err := MakeAbi(abiData)
@@ -97,6 +57,27 @@ func Packer(abiData []byte, data ...string) (string, error) {
 	}
 
 	return tx, nil
+}
+
+func PackArgsABI(abiSpec abi.ABI, data ...string) (string, error) {
+
+	funcName := data[0]
+	args := data[1:]
+
+	a := []interface{}{}
+	for _, aa := range args {
+		bb, _ := hex.DecodeString(common.StripHex(common.CoerceHexAndPad(aa, true)))
+		a = append(a, bb)
+	}
+
+	packedBytes, err := abiSpec.Pack(funcName, args, a...)
+	if err != nil {
+		return "", err
+	}
+
+	packed := hex.EncodeToString(packedBytes)
+
+	return packed, nil
 }
 
 func UnPacker(abiData []byte, name string, datas string, pp bool) (string, error) {

@@ -162,3 +162,66 @@ func RightPadString(str string, l int) string {
 	return str + zeros
 
 }
+
+func UnLeftPadBytes(slice []byte) []byte {
+	var l int
+	for i, b := range slice {
+		if (b != byte(0)) {
+			l = i
+			break
+		}
+	}
+	unpadded := make([]byte, len(slice)-l)
+	copy(unpadded, slice[l:len(slice)])
+
+	return unpadded
+}
+
+
+func UnRightPadBytes(slice []byte) []byte {
+	var l int
+	for i, b := range slice {
+		if (b == byte(0)) {
+			l = i
+			break
+		}
+	}
+	unpadded := make([]byte, l)
+	copy(unpadded, slice[:l])
+
+	return unpadded
+}
+
+func Address(slice []byte) (addr []byte) {
+	if len(slice) < 20 {
+		addr = LeftPadBytes(slice, 20)
+	} else if len(slice) > 20 {
+		addr = slice[len(slice)-20:]
+	} else {
+		addr = slice
+	}
+
+	addr = CopyBytes(addr)
+
+	return
+}
+
+func AddressStringToBytes(addr string) []byte {
+	var slice []byte
+	for i := 0; i < len(addr); i++ {
+		a, _ := hex.DecodeString(addr[i:i+2])
+		slice = append(slice, a[0])
+		i++
+	}
+	return slice
+}
+
+// Copy bytes
+//
+// Returns an exact copy of the provided bytes
+func CopyBytes(b []byte) (copiedBytes []byte) {
+	copiedBytes = make([]byte, len(b))
+	copy(copiedBytes, b)
+
+	return
+}

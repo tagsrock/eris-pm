@@ -1,9 +1,9 @@
 package common
 
 import (
-	"strings"
-	"strconv"
 	"encoding/hex"
+	"strconv"
+	"strings"
 )
 
 // s can be string, hex, or int.

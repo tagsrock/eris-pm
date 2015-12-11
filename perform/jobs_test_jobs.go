@@ -196,7 +196,7 @@ func assertPass() (string, error) {
 }
 
 func assertFail(expect, receive string) (string, error) {
-	return "failed", fmt.Errorf("Assertion Failed =>\t\t%s:%s", expect, receive)
+	return "failed", fmt.Errorf("Assertion Failed =>\t\t%s:%s\n\t%v:%v", expect, receive, []byte(expect), []byte(receive))
 }
 
 func convFail() (string, error) {

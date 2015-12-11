@@ -1,9 +1,10 @@
 package abi
 
 import (
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-abi/utils/common"
 	"math/big"
 	"reflect"
+
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 )
 
 var big_t = reflect.TypeOf(&big.Int{})

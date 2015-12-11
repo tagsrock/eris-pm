@@ -1,10 +1,12 @@
-import "base.sol";
+contract SimpleStorage {
+  uint storedData;
 
-contract SimpleStorage is base {
-	function SimpleStorage (uint x) base(x){}
+  function set(uint x) {
+    storedData = x;
+  }
 
-	function test() returns (uint) {
-		return 42;
-	}
+  function get() constant returns (uint retVal) {
+    return storedData;
+  }
 }
 

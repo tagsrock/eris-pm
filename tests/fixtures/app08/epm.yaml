@@ -13,14 +13,8 @@ jobs:
 - name: deployStorageK
   job:
     deploy:
-      contract: storage.sol
-      wait: true
-
-- name: setStorage
-  job:
-    call:
-      destination: $deployStorageK
-      data: set $setStorage
+      contract: ./storage.sol
+      data: $setStorage
       wait: true
 
 - name: queryStorage

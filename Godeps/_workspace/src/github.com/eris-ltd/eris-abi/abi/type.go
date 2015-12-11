@@ -2,10 +2,11 @@ package abi
 
 import (
 	"fmt"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-abi/utils/common"
 	"reflect"
 	"regexp"
 	"strconv"
+
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 )
 
 const (
@@ -24,6 +25,10 @@ type Type struct {
 	Size       int
 	T          byte   // Our own type checking
 	stringKind string // holds the unparsed string for deriving signatures
+}
+
+func (t Type) MarshalJSON() ([]byte, error) {
+	return []byte(fmt.Sprintf(`"%s"`, t.stringKind)), nil
 }
 
 // New type returns a fully parsed Type given by the input string or an error if it  can't be parsed.
@@ -136,18 +141,29 @@ func (t Type) String() (out string) {
 // * Strings, addresses and bytes are checks for type and size
 func (t Type) pack(v interface{}) ([]byte, error) {
 	value := reflect.ValueOf(v)
-	switch kind := value.Kind(); kind {
+	var kind reflect.Kind
+
+	if t.Kind == reflect.Bool {
+		kind = t.Kind
+	} else {
+		kind = value.Kind()
+	}
+
+	switch kind {
 	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
+		// never triggerd
 		if t.Type != ubig_t {
 			return nil, fmt.Errorf("type mismatch: %s for %T", t.Type, v)
 		}
 		return packNum(value, t.T), nil
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		// never triggerd
 		if t.Type != ubig_t {
 			return nil, fmt.Errorf("type mismatch: %s for %T", t.Type, v)
 		}
 		return packNum(value, t.T), nil
 	case reflect.Ptr:
+		// never triggerd
 		// If the value is a ptr do a assign check (only used by
 		// big.Int for now)
 		if t.Type == ubig_t && value.Type() != ubig_t {
@@ -155,6 +171,7 @@ func (t Type) pack(v interface{}) ([]byte, error) {
 		}
 		return packNum(value, t.T), nil
 	case reflect.String:
+		// never triggerd
 		if t.Size > -1 && value.Len() > t.Size {
 			return nil, fmt.Errorf("%v out of bound. %d for %d", value.Kind(), value.Len(), t.Size)
 		}
@@ -164,8 +181,9 @@ func (t Type) pack(v interface{}) ([]byte, error) {
 			return nil, fmt.Errorf("%v out of bound. %d for %d", value.Kind(), value.Len(), t.Size)
 		}
 
-		if bb, ok := v.([]byte); ok {
-			return common.LeftPadBytes(bb, 32), nil
+		// Signed / Unsigned check
+		if (t.T != IntTy && isSigned(value)) || (t.T == UintTy && isSigned(value)) {
+			return nil, fmt.Errorf("slice of incompatible types.")
 		}
 
 		// Address is a special slice. The slice acts as one rather than a list of elements.
@@ -173,9 +191,8 @@ func (t Type) pack(v interface{}) ([]byte, error) {
 			return common.LeftPadBytes(v.([]byte), 32), nil
 		}
 
-		// Signed / Unsigned check
-		if (t.T != IntTy && isSigned(value)) || (t.T == UintTy && isSigned(value)) {
-			return nil, fmt.Errorf("slice of incompatible types.")
+		if bb, ok := v.([]byte); ok {
+			return common.LeftPadBytes(bb, 32), nil
 		}
 
 		var packed []byte
@@ -184,7 +201,8 @@ func (t Type) pack(v interface{}) ([]byte, error) {
 		}
 		return packed, nil
 	case reflect.Bool:
-		if value.Bool() {
+		v := value.Interface().([]uint8)
+		if v[0] == 1 {
 			return common.LeftPadBytes(common.Big1.Bytes(), 32), nil
 		} else {
 			return common.LeftPadBytes(common.Big0.Bytes(), 32), nil

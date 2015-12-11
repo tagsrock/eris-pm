@@ -13,7 +13,7 @@
 # ----------------------------------------------------------
 # USAGE
 
-# test.sh
+# test.sh [setup]
 
 # ----------------------------------------------------------
 # Set defaults
@@ -30,11 +30,6 @@ else
 fi
 branch=${CIRCLE_BRANCH:=master}
 branch=${branch/-/_}
-
-# Define now the tool tests within the Docker container will be booted from docker run
-# entrypoint="/home/eris/test_tool.sh"
-# testimage=quay.io/eris/epm
-# testuser=eris
 
 # Key variables
 key1_addr="1040E6521541DAB4E7EE57F21226DD17CE9F0FB7"
@@ -82,23 +77,16 @@ test_setup(){
   then
     export ERIS_PULL_APPROVE="true"
     eris init --yes --skip-pull 1>/dev/null
-
-    # by default the keys daemon does not export its port to the host
-    # for this sequencing to work properly it needs to be exported.
-    # this is a hack.
-    # echo 'ports = [ "4767:4767" ]' >> ~/.eris/services/keys.toml
   fi
 
   ensure_running keys
-  eris services exec keys "eris-keys import $(cat tests/fixtures/keys/$key1_addr) --no-pass" 1>/dev/null
-  early_exit
-  eris services exec keys "eris-keys import $(cat tests/fixtures/keys/$key2_addr) --no-pass" 1>/dev/null
-  early_exit
+  eris keys import $key1_addr --src tests/fixtures/keys/$key1_addr 1>/dev/null
+  eris keys import $key2_addr --src tests/fixtures/keys/$key2_addr 1>/dev/null
 
   # check keys were properly imported
-  eris services exec keys "eris-keys pub --addr $key1_addr" 1>/dev/null
+  eris keys pub $key1_addr 1>/dev/null
   early_exit
-  eris services exec keys "eris-keys pub --addr $key2_addr" 1>/dev/null
+  eris keys pub $key2_addr 1>/dev/null
   early_exit
 
   eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata 1>/dev/null
@@ -119,7 +107,8 @@ perform_tests(){
     cd $app
     if [ "$circle" = false ]
     then
-      eris contracts test --chain "epm-tests-$uuid"
+      eris contracts test --chain "epm-tests-$uuid" -d
+      # eris contracts test --chain "epm-tests-$uuid"
     else
       eris contracts test --chain "epm-tests-$uuid" --rm
     fi
@@ -170,11 +159,13 @@ test_teardown(){
 # Get the things build and dependencies turned on
 
 echo "Hello! I'm the marmot that tests the epm tooling."
-echo ""
-echo "Building epm in a docker container."
 start=`pwd`
 cd $repo
-tests/build_tool.sh > /dev/null
+echo ""
+echo "Building epm in a docker container."
+set -e
+tests/build_tool.sh 1>/dev/null
+set +e
 if [ $? -ne 0 ]
 then
   echo "Could not build epm. Debug via by directly running [`pwd`/tests/build_tool.sh]"

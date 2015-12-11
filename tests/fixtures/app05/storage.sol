@@ -1,11 +1,11 @@
 contract SimpleStorage {
-  uint storedData;
+  int storedData;
 
-  function set(uint x) {
+  function set(int x) {
     storedData = x;
   }
 
-  function get() constant returns (uint retVal) {
+  function get() constant returns (int retVal) {
     return storedData;
   }
 }
