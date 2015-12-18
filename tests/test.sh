@@ -46,9 +46,11 @@ test_exit=0
 ensure_running(){
   if [[ "$(eris services ls | grep $1 | awk '{print $2}')" == "No" ]]
   then
+    echo "Starting service: $1"
     eris services start $1 1>/dev/null
     sleep 3 # boot time
   else
+    echo "$1 already started. Not starting."
     was_running=1
   fi
 }
@@ -81,13 +83,21 @@ test_setup(){
   fi
 
   ensure_running keys
-  eris keys import $key1_addr --src tests/fixtures/keys/$key1_addr 1>/dev/null
-  eris keys import $key2_addr --src tests/fixtures/keys/$key2_addr 1>/dev/null
+  eris keys import $key1_addr --src tests/fixtures/keys/$key1_addr --debug #1>/dev/null
+  eris keys import $key2_addr --src tests/fixtures/keys/$key2_addr --debug #1>/dev/null
+
+  ###############################################################################
+  docker ps -a
+  eris services exec keys "ls -la /home/eris/.eris/keys/data/"
+  eris services exec keys "ls -la /home/eris/.eris/keys/data/$key1_addr"
+  eris services exec keys "cat /home/eris/.eris/keys/data/$key1_addr"
+  eris services exec keys "cat /home/eris/.eris/keys/data/$key1_addr/$key1_addr"
+  ###############################################################################
 
   # check keys were properly imported
-  eris keys pub $key1_addr 1>/dev/null
+  eris keys pub $key1_addr #1>/dev/null
   early_exit
-  eris keys pub $key2_addr 1>/dev/null
+  eris keys pub $key2_addr #1>/dev/null
   early_exit
 
   eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata 1>/dev/null
@@ -95,24 +105,36 @@ test_setup(){
   echo "Setup complete"
 }
 
+goto_base(){
+  cd $repo/tests/fixtures
+}
+
+run_test(){
+  # Run the epm deploy
+  echo ""
+  echo -e "Testing EPM using fixture =>\t$1"
+  cd $1
+  if [ "$circle" = false ]
+  then
+    # eris contracts test --chain "epm-tests-$uuid" -d
+    eris contracts test --chain "epm-tests-$uuid"
+  else
+    eris contracts test --chain "epm-tests-$uuid" --rm
+  fi
+  test_exit=$?
+
+  # Reset for next run
+  goto_base
+  return $test_exit
+}
+
 perform_tests(){
   echo ""
-  cd $repo/tests/fixtures
+  goto_base
   apps=(app*/)
   for app in "${apps[@]}"
   do
-    echo ""
-    echo -e "Testing EPM using fixture =>\t${app%/}"
-
-    # Run the epm deploy
-    cd $app
-    if [ "$circle" = false ]
-    then
-      # eris contracts test --chain "epm-tests-$uuid" -d
-      eris contracts test --chain "epm-tests-$uuid"
-    else
-      eris contracts test --chain "epm-tests-$uuid" --rm
-    fi
+    run_test $app
 
     # Set exit code properly
     test_exit=$?
@@ -121,9 +143,6 @@ perform_tests(){
       failing_dir=`pwd`
       break
     fi
-
-    # Reset for next run
-    cd ..
   done
 }
 
@@ -185,7 +204,14 @@ test_setup
 
 if [[ "$1" != "setup" ]]
 then
-  perform_tests
+  if ! [ -z "$1" ]
+  then
+    echo "Running One Test..."
+    run_test "$1/"
+  else
+    echo "Running All Tests..."
+    perform_tests
+  fi
 fi
 
 # ---------------------------------------------------------------------------
