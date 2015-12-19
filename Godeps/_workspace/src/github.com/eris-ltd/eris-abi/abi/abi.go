@@ -168,7 +168,11 @@ func ProcessType(typ string, value []byte) string {
 	case "byte", "string":
 		return string(common.UnRightPadBytes(value))
 	case "uint", "int":
-		return common.StripZeros(common.BigD(value).String())
+		val := common.StripZeros(common.BigD(value).String())
+		if val == "" {
+			return "0"
+		}
+		return val
 	case "address":
 		return strings.ToUpper(hex.EncodeToString(common.Address(value)))
 	case "bool":

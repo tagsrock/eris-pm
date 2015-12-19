@@ -1,0 +1,20 @@
+jobs:
+
+- name: contract
+  job:
+    deploy:
+      contract: zero.sol
+      wait: true
+
+- name: query
+  job:
+    query-contract:
+      destination: $contract
+      data: zero
+
+- name: assertZero
+  job:
+    assert:
+      key: $query
+      relation: eq
+      val: 0

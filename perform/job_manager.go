@@ -126,15 +126,17 @@ func defaultSetJobs(do *definitions.Do) {
 	newJobs := []*definitions.Jobs{}
 
 	for _, setr := range do.DefaultSets {
-		blowdUp := strings.Split(setr, ",")
-		newJobs = append(newJobs, &definitions.Jobs{
-			JobName: blowdUp[0],
-			Job: &definitions.Job{
-				Set: &definitions.Set{
-					Value: blowdUp[1],
+		blowdUp := strings.Split(setr, "=")
+		if blowdUp[0] != "" {
+			newJobs = append(newJobs, &definitions.Jobs{
+				JobName: blowdUp[0],
+				Job: &definitions.Job{
+					Set: &definitions.Set{
+						Value: blowdUp[1],
+					},
 				},
-			},
-		})
+			})
+		}
 	}
 
 	do.Package.Jobs = append(newJobs, oldJobs...)

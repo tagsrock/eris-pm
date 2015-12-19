@@ -1,8 +1,4 @@
 jobs:
-- name: account1
-  job:
-    account:
-      address: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
 
 - name: val1
   job:
@@ -17,7 +13,6 @@ jobs:
 - name: sendTxTest1
   job:
     send:
-      source: $account1
       destination: 58FD1799AA32DED3F6EAC096A1DC77834A446B9C
       amount: $val1
       wait: true
@@ -46,7 +41,7 @@ jobs:
     assert:
       key: $sendTxQuery1
       relation: eq
-      val: 110000001234
+      val: 1234
 
 - name: sendTxAssert2
   job:
