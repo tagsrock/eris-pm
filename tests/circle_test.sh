@@ -40,6 +40,7 @@ docker pull quay.io/eris/data 1>/dev/null
 docker pull quay.io/eris/keys 1>/dev/null
 docker pull quay.io/eris/erisdb:$ver 1>/dev/null
 echo "Pulling finished."
+echo
 
 # ----------------------------------------------------------
 # Run tests
