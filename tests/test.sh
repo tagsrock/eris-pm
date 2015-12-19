@@ -31,10 +31,6 @@ fi
 branch=${CIRCLE_BRANCH:=master}
 branch=${branch/-/_}
 
-# Key variables
-key1_addr="1040E6521541DAB4E7EE57F21226DD17CE9F0FB7"
-key2_addr="58FD1799AA32DED3F6EAC096A1DC77834A446B9C"
-
 # Other variables
 uuid=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 12 | head -n 1)
 was_running=0
@@ -44,11 +40,13 @@ test_exit=0
 # Needed functionality
 
 ensure_running(){
-  if [[ "$(eris services ls | grep $1 | awk '{print $3}')" == "No" ]]
+  if [[ "$(eris services ls | grep $1 | awk '{print $2}')" == "No" ]]
   then
-    eris services start $1 #1>/dev/null
+    echo "Starting service: $1"
+    eris services start $1 1>/dev/null
     sleep 3 # boot time
   else
+    echo "$1 already started. Not starting."
     was_running=1
   fi
 }
@@ -81,16 +79,18 @@ test_setup(){
   fi
 
   ensure_running keys
-  eris keys import $key1_addr --src tests/fixtures/keys/$key1_addr --debug #1>/dev/null
-  eris keys import $key2_addr --src tests/fixtures/keys/$key2_addr #1>/dev/null
 
-  # check keys were properly imported
-  eris keys pub $key1_addr #1>/dev/null
-  early_exit
-  eris keys pub $key2_addr #1>/dev/null
-  early_exit
+  # make two keys
+  key1_addr=$(eris keys gen)
+  key2_addr=$(eris keys gen)
+  echo -e "Default Key =>\t\t\t$key1_addr"
+  echo -e "Backup Key =>\t\t\t$key2_addr"
 
-  eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata 1>/dev/null
+  # fixup the genesis.json with the new addresses
+  jq ".accounts[0].address=\"`echo $key1_addr | sed -e 's/\\r//g'`\"" tests/fixtures/chaindata/genesis.json.example | jq ".accounts[1].address=\"`echo $key2_addr | sed -e 's/\\r//g'`\"" > tests/fixtures/chaindata/genesis.json
+
+  # start the chain with the current genesis.json
+  eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata #1>/dev/null
   sleep 5 # boot time
   echo "Setup complete"
 }
@@ -106,10 +106,9 @@ run_test(){
   cd $1
   if [ "$circle" = false ]
   then
-    # eris contracts test --chain "epm-tests-$uuid" -d
-    eris contracts test --chain "epm-tests-$uuid"
+    eris contracts test --chain "epm-tests-$uuid" --address "$key1_addr" --set "addr2=$key2_addr"
   else
-    eris contracts test --chain "epm-tests-$uuid" --rm
+    eris contracts test --chain "epm-tests-$uuid" --address "$key1_addr" --set "addr2=$key2_addr" --rm
   fi
   test_exit=$?
 

@@ -1,10 +1,5 @@
 jobs:
 
-- name: account
-  job:
-    account:
-      address: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
-
 - name: setStorageBaseBool
   job:
     set:
@@ -23,7 +18,7 @@ jobs:
 - name: setStorageBaseAddress
   job:
     set:
-      val: $account
+      val: "1040E6521541DAB4E7EE57F21226DD17CE9F0FB7"
 
 - name: setStorageBaseBytes
   job:
@@ -66,7 +61,7 @@ jobs:
   job:
     call:
       destination: $deployStorageK
-      data: setAddress $account
+      data: setAddress $setStorageBaseAddress
       wait: true
 
 - name: setStorageBytes
@@ -145,7 +140,7 @@ jobs:
     assert:
       key: $queryStorageAddress
       relation: eq
-      val: $account
+      val: $setStorageBaseAddress
 
 - name: assertStorageBytes
   job:

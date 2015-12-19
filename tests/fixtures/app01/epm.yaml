@@ -1,10 +1,5 @@
 jobs:
 
-- name: account
-  job:
-    account:
-      address: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
-
 - name: val1
   job:
     set:
@@ -28,7 +23,6 @@ jobs:
 - name: nameRegTest1
   job:
     register:
-      source: $account
       name: $val1
       data: $val2
       amount: $to_save

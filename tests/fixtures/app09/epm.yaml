@@ -1,14 +1,9 @@
 jobs:
 
-- name: account
-  job:
-    account:
-      address: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
-
 - name: setStorage
   job:
     set:
-      val: 0x5
+      val: 17
 
 - name: deployStorageK
   job:

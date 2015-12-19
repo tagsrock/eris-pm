@@ -1,14 +1,9 @@
 jobs:
 
-- name: account
-  job:
-    account:
-      address: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
-
 - name: bond_account
   job:
     set:
-      val: 58FD1799AA32DED3F6EAC096A1DC77834A446B9C
+      val: $addr2
 
 - name: bondPerm
   job:
@@ -69,7 +64,7 @@ jobs:
 - name: assertBonded
   job:
     assert:
-      key: $account
+      key: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
       relation: eq
       val: $queryBonded
 
