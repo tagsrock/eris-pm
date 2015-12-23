@@ -6,7 +6,7 @@ import (
 	"regexp"
 	"strconv"
 
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
+	// "github.com/eris-ltd/eris-abi/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 )
 
 const (
@@ -131,83 +131,4 @@ func NewType(t string) (typ Type, err error) {
 
 func (t Type) String() (out string) {
 	return t.stringKind
-}
-
-// Test the given input parameter `v` and checks if it matches certain
-// criteria
-// * Big integers are checks for ptr types and if the given value is
-//   assignable
-// * Integer are checked for size
-// * Strings, addresses and bytes are checks for type and size
-func (t Type) pack(v interface{}) ([]byte, error) {
-	value := reflect.ValueOf(v)
-	var kind reflect.Kind
-
-	if t.Kind == reflect.Bool {
-		kind = t.Kind
-	} else {
-		kind = value.Kind()
-	}
-
-	switch kind {
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		// never triggerd
-		if t.Type != ubig_t {
-			return nil, fmt.Errorf("type mismatch: %s for %T", t.Type, v)
-		}
-		return packNum(value, t.T), nil
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		// never triggerd
-		if t.Type != ubig_t {
-			return nil, fmt.Errorf("type mismatch: %s for %T", t.Type, v)
-		}
-		return packNum(value, t.T), nil
-	case reflect.Ptr:
-		// never triggerd
-		// If the value is a ptr do a assign check (only used by
-		// big.Int for now)
-		if t.Type == ubig_t && value.Type() != ubig_t {
-			return nil, fmt.Errorf("type mismatch: %s for %T", t.Type, v)
-		}
-		return packNum(value, t.T), nil
-	case reflect.String:
-		// never triggerd
-		if t.Size > -1 && value.Len() > t.Size {
-			return nil, fmt.Errorf("%v out of bound. %d for %d", value.Kind(), value.Len(), t.Size)
-		}
-		return []byte(common.LeftPadString(t.String(), 32)), nil
-	case reflect.Slice:
-		if t.Size > -1 && value.Len() > t.Size {
-			return nil, fmt.Errorf("%v out of bound. %d for %d", value.Kind(), value.Len(), t.Size)
-		}
-
-		// Signed / Unsigned check
-		if (t.T != IntTy && isSigned(value)) || (t.T == UintTy && isSigned(value)) {
-			return nil, fmt.Errorf("slice of incompatible types.")
-		}
-
-		// Address is a special slice. The slice acts as one rather than a list of elements.
-		if t.T == AddressTy {
-			return common.LeftPadBytes(v.([]byte), 32), nil
-		}
-
-		if bb, ok := v.([]byte); ok {
-			return common.LeftPadBytes(bb, 32), nil
-		}
-
-		var packed []byte
-		for i := 0; i < value.Len(); i++ {
-			packed = append(packed, packNum(value.Index(i), t.T)...)
-		}
-		return packed, nil
-	case reflect.Bool:
-		v := value.Interface().([]uint8)
-		if v[0] == 1 {
-			return common.LeftPadBytes(common.Big1.Bytes(), 32), nil
-		} else {
-			return common.LeftPadBytes(common.Big0.Bytes(), 32), nil
-		}
-	}
-
-	panic("unreached")
 }

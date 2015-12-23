@@ -70,7 +70,7 @@ func PackArgsABI(abiSpec abi.ABI, data ...string) (string, error) {
 		a = append(a, bb)
 	}
 
-	packedBytes, err := abiSpec.Pack(funcName, args, a...)
+	packedBytes, err := abiSpec.Pack(funcName, args)
 	if err != nil {
 		return "", err
 	}

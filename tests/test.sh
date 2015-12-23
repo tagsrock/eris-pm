@@ -103,6 +103,7 @@ run_test(){
   # Run the epm deploy
   echo ""
   echo -e "Testing EPM using fixture =>\t$1"
+  goto_base
   cd $1
   if [ "$circle" = false ]
   then

@@ -36,6 +36,7 @@ type Argpairs struct {
 	Name  string
 	Type  string
 	Value string
+	VByte []byte
 }
 
 // Argument holds the name of the argument and the corresponding type.
@@ -84,27 +85,68 @@ func (m Method) Id() []byte {
 // of 4 bytes and arguments are all 32 bytes.
 // Method ids are created from the first 4 bytes of the hash of the
 // methods string signature. (signature = baz(uint32,string32))
-func (abi ABI) Pack(name string, argsRaw []string, args ...interface{}) ([]byte, error) {
+func (abi ABI) Pack(name string, data []string) ([]byte, error) {
 	method, exist := abi.Methods[name]
 	if !exist {
 		return nil, fmt.Errorf("method '%s' not found", name)
 	}
 
 	// start with argument count match
-	if len(args) != len(method.Inputs) {
-		return nil, fmt.Errorf("argument count mismatch: %d for %d", len(args), len(method.Inputs))
+	if len(data) != len(method.Inputs) {
+		return nil, fmt.Errorf("argument count mismatch: %d for %d", len(data), len(method.Inputs))
 	}
 
-	arguments, err := abi.pack(name, argsRaw, args...)
-	if err != nil {
-		return nil, err
+	var arguments []byte
+	for i, a := range data {
+		input := method.Inputs[i]
+
+		logger.Debugf("ABI Pack. Name =>\t\t%s\n", input.Name)
+		logger.Debugf("ABI Pack. Type =>\t\t%s\n", input.Type.String())
+		logger.Debugf("ABI Pack. Value =>\t\t%s\n", a)
+		ret, err := PackProcessType(input.Type.String(), a)
+		if err != nil {
+			return nil, err
+		}
+
+		arguments = append(arguments, ret...)
 	}
 
-	// Set function id
-	packed := abi.Methods[name].Id()
+	// Set function id; final formulation of call
+	packed := method.Id()
 	packed = append(packed, arguments...)
 
 	return packed, nil
+}
+
+//Conversion to []byte based on "Type"
+func PackProcessType(typ string, value string) ([]byte, error) {
+	t := getMajorType(typ)
+	switch t {
+	case "byte", "string":
+		return common.RightPadBytes([]byte(value), lengths["retBlock"]), nil
+	case "uint":
+		val, err := strconv.ParseUint(value, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		return U2U256(val), nil
+	case "int":
+		val, err := strconv.ParseInt(value, 10, 64)
+		if err != nil {
+			return nil, err
+		}
+		return S2S256(val), nil
+	case "address":
+		return common.LeftPadBytes(common.AddressStringToBytes(value), lengths["retBlock"]), nil
+	case "bool":
+		if value == "1" {
+			return common.LeftPadBytes(common.Big1.Bytes(), lengths["retBlock"]), nil
+		} else {
+			return common.LeftPadBytes(common.Big0.Bytes(), lengths["retBlock"]), nil
+		}
+	default:
+		return nil, fmt.Errorf("Unknown type. Cannot pack.")
+	}
 }
 
 //Unpacking function
@@ -129,16 +171,13 @@ func (abi ABI) UnPack(name string, data []byte) ([]byte, error) {
 		}
 
 		next = start + lengths["retBlock"]
-		// next = start + bytesToParse
-		// start = next - bytesToParse
-
 		if next > end {
 			return nil, fmt.Errorf("Too little data")
 		}
 
 		ret[i].Name = method.Outputs[i].Name
 		ret[i].Type = method.Outputs[i].Type.String()
-		ret[i].Value = ProcessType(ret[i].Type, data[start:next])
+		ret[i].Value = UnpackProcessType(ret[i].Type, data[start:next])
 		logger.Debugf("ABI Unpack. Name =>\t\t%s\n", ret[i].Name)
 		logger.Debugf("ABI Unpack. Type =>\t\t%s\n", ret[i].Type)
 		logger.Debugf("ABI Unpack. Value =>\t\t%s\n", ret[i].Value)
@@ -162,16 +201,38 @@ func (abi ABI) UnPack(name string, data []byte) ([]byte, error) {
 //utility Functions
 
 //Conversion to string based on "Type"
-func ProcessType(typ string, value []byte) string {
+func UnpackProcessType(typ string, value []byte) string {
 	t := getMajorType(typ)
 	switch t {
 	case "byte", "string":
 		return string(common.UnRightPadBytes(value))
-	case "uint", "int":
+	case "uint":
 		val := common.StripZeros(common.BigD(value).String())
 		if val == "" {
 			return "0"
 		}
+		return val
+	case "int":
+		// there is weird encoding solidity does with negative ints
+		//   it prepends with 01 instead of 00.
+		if value[0] == 1 {
+			i := 0
+			for ; i < len(value); i++ {
+				if value[i] != 1 {
+					break
+				}
+			}
+			val := common.BigD(value[i:]).String()
+			return ("-" + val)
+		}
+
+		val := common.StripZeros(common.BigD(value).String())
+
+		// blank strings will be zero after all the decoding finishes
+		if val == "" {
+			return "0"
+		}
+
 		return val
 	case "address":
 		return strings.ToUpper(hex.EncodeToString(common.Address(value)))
@@ -207,6 +268,21 @@ func UnpackPrettyPrint(injson []byte) (string, error) {
 	return pps, nil
 }
 
+//Fills an ABI object with umarshalled data.
+func (abi *ABI) UnmarshalJSON(data []byte) error {
+	var methods []Method
+	if err := json.Unmarshal(data, &methods); err != nil {
+		return err
+	}
+
+	abi.Methods = make(map[string]Method)
+	for _, method := range methods {
+		abi.Methods[method.Name] = method
+	}
+
+	return nil
+}
+
 func (a *Argument) UnmarshalJSON(data []byte) error {
 	var extarg struct {
 		Name string
@@ -222,21 +298,6 @@ func (a *Argument) UnmarshalJSON(data []byte) error {
 		return err
 	}
 	a.Name = extarg.Name
-
-	return nil
-}
-
-//Fills an ABI object with umarshalled data.
-func (abi *ABI) UnmarshalJSON(data []byte) error {
-	var methods []Method
-	if err := json.Unmarshal(data, &methods); err != nil {
-		return err
-	}
-
-	abi.Methods = make(map[string]Method)
-	for _, method := range methods {
-		abi.Methods[method.Name] = method
-	}
 
 	return nil
 }
@@ -286,26 +347,4 @@ func getMajorType(typ string) string {
 		return "bool"
 	}
 	return "unknown"
-}
-
-// tests, tests whether the given input would result in a successful
-// call. Checks argument list count and matches input to `input`.
-func (abi ABI) pack(name string, argsRaw []string, args ...interface{}) ([]byte, error) {
-	method := abi.Methods[name]
-
-	var ret []byte
-	for i, a := range args {
-		input := method.Inputs[i]
-		if method.Inputs[i].Type.String() == "address" {
-			a = common.AddressStringToBytes(argsRaw[i])
-		}
-		logger.Debugf("Packing =>\t\t\t%v:%v\n", input, a)
-		packed, err := input.Type.pack(a)
-		if err != nil {
-			return nil, fmt.Errorf("ERROR packing fn =>\t\t%s:%v", name, err)
-		}
-		ret = append(ret, packed...)
-	}
-
-	return ret, nil
 }
