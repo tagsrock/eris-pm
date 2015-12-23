@@ -36,9 +36,18 @@ var int32_ts = reflect.TypeOf([]int32(nil))
 var int64_ts = reflect.TypeOf([]int64(nil))
 var big_ts = reflect.TypeOf([]*big.Int(nil))
 
+func U2U256(n uint64) []byte {
+	return U256(big.NewInt(int64(n)))
+}
+
 // U256 will ensure unsigned 256bit on big nums
 func U256(n *big.Int) []byte {
 	return common.LeftPadBytes(common.U256(n).Bytes(), 32)
+}
+
+// S256 will ensure signed 256bit on big nums
+func S2S256(n int64) []byte {
+	return S256(big.NewInt(n))
 }
 
 func S256(n *big.Int) []byte {
@@ -55,52 +64,4 @@ func S256(n *big.Int) []byte {
 	}
 
 	return ret
-}
-
-// S256 will ensure signed 256bit on big nums
-func U2U256(n uint64) []byte {
-	return U256(big.NewInt(int64(n)))
-}
-
-func S2S256(n int64) []byte {
-	return S256(big.NewInt(n))
-}
-
-// packNum packs the given number (using the reflect value) and will cast it to appropriate number representation
-func packNum(value reflect.Value, to byte) []byte {
-	switch kind := value.Kind(); kind {
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		if to == UintTy {
-			return U2U256(value.Uint())
-		} else {
-			return S2S256(int64(value.Uint()))
-		}
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		if to == UintTy {
-			return U2U256(uint64(value.Int()))
-		} else {
-			return S2S256(value.Int())
-		}
-	case reflect.Ptr:
-		// This only takes care of packing and casting. No type checking is done here. It should be done prior to using this function.
-		if to == UintTy {
-			return U256(value.Interface().(*big.Int))
-		} else {
-			return S256(value.Interface().(*big.Int))
-		}
-
-	}
-
-	return nil
-}
-
-// checks whether the given reflect value is signed. This also works for slices with a number type
-func isSigned(v reflect.Value) bool {
-	switch v.Type() {
-	case ubig_ts, big_ts, big_t, ubig_t:
-		return true
-	case int_ts, int8_ts, int16_ts, int32_ts, int64_ts, int_t, int8_t, int16_t, int32_t, int64_t:
-		return true
-	}
-	return false
 }

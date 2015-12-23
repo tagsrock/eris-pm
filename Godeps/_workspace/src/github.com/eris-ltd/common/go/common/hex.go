@@ -115,6 +115,16 @@ func StripZeros(s string) string {
 	return s[i:]
 }
 
+func StripOnes(s string) string {
+	i := 0
+	for ; i < len(s); i++ {
+		if s[i:i+1] != "01" {
+			break
+		}
+	}
+	return s[i:]
+}
+
 func Bytes2Hex(d []byte) string {
 	return hex.EncodeToString(d)
 }
@@ -166,22 +176,21 @@ func RightPadString(str string, l int) string {
 func UnLeftPadBytes(slice []byte) []byte {
 	var l int
 	for i, b := range slice {
-		if (b != byte(0)) {
+		if b != byte(0) {
 			l = i
 			break
 		}
 	}
 	unpadded := make([]byte, len(slice)-l)
-	copy(unpadded, slice[l:len(slice)])
+	copy(unpadded, slice[l:])
 
 	return unpadded
 }
 
-
 func UnRightPadBytes(slice []byte) []byte {
 	var l int
 	for i, b := range slice {
-		if (b == byte(0)) {
+		if b == byte(0) {
 			l = i
 			break
 		}
@@ -209,7 +218,7 @@ func Address(slice []byte) (addr []byte) {
 func AddressStringToBytes(addr string) []byte {
 	var slice []byte
 	for i := 0; i < len(addr); i++ {
-		a, _ := hex.DecodeString(addr[i:i+2])
+		a, _ := hex.DecodeString(addr[i : i+2])
 		slice = append(slice, a[0])
 		i++
 	}
