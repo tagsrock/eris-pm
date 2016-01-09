@@ -32,7 +32,15 @@ branch=${CIRCLE_BRANCH:=master}
 branch=${branch/-/_}
 
 # Other variables
-uuid=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 12 | head -n 1)
+if [[ "$(uname -s)" == "Linux" ]]
+then
+  uuid=$(cat /proc/sys/kernel/random/uuid | tr -dc 'a-zA-Z0-9' | fold -w 12 | head -n 1)
+elif [[ "$(uname -s)" == "Darwin" ]]
+then
+  uuid=$(cat /compat/linux/proc/sys/kernel/random/uuid | tr -dc 'a-zA-Z0-9' | fold -w 12 | head -n 1)
+else
+  uuid="62d1486f0fe5"
+fi
 was_running=0
 test_exit=0
 
