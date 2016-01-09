@@ -37,7 +37,7 @@ then
   uuid=$(cat /proc/sys/kernel/random/uuid | tr -dc 'a-zA-Z0-9' | fold -w 12 | head -n 1)
 elif [[ "$(uname -s)" == "Darwin" ]]
 then
-  uuid=$(cat /compat/linux/proc/sys/kernel/random/uuid | tr -dc 'a-zA-Z0-9' | fold -w 12 | head -n 1)
+  uuid=$(uuidgen | tr -dc 'a-zA-Z0-9' | fold -w 12 | head -n 1)
 else
   uuid="62d1486f0fe5"
 fi
