@@ -101,6 +101,7 @@ test_setup(){
   eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata #1>/dev/null
   sleep 5 # boot time
   echo "Setup complete"
+  docker ps -a
 }
 
 goto_base(){
