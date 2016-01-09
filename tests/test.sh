@@ -89,13 +89,13 @@ test_setup(){
   ensure_running keys
 
   # make two keys
-  key1_addr=$(eris keys gen)
-  key2_addr=$(eris keys gen)
+  key1_addr=$(eris keys gen | tr -d '\r')
+  key2_addr=$(eris keys gen | tr -d '\r')
   echo -e "Default Key =>\t\t\t$key1_addr"
   echo -e "Backup Key =>\t\t\t$key2_addr"
 
   # fixup the genesis.json with the new addresses
-  jq ".accounts[0].address=\"`echo $key1_addr | sed -e 's/\\r//g'`\"" tests/fixtures/chaindata/genesis.json.example | jq ".accounts[1].address=\"`echo $key2_addr | sed -e 's/\\r//g'`\"" > tests/fixtures/chaindata/genesis.json
+  jq '.accounts[0].address="'$key1_addr'" | .accounts[1].address="'$key2_addr'"' tests/fixtures/chaindata/genesis.json.example > tests/fixtures/chaindata/genesis.json
 
   cat tests/fixtures/chaindata/genesis.json
 
