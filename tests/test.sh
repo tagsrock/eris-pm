@@ -97,11 +97,13 @@ test_setup(){
   # fixup the genesis.json with the new addresses
   jq ".accounts[0].address=\"`echo $key1_addr | sed -e 's/\\r//g'`\"" tests/fixtures/chaindata/genesis.json.example | jq ".accounts[1].address=\"`echo $key2_addr | sed -e 's/\\r//g'`\"" > tests/fixtures/chaindata/genesis.json
 
+  cat tests/fixtures/chaindata/genesis.json
+
   # start the chain with the current genesis.json
   eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata #1>/dev/null
   sleep 5 # boot time
   echo "Setup complete"
-  docker ps -a
+  eris chains logs epm-tests-$uuid
 }
 
 goto_base(){
