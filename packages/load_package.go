@@ -6,6 +6,8 @@ import (
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
+	log "github.com/Sirupsen/logrus"
+
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/viper"
 )
 
@@ -24,8 +26,8 @@ func LoadPackage(fileName string) (*definitions.Package, error) {
 	file := filepath.Base(abs)
 	extName := filepath.Ext(file)
 	bName := file[:len(file)-len(extName)]
-	logger.Debugf("Config Path =>\t\t\t%s\n", path)
-	logger.Debugf("Config FileBase =>\t\t%s\n", bName)
+	log.Debug("Config Path =>\t\t\t%s\n", path)
+	log.Debug("Config FileBase =>\t\t%s\n", bName)
 
 	epmJobs.AddConfigPath(path)
 	epmJobs.SetConfigName(bName)
