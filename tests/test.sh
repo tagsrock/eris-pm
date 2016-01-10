@@ -95,7 +95,15 @@ test_setup(){
   echo -e "Backup Key =>\t\t\t$key2_addr"
 
   # fixup the genesis.json with the new addresses
-  jq ".accounts[0].address=\"$key1_addr\" | .accounts[1].address=\"$key2_addr\"" tests/fixtures/chaindata/genesis.json.example > tests/fixtures/chaindata/genesis.json
+  if [[ "$MACHINE_NAME" != eris-test-win* ]]
+  then
+    jq ".accounts[0].address=\"$key1_addr\" | .accounts[1].address=\"$key2_addr\"" tests/fixtures/chaindata/genesis.json.example > tests/fixtures/chaindata/genesis.json
+  else
+    str=`pwd`
+    cd $repo/tests/fixtures/chaindata
+    go run fixup.go "$key1_addr" "$key2_addr" > genesis.json
+    cd $str
+  fi
 
   # start the chain with the current genesis.json
   eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata #1>/dev/null
