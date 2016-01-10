@@ -19,7 +19,7 @@ import (
 )
 
 var (
-	MaxCommitWaitTimeSeconds = 10
+	MaxCommitWaitTimeSeconds = 20
 )
 
 //------------------------------------------------------------------------------------
@@ -99,11 +99,11 @@ type PermFunc struct {
 }
 
 var PermsFuncs = []PermFunc{
-	PermFunc{"set_base", "address, permission flag, value"},
-	PermFunc{"unset_base", "address, permission flag"},
-	PermFunc{"set_global", "permission flag, value"},
-	PermFunc{"add_role", "address, role"},
-	PermFunc{"rm_role", "address, role"},
+	{"set_base", "address, permission flag, value"},
+	{"unset_base", "address, permission flag"},
+	{"set_global", "permission flag, value"},
+	{"add_role", "address, role"},
+	{"rm_role", "address, role"},
 }
 
 func Permissions(nodeAddr, signAddr, pubkey, addrS, nonceS, permFunc string, argsS []string) (*types.PermissionsTx, error) {
@@ -581,7 +581,7 @@ func checkCommon(nodeAddr, signAddr, pubkey, addr, amtS, nonceS string) (pub acc
 		if addr != "" {
 			// NOTE: if --addr given byt MINTX_PUBKEY is set, the pubkey still wins
 			// TODO: fix this
-			//logger.Errorln("you have specified both a pubkey and an address. the pubkey takes precedent")
+			logger.Infoln("you have specified both a pubkey and an address. the pubkey takes precedent")
 		}
 		pubKeyBytes, err = hex.DecodeString(pubkey)
 		if err != nil {

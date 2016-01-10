@@ -63,16 +63,16 @@
 			"Rev": "4dcdeb12135efa6f6ce46ddea4e10d739a4ab517"
 		},
 		{
-			"ImportPath": "github.com/eris-ltd/lllc-server",
+			"ImportPath": "github.com/eris-ltd/eris-compilers",
 			"Rev": "fb2c4bc8133a12a9b47c3310dfca652faf3249ab"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/mint-client/mintx/core",
-			"Rev": "4aa5182051a4a4e8e0235b129a062fbebab3ebdc"
+			"Rev": "14c2fa3af1107cfed206c524405cbf73cb8e6e03"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/mint-client/utils",
-			"Rev": "4aa5182051a4a4e8e0235b129a062fbebab3ebdc"
+			"Rev": "14c2fa3af1107cfed206c524405cbf73cb8e6e03"
 		},
 		{
 			"ImportPath": "github.com/ethereum/go-ethereum/crypto/sha3",

@@ -7,18 +7,18 @@ import (
 	"runtime"
 	"strconv"
 
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/lllc-server"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-compilers"
 
 	"github.com/codegangsta/cli"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/log"
 )
 
-// simple lllc-server and cli
+// simple eris-compilers and cli
 func main() {
 
 	app := cli.NewApp()
-	app.Name = "lllc-server"
+	app.Name = "eris-compilers"
 	app.Usage = ""
 	app.Version = "0.10.0"
 	app.Author = "Ethan Buchman"
@@ -66,7 +66,7 @@ func main() {
 }
 
 func before(c *cli.Context) error {
-	log.SetLogLevel("lllc-server-cli", c.GlobalInt("log"))
+	log.SetLogLevel("eris-compilers-cli", c.GlobalInt("log"))
 	return nil
 }
 
