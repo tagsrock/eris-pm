@@ -25,8 +25,8 @@ func LoadPackage(fileName string) (*definitions.Package, error) {
 	file := filepath.Base(abs)
 	extName := filepath.Ext(file)
 	bName := file[:len(file)-len(extName)]
-	log.Debug("Config Path =>\t\t\t%s\n", path)
-	log.Debug("Config FileBase =>\t\t%s\n", bName)
+	log.WithField("=>", path).Debug("Config Path")
+	log.WithField("=>", bName).Debug("Config FileBase")
 
 	epmJobs.AddConfigPath(path)
 	epmJobs.SetConfigName(bName)

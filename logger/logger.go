@@ -8,6 +8,8 @@ import (
 	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 )
 
+// XXX file copied directly from eris-cli
+
 type ErisFormatter struct{}
 
 const (

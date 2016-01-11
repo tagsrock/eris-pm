@@ -29,14 +29,19 @@ func ReadTxSignAndBroadcast(result *core.TxResult, err error) error {
 	}
 
 	// Unpack and display for the user.
+	addr := fmt.Sprintf("%X", result.Address)
+	hash := fmt.Sprintf("%X", result.Hash)
+	blkHash := fmt.Sprintf("%X", result.BlockHash)
+	ret := fmt.Sprintf("%X", result.Return)
+
 	if result.Address != nil {
-		log.WithField("=>", result.Address).Warn("Contract Address")
-		log.WithField("=>", result.Hash).Warn("Transaction Hash")
+		log.WithField("=>", addr).Warn("Contract Address")
+		log.WithField("=>", hash).Warn("Transaction Hash")
 	} else {
-		log.WithField("=>", result.Hash).Warn("Transaction Hash")
-		log.WithField("=>", result.BlockHash).Debugf("Block Hash")
+		log.WithField("=>", hash).Warn("Transaction Hash")
+		log.WithField("=>", blkHash).Debug("Block Hash")
 		if len(result.Return) != 0 {
-			log.WithField("=>", result.Return).Warn("Return Value")
+			log.WithField("=>", ret).Warn("Return Value")
 			log.WithField("=>", result.Exception).Debug("Exception")
 		}
 	}
