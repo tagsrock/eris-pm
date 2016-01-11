@@ -10,6 +10,7 @@ import (
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/wire"
 )
 
@@ -29,10 +30,10 @@ func ClearJobResults() error {
 }
 
 func PrintPathPackage(do *definitions.Do) {
-	logger.Infof("Using Compiler at =>\t\t%s\n", do.Compiler)
-	logger.Infof("Using Chain at =>\t\t%s\n", do.Chain)
-	logger.Debugf("\twith ChainID =>\t\t%s\n", do.ChainID)
-	logger.Infof("Using Signer at =>\t\t%s\n", do.Signer)
+	log.WithField("=>", do.Compiler).Info("Using Compiler at")
+	log.WithField("=>", do.Chain).Info("Using Chain at")
+	log.WithField("=>", do.ChainID).Debug("With ChainID")
+	log.WithField("=>", do.Signer).Info("Using Signer at")
 }
 
 // WriteJobResultCSV takes two strings and writes those to the delineated log

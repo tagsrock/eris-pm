@@ -5,6 +5,8 @@ import (
 
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
+
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 )
 
 func RunJobs(do *definitions.Do) error {
@@ -101,8 +103,8 @@ func RunJobs(do *definitions.Do) error {
 }
 
 func announce(job, typ string) {
-	logger.Printf("Executing Job Named =>\t\t%s\n", job)
-	logger.Infof("\tType =>\t\t\t%s\n", typ)
+	log.WithField("=>", job).Warn("Executing Job Named")
+	log.WithField("=>", typ).Info("Type")
 }
 
 func defaultAddrJob(do *definitions.Do) {

@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
+
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 )
 
 func PreProcess(toProcess string, do *definitions.Do) (string, error) {
@@ -25,7 +27,10 @@ func PreProcess(toProcess string, do *definitions.Do) (string, error) {
 		// second we loop through the jobNames to do a result replace
 		for _, job := range do.Package.Jobs {
 			if string(jobName) == job.JobName {
-				logger.Debugf("Fixing Variables =>\t\t$%s:%s\n", string(jobName), job.JobResult)
+				log.WithFields(log.Fields{
+					"jobname": string(jobName),
+					"result":  job.JobResult,
+				}).Debug("Fixing Variables =>")
 				return job.JobResult, nil
 			}
 		}
