@@ -6,12 +6,13 @@ import (
 	"strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
+	"github.com/eris-ltd/eris-pm/logger"
 	"github.com/eris-ltd/eris-pm/packages"
 	"github.com/eris-ltd/eris-pm/util"
 	"github.com/eris-ltd/eris-pm/version"
 
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	. "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/log"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
 	cfg "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/config"
 )
@@ -35,19 +36,20 @@ Complete documentation is available at https://docs.erisindustries.com
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		// TODO: make this better.... need proper epm config
 		// need to be able to have variable writers (eventually)
-		var logLevel log.LogLevel
+		log.SetFormatter(logger.ErisFormatter{})
+
+		log.SetLevel(log.WarnLevel)
 		if do.Verbose {
-			logLevel = 2
+			log.SetLevel(log.InfoLevel)
 		} else if do.Debug {
-			logLevel = 3
+			log.SetLevel(log.DebugLevel)
 		}
-		log.SetLoggers(logLevel, os.Stdout, os.Stderr)
 
 		// clears epm.log file
 		util.ClearJobResults()
 
 		// Welcomer....
-		logger.Infoln("Hello! I'm EPM.")
+		log.Info("Hello! I'm EPM.")
 
 		// Fixes path issues and controls for mint-client / eris-keys assumptions
 		util.BundleHttpPathCorrect(do)
@@ -66,7 +68,7 @@ Complete documentation is available at https://docs.erisindustries.com
 
 	PersistentPostRun: func(cmd *cobra.Command, args []string) {
 		// Ensure that errors get written to screen and generally flush the log
-		log.Flush()
+		// log.Flush()
 	},
 }
 

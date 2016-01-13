@@ -8,6 +8,7 @@ import (
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
 
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core_client"
 )
 
@@ -54,14 +55,14 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	}
 
 	// Formally process the return
-	logger.Debugf("Decoding Raw Result =>\t\t%s\n", result)
+	log.WithField("=>", result).Debug("Decoding Raw Result")
 	result, err = util.ReadAndDecodeContractReturn(query.Destination, query.Data, result, do)
 	if err != nil {
 		return "", err
 	}
 
 	// Finalize
-	logger.Printf("Return Value =>\t\t\t%s\n", result)
+	log.WithField("=>", result).Warn("Return Value")
 	return result, nil
 }
 
@@ -71,14 +72,16 @@ func QueryAccountJob(query *definitions.QueryAccount, do *definitions.Do) (strin
 	query.Field, _ = util.PreProcess(query.Field, do)
 
 	// Perform Query
-	logger.Infof("Querying Account =>\t\t%s:%s\n", query.Account, query.Field)
+	arg := fmt.Sprintf("%s:%s", query.Account, query.Field)
+	log.WithField("=>", arg).Info("Querying Account")
+
 	result, err := util.AccountsInfo(query.Account, query.Field, do)
 	if err != nil {
 		return "", err
 	}
 
 	// Result
-	logger.Printf("Return Value =>\t\t\t%s\n", result)
+	log.WithField("=>", result).Warn("Return Value")
 	return result, nil
 }
 
@@ -88,13 +91,16 @@ func QueryNameJob(query *definitions.QueryName, do *definitions.Do) (string, err
 	query.Field, _ = util.PreProcess(query.Field, do)
 
 	// Peform query
-	logger.Infof("Querying Name =>\t\t%s:%s\n", query.Name, query.Field)
+	log.WithFields(log.Fields{
+		"name":  query.Name,
+		"field": query.Field,
+	}).Info("Querying")
 	result, err := util.NamesInfo(query.Name, query.Field, do)
 	if err != nil {
 		return "", err
 	}
 
-	logger.Printf("Return Value =>\t\t\t%s\n", result)
+	log.WithField("=>", result).Warn("Return Value")
 	return result, nil
 }
 
@@ -105,13 +111,13 @@ func QueryValsJob(query *definitions.QueryVals, do *definitions.Do) (string, err
 	query.Field, _ = util.PreProcess(query.Field, do)
 
 	// Peform query
-	logger.Infof("Querying Vals =>\t\t%s\n", query.Field)
+	log.WithField("=>", query.Field).Info("Querying Vals")
 	result, err := util.ValidatorsInfo(query.Field, do)
 	if err != nil {
 		return "", err
 	}
 
-	logger.Printf("Return Value =>\t\t\t%s\n", result)
+	log.WithField("=>", result).Warn("Return Value")
 	return result, nil
 }
 
@@ -123,7 +129,12 @@ func AssertJob(assertion *definitions.Assert, do *definitions.Do) (string, error
 	assertion.Value, _ = util.PreProcess(assertion.Value, do)
 
 	// Switch on relation
-	logger.Infof("Assertion =>\t\t\t%s:%s:%s\n", assertion.Key, assertion.Relation, assertion.Value)
+	log.WithFields(log.Fields{
+		"key":      assertion.Key,
+		"relation": assertion.Relation,
+		"value":    assertion.Value,
+	}).Info("Assertion =>")
+
 	switch assertion.Relation {
 	case "==", "eq":
 		if assertion.Key == assertion.Value {
@@ -195,7 +206,7 @@ func bulkConvert(key, value string) (int, int, error) {
 }
 
 func assertPass() (string, error) {
-	logger.Println("Assertion =>\t\t\tSucceeded")
+	log.Warn("Assertion Succeeded")
 	return "passed", nil
 }
 

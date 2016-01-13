@@ -10,6 +10,7 @@ import (
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	ebi "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-abi/core"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
@@ -28,18 +29,22 @@ func ReadTxSignAndBroadcast(result *core.TxResult, err error) error {
 	}
 
 	// Unpack and display for the user.
+	addr := fmt.Sprintf("%X", result.Address)
+	hash := fmt.Sprintf("%X", result.Hash)
+	blkHash := fmt.Sprintf("%X", result.BlockHash)
+	ret := fmt.Sprintf("%X", result.Return)
+
 	if result.Address != nil {
-		logger.Printf("Contract Address =>\t\t%X\n", result.Address)
-		logger.Infof("Transaction Hash =>\t\t%X\n", result.Hash)
+		log.WithField("=>", addr).Warn("Contract Address")
+		log.WithField("=>", hash).Warn("Transaction Hash")
 	} else {
-		logger.Printf("Transaction Hash =>\t\t%X\n", result.Hash)
-		logger.Debugf("Block Hash =>\t\t\t%X\n", result.BlockHash)
+		log.WithField("=>", hash).Warn("Transaction Hash")
+		log.WithField("=>", blkHash).Debug("Block Hash")
 		if len(result.Return) != 0 {
-			logger.Printf("Return Value =>\t\t\t%X\n", result.Return)
-			logger.Debugf("Exception =>\t\t\t%s\n", result.Exception)
+			log.WithField("=>", ret).Warn("Return Value")
+			log.WithField("=>", result.Exception).Debug("Exception")
 		}
 	}
-
 
 	return nil
 }
@@ -49,7 +54,7 @@ func ReadAbiFormulateCall(contract, dataRaw string, do *definitions.Do) (string,
 	if err != nil {
 		return "", err
 	}
-	logger.Debugf("ABI Spec =>\t\t\t%s\n", abiSpecBytes)
+	log.WithField("=>", abiSpecBytes).Debug("ABI Spec")
 
 	// Process and Pack the Call
 	funcName, args := abiPreProcess(dataRaw, do)
@@ -57,7 +62,11 @@ func ReadAbiFormulateCall(contract, dataRaw string, do *definitions.Do) (string,
 	var totalArgs []string
 	totalArgs = append(totalArgs, funcName)
 	totalArgs = append(totalArgs, args...)
-	logger.Debugf("Packing Call via ABI =>\t\t%v:%v\n", funcName, args)
+	arg := strings.Join(totalArgs, "\n")
+	log.WithFields(log.Fields{
+		"function name": funcName,
+		"arguments":     arg,
+	}).Debug("Packing Call via ABI =>")
 
 	return ebi.Packer(abiSpecBytes, totalArgs...)
 }
@@ -67,7 +76,7 @@ func ReadAndDecodeContractReturn(contract, dataRaw, resultRaw string, do *defini
 	if err != nil {
 		return "", err
 	}
-	logger.Debugf("ABI Spec =>\t\t\t%s\n", abiSpecBytes)
+	log.WithField("=>", abiSpecBytes).Debug("ABI Spec")
 
 	// Process and Pack the Call
 	funcName, _ := abiPreProcess(dataRaw, do)

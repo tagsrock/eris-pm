@@ -9,6 +9,7 @@ import (
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core_client"
 )
 
@@ -37,7 +38,7 @@ func GetChainID(do *definitions.Do) error {
 
 		// Wrangle these returns
 		type NodeInfo struct {
-			ChainID  string `mapstructure:"chain_id" json:"chain_id"`
+			ChainID string `mapstructure:"chain_id" json:"chain_id"`
 		}
 		var ret NodeInfo
 		err = json.Unmarshal([]byte(status), &ret)
@@ -46,7 +47,7 @@ func GetChainID(do *definitions.Do) error {
 		}
 
 		do.ChainID = ret.ChainID
-		logger.Infof("Using ChainID from Node =>\t%s\n", do.ChainID)
+		log.WithField("=>", do.ChainID).Info("Using ChainID from Node")
 	}
 
 	return nil
@@ -173,4 +174,3 @@ func ValidatorsInfo(field string, do *definitions.Do) (string, error) {
 
 	return s, nil
 }
-

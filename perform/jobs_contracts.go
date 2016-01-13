@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	compilers "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-compilers"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
@@ -45,11 +46,11 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (string, error) {
 	} else {
 		p = filepath.Join(do.ContractsPath, deploy.Contract)
 	}
-	logger.Debugf("Contract path =>\t\t%s\n", p)
+	log.WithField("=>", p).Debug("Contract path")
 
 	// use the proper compiler
 	if do.Compiler != "" {
-		logger.Debugf("Setting compiler path =>\t%s\n", do.Compiler)
+		log.WithField("=>", do.Compiler).Debug("Setting compiler path")
 		if err := setCompiler(do, p); err != nil {
 			return "", err
 		}
@@ -60,7 +61,7 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	logger.Debugf("Abi spec =>\t\t\t%s\n", string(abiSpec))
+	log.WithField("=>", string(abiSpec)).Debug("Abi spec")
 	contractCode := hex.EncodeToString(bytecode)
 
 	// Don't use pubKey if account override
@@ -78,14 +79,18 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (string, error) {
 		for _, s := range splitout {
 			s, _ = util.PreProcess(s, do)
 			addOns := common.LeftPadString(common.StripHex(common.Coerce2Hex(s)), 64)
-			logger.Debugf("Contract Code =>\t\t%s\n", contractCode)
-			logger.Debugf("\tAdditional Data =>\t%s\n", addOns)
+			log.WithField("=>", contractCode).Debug("Contract Code")
+			log.WithField("=>", addOns).Debug("Additional Data")
 			contractCode = contractCode + addOns
 		}
 	}
 
 	// Deploy contract
-	logger.Infof("Deploying Contract =>\t\t%s:%v\n", deploy.Source, contractCode)
+	log.WithFields(log.Fields{
+		"source": deploy.Source,
+		"code":   contractCode,
+	}).Info("Deploying Contract")
+
 	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, deploy.Source, "", deploy.Amount, deploy.Nonce, deploy.Gas, deploy.Fee, contractCode)
 	if err != nil {
 		return "", fmt.Errorf("Error deploying contract %s: %v", p, err)
@@ -102,7 +107,7 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (string, error) {
 		}
 	}
 	abiLocation := filepath.Join(do.ABIPath, result)
-	logger.Debugf("Saving ABI =>\t\t\t%s\n", abiLocation)
+	log.WithField("=>", abiLocation).Debug("Saving ABI")
 	if err := ioutil.WriteFile(abiLocation, []byte(abiSpec), 0664); err != nil {
 		return "", err
 	}
@@ -133,7 +138,7 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 	var err error
 	call.Data, err = util.ReadAbiFormulateCall(call.Destination, call.Data, do)
 	if err != nil {
-		logger.Errorf("Error Formulating Call from ABI.\n")
+		log.Error("Error Formulating Call from ABI.")
 		return "", err
 	}
 
@@ -144,7 +149,11 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 		do.PublicKey = ""
 	}
 
-	logger.Infof("Calling =>\t\t\t%s:%v\n", call.Destination, call.Data)
+	log.WithFields(log.Fields{
+		"destination": call.Destination,
+		"data":        call.Data,
+	}).Info("Calling")
+
 	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, call.Source, call.Destination, call.Amount, call.Nonce, call.Gas, call.Fee, call.Data)
 	if err != nil {
 		return "", err
@@ -175,12 +184,12 @@ func deployFinalize(do *definitions.Do, tx interface{}, wait bool) (string, erro
 
 	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx.(types.Tx), true, true, wait)
 	if err != nil {
-		logger.Errorf("ERROR =>\n")
+		log.Error("ERROR =>")
 		return "", err
 	}
 
 	if err := util.ReadTxSignAndBroadcast(res, err); err != nil {
-		logger.Errorf("ERROR =>\n")
+		log.Error("ERROR =>")
 		return "", err
 	}
 
