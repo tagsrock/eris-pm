@@ -83,7 +83,7 @@ test_setup(){
   if [ "$circle" = true ]
   then
     export ERIS_PULL_APPROVE="true"
-    eris init --yes --skip-pull 1>/dev/null
+    eris init --yes --pull-images --source="rawgit" --testing 1>/dev/null
   fi
 
   ensure_running keys
