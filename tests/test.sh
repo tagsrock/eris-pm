@@ -48,13 +48,13 @@ test_exit=0
 # Needed functionality
 
 ensure_running(){
-  if [[ "$(eris services ls | grep $1 | awk '{print $2}')" == "No" ]]
+  if [[ "$(eris services ls --running | grep $1 | awk '{print $2}')" == "Yes" ]]
   then
+    echo "$1 already started. Not starting."
+  else
     echo "Starting service: $1"
     eris services start $1 1>/dev/null
     sleep 3 # boot time
-  else
-    echo "$1 already started. Not starting."
     was_running=1
   fi
 }
@@ -85,7 +85,6 @@ test_setup(){
     export ERIS_PULL_APPROVE="true"
     eris init --yes --pull-images --source="rawgit" --testing 1>/dev/null
   fi
-
   ensure_running keys
 
   # make two keys
