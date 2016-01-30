@@ -23,23 +23,27 @@ In EPM a *job* is a single action which is performed (such as a transaction, a c
 ## Usage
 
 ```
+The Eris Chain Manager is a utility for performing complex operations on eris chains.
+
+Made with <3 by Eris Industries.
+
+Complete documentation is available at https://docs.erisindustries.com
+
+Version:
+  0.11.0
+
 Usage:
-  epm [flags]
+  eris-cm [flags]
+  eris-cm [command]
+
+Available Commands:
+  make        The Eris Chain Maker is a utility for easily creating the files necessary to build eris chains
 
 Flags:
-  -a, --abi-path="./contracts": path to the abi directory EPM should use when saving ABIs after the compile process; default respects $EPM_ABI_PATH
-  -r, --address="": default address to use; operates the same way as the [account] job, only before the epm file is ran; default respects $EPM_ADDRESS
-  -u, --amount="9999": default amount to use; default respects $EPM_AMOUNT
-  -c, --chain="localhost:46657": <ip:port> of chain which EPM should use; default respects $EPM_CHAIN_ADDR
-  -m, --compiler="compilers.eris.industries:8091": <ip:port> of compiler which EPM should use; default respects $EPM_COMPILER_ADDR
-  -p, --contracts-path="./contracts": path to the contracts EPM should use; default respects $EPM_CONTRACTS_PATH
-  -d, --debug[=false]: debug level output; the most output available for epm; if it is too chatty use verbose flag; default respects $EPM_DEBUG
-  -n, --fee="1234": default fee to use; default respects $EPM_FEE
-  -f, --file="./epm.yaml": path to package file which EPM should use; default respects $EPM_FILE
-  -g, --gas="1111111111": default gas to use; can be overridden for any single job; default respects $EPM_GAS
-  -e, --set=[]: default sets to use; operates the same way as the [set] jobs, only before the epm file is ran (and after default address; default respects $EPM_SETS
-  -s, --sign="localhost:4767": <ip:port> of signer daemon which EPM should use; default respects $EPM_SIGNER_ADDR
-  -v, --verbose[=false]: verbose output; more output than no output flags; less output than debug level; default respects $EPM_VERBOSE
+  -d, --debug[=false]: debug level output; the most output available for eris-cm; if it is too chatty use verbose flag; default respects $ERIS_CHAINMANAGER_DEBUG
+  -h, --help[=false]: help for eris-cm
+  -o, --output[=true]: should eris-cm provide an output of its job; default respects $ERIS_CHAINMANAGER_OUTPUT
+  -v, --verbose[=false]: verbose output; more output than no output flags; less output than debug level; default respects $ERIS_CHAINMANAGER_VERBOSE
 ```
 
 EPM is a simple tool from the command line perspective in that it does not have subcommands. `epm` is the only command it will run. This command will execute the instructions of the epm definition file in the current directory (unless a different file is given via the `--file` flag or `$EPM_FILE` environment variable).

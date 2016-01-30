@@ -19,6 +19,7 @@
 # Set defaults
 
 # Where are the Things?
+
 base=github.com/eris-ltd/eris-pm
 if [ "$CIRCLE_BRANCH" ]
 then
@@ -44,18 +45,22 @@ fi
 was_running=0
 test_exit=0
 
+export ERIS_PULL_APPROVE="true"
+export ERIS_MIGRATE_APPROVE="true"
+
 # ---------------------------------------------------------------------------
 # Needed functionality
 
 ensure_running(){
-  if [[ "$(eris services ls | grep $1 | awk '{print $2}')" == "No" ]]
+  if [[ "$(eris services ls -qr | grep $1)" == "$1" ]]
   then
-    echo "Starting service: $1"
-    eris services start $1 1>/dev/null
-    sleep 3 # boot time
-  else
     echo "$1 already started. Not starting."
     was_running=1
+  else
+    echo "Starting service: $1"
+    eris services start $1 1>/dev/null
+    early_exit
+    sleep 3 # boot time
   fi
 }
 
@@ -83,7 +88,7 @@ test_setup(){
   if [ "$circle" = true ]
   then
     export ERIS_PULL_APPROVE="true"
-    eris init --yes --pull-images --source="rawgit" --testing 1>/dev/null
+    eris init --yes --pull-images=true --testing=true 1>/dev/null
   fi
 
   ensure_running keys
