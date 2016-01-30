@@ -90,7 +90,6 @@ test_setup(){
     export ERIS_PULL_APPROVE="true"
     eris init --yes --pull-images=true --testing=true 1>/dev/null
   fi
-
   ensure_running keys
 
   # make two keys
