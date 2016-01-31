@@ -20,11 +20,12 @@
 
 # Where are the Things?
 
-base=github.com/eris-ltd/eris-pm
+name=eris-pm
+base=github.com/eris-ltd/$name
 repo=$GOPATH/src/$base
 if [ "$CIRCLE_BRANCH" ]
 then
-  repo=${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
+  repo=${GOPATH%%:*}/src/$base
   ci=true
   linux=true
 elif [ "$TRAVIS_BRANCH" ]
