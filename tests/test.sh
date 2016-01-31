@@ -109,12 +109,7 @@ test_setup(){
   ensure_running keys
 
   # make a chain
-  eris chains make --account-types=Full:1,Participant:1 epm-tests-$uuid --verbose #1>/dev/null
-  pwd
-  ls -la $chains_dir
-  ls -la $chain_dir
-  echo $name_full
-  echo $name_part
+  eris chains make --account-types=Full:1,Participant:1 epm-tests-$uuid 1>/dev/null
   key1_addr=$(cat $chain_dir/addresses.csv | grep $name_full | cut -d ',' -f 1)
   key2_addr=$(cat $chain_dir/addresses.csv | grep $name_part | cut -d ',' -f 1)
   key2_pub=$(cat $chain_dir/accounts.csv | grep $name_part | cut -d ',' -f 1)
