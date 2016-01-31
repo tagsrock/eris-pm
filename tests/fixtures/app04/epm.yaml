@@ -5,6 +5,16 @@ jobs:
     set:
       val: $addr2
 
+- name: bond_pub_key
+  job:
+    set:
+      val: $addr2_pub
+
+- name: bond_amount
+  job:
+    set:
+      val: 1234
+
 - name: bondPerm
   job:
     permission:
@@ -14,20 +24,10 @@ jobs:
       value: "true"
       wait: true
 
-- name: bond_pub_key
-  job:
-    set:
-      val: 77D803D934A3351444E6BC757CDF0EB476CE0F56F975E776BEE1DB6A082E2AF9
-
 - name: account
   job:
     account:
       address: $bond_account
-
-- name: bond_amount
-  job:
-    set:
-      val: 1234
 
 - name: bondTest1
   job:
@@ -64,7 +64,7 @@ jobs:
 - name: assertBonded
   job:
     assert:
-      key: 1040E6521541DAB4E7EE57F21226DD17CE9F0FB7
+      key: $addr1
       relation: eq
       val: $queryBonded
 

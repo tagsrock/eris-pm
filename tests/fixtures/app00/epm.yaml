@@ -24,6 +24,13 @@ jobs:
       amount: $val1
       wait: true
 
+- name: sendTxTest3
+  job:
+    send:
+      destination: $addr2
+      amount: $val1
+      wait: true
+
 - name: sendTxQuery1
   job:
     query-account:
@@ -34,6 +41,12 @@ jobs:
   job:
     query-account:
       account: 58FD1799AA32DED3F6EAC096A1DC77834A446B9C
+      field: balance
+
+- name: sendTxQuery3
+  job:
+    query-account:
+      account: $addr2
       field: balance
 
 - name: sendTxAssert1
@@ -48,4 +61,11 @@ jobs:
     assert:
       key: $sendTxQuery2
       relation: eq
-      val: 110000001234
+      val: 1234
+
+- name: sendTxAssert3
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: eq
+      val: 10000001233

@@ -92,25 +92,14 @@ test_setup(){
   fi
   ensure_running keys
 
-  # make two keys
-  key1_addr=$(eris keys gen | tr -d '\r')
-  key2_addr=$(eris keys gen | tr -d '\r')
-  echo -e "Default Key =>\t\t\t$key1_addr"
-  echo -e "Backup Key =>\t\t\t$key2_addr"
-
-  # fixup the genesis.json with the new addresses
-  if [[ "$MACHINE_NAME" != eris-test-win* ]]
-  then
-    jq ".accounts[0].address=\"$key1_addr\" | .accounts[1].address=\"$key2_addr\"" tests/fixtures/chaindata/genesis.json.example > tests/fixtures/chaindata/genesis.json
-  else
-    str=`pwd`
-    cd $repo/tests/fixtures/chaindata
-    go run fixup.go "$key1_addr" "$key2_addr" > genesis.json
-    cd $str
-  fi
-
-  # start the chain with the current genesis.json
-  eris chains new epm-tests-$uuid --dir tests/fixtures/chaindata #1>/dev/null
+  # make a chain
+  eris chains make --account-types=Full:1,Participant:1 epm-tests-$uuid 1>/dev/null
+  key1_addr=$(cat $HOME/.eris/chains/epm-tests-$uuid/addresses.csv | grep epm-tests-"$uuid"_full_000 | cut -d ',' -f 1)
+  key2_addr=$(cat $HOME/.eris/chains/epm-tests-$uuid/addresses.csv | grep epm-tests-"$uuid"_participant_000 | cut -d ',' -f 1)
+  key2_pub=$(cat $HOME/.eris/chains/epm-tests-$uuid/accounts.csv | grep epm-tests-"$uuid"_participant_000 | cut -d ',' -f 1)
+  echo -e "Default Key =>\t\t\t\t$key1_addr"
+  echo -e "Backup Key =>\t\t\t\t$key2_addr"
+  eris chains new epm-tests-$uuid --dir epm-tests-$uuid/epm-tests-"$uuid"_full_000 1>/dev/null
   sleep 5 # boot time
   echo "Setup complete"
 }
@@ -127,9 +116,9 @@ run_test(){
   cd $1
   if [ "$circle" = false ]
   then
-    eris contracts test --chain "epm-tests-$uuid" --address "$key1_addr" --set "addr2=$key2_addr"
+    eris contracts test --chain "epm-tests-$uuid" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub"
   else
-    eris contracts test --chain "epm-tests-$uuid" --address "$key1_addr" --set "addr2=$key2_addr" --rm
+    eris contracts test --chain "epm-tests-$uuid" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub" --rm
   fi
   test_exit=$?
 
@@ -173,6 +162,7 @@ test_teardown(){
     then
       eris services stop -rx keys
     fi
+    rm -rf $HOME/.eris/chains/epm-tests-$uuid
   fi
   echo ""
   if [ "$test_exit" -eq 0 ]
