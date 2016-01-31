@@ -21,16 +21,27 @@
 # Where are the Things?
 
 base=github.com/eris-ltd/eris-pm
+repo=$GOPATH/src/$base
 if [ "$CIRCLE_BRANCH" ]
 then
-  repo=`pwd`
+  repo=${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
   ci=true
+  linux=true
+elif [ "$TRAVIS_BRANCH" ]
+then
+  ci=true
+  osx=true
+elif [ "$APPVEYOR_REPO_BRANCH" ]
+then
+  ci=true
+  win=true
 else
-  repo=$GOPATH/src/$base
   ci=false
 fi
+
 branch=${CIRCLE_BRANCH:=master}
 branch=${branch/-/_}
+branch=${branch/\//_}
 
 # Other variables
 if [[ "$(uname -s)" == "Linux" ]]
@@ -42,6 +53,7 @@ then
 else
   uuid="62d1486f0fe5"
 fi
+
 was_running=0
 test_exit=0
 chains_dir=$HOME/.eris/chains
