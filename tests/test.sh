@@ -2,8 +2,8 @@
 # ----------------------------------------------------------
 # PURPOSE
 
-# This is the test manager for epm. It will run the testing
-# sequence for epm using docker.
+# This is the test manager for eris-pm. It will run the testing
+# sequence for eris-pm using docker.
 
 # ----------------------------------------------------------
 # REQUIREMENTS
@@ -178,17 +178,17 @@ test_teardown(){
 # ---------------------------------------------------------------------------
 # Get the things build and dependencies turned on
 
-echo "Hello! I'm the marmot that tests the epm tooling."
+echo "Hello! I'm the marmot that tests the eris-pm tooling."
 start=`pwd`
 cd $repo
 echo ""
-echo "Building epm in a docker container."
+echo "Building eris-pm in a docker container."
 set -e
 tests/build_tool.sh 1>/dev/null
 set +e
 if [ $? -ne 0 ]
 then
-  echo "Could not build epm. Debug via by directly running [`pwd`/tests/build_tool.sh]"
+  echo "Could not build eris-pm. Debug via by directly running [`pwd`/tests/build_tool.sh]"
   exit 1
 fi
 echo "Build complete."
