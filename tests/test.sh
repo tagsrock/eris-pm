@@ -23,11 +23,11 @@
 base=github.com/eris-ltd/eris-pm
 if [ "$CIRCLE_BRANCH" ]
 then
-  repo=${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
-  circle=true
+  repo=`pwd`
+  ci=true
 else
   repo=$GOPATH/src/$base
-  circle=false
+  ci=false
 fi
 branch=${CIRCLE_BRANCH:=master}
 branch=${branch/-/_}
@@ -44,6 +44,11 @@ else
 fi
 was_running=0
 test_exit=0
+chains_dir=$HOME/.eris/chains
+chain_name=epm-tests-$uuid
+name_full="$chain_name"_full_000
+name_part="$chain_name"_participant_000
+chain_dir=$chains_dir/$chain_name
 
 export ERIS_PULL_APPROVE="true"
 export ERIS_MIGRATE_APPROVE="true"
@@ -73,7 +78,7 @@ early_exit(){
   echo "There was an error duing setup; keys were not properly imported. Exiting."
   if [ "$was_running" -eq 0 ]
   then
-    if [ "$circle" = true ]
+    if [ "$ci" = true ]
     then
       eris services stop keys
     else
@@ -85,21 +90,20 @@ early_exit(){
 
 test_setup(){
   echo "Getting Setup"
-  if [ "$circle" = true ]
+  if [ "$ci" = true ]
   then
-    export ERIS_PULL_APPROVE="true"
     eris init --yes --pull-images=true --testing=true 1>/dev/null
   fi
   ensure_running keys
 
   # make a chain
   eris chains make --account-types=Full:1,Participant:1 epm-tests-$uuid 1>/dev/null
-  key1_addr=$(cat $HOME/.eris/chains/epm-tests-$uuid/addresses.csv | grep epm-tests-"$uuid"_full_000 | cut -d ',' -f 1)
-  key2_addr=$(cat $HOME/.eris/chains/epm-tests-$uuid/addresses.csv | grep epm-tests-"$uuid"_participant_000 | cut -d ',' -f 1)
-  key2_pub=$(cat $HOME/.eris/chains/epm-tests-$uuid/accounts.csv | grep epm-tests-"$uuid"_participant_000 | cut -d ',' -f 1)
+  key1_addr=$(cat $chain_dir/addresses.csv | grep $name_full | cut -d ',' -f 1)
+  key2_addr=$(cat $chain_dir/addresses.csv | grep $name_part | cut -d ',' -f 1)
+  key2_pub=$(cat $chain_dir/accounts.csv | grep $name_part | cut -d ',' -f 1)
   echo -e "Default Key =>\t\t\t\t$key1_addr"
   echo -e "Backup Key =>\t\t\t\t$key2_addr"
-  eris chains new epm-tests-$uuid --dir epm-tests-$uuid/epm-tests-"$uuid"_full_000 1>/dev/null
+  eris chains new $chain_name --dir $chain_dir/$name_full 1>/dev/null
   sleep 5 # boot time
   echo "Setup complete"
 }
@@ -114,11 +118,11 @@ run_test(){
   echo -e "Testing EPM using fixture =>\t$1"
   goto_base
   cd $1
-  if [ "$circle" = false ]
+  if [ "$ci" = false ]
   then
-    eris contracts test --chain "epm-tests-$uuid" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub"
+    eris contracts test --chain "$chain_name" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub"
   else
-    eris contracts test --chain "epm-tests-$uuid" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub" --rm
+    eris contracts test --chain "$chain_name" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub" --rm
   fi
   test_exit=$?
 
@@ -152,17 +156,17 @@ test_teardown(){
     echo "EPM Log on Failed Test."
     cat $failing_dir/epm.json
   fi
-  if [ "$circle" = false ]
+  if [ "$ci" = false ]
   then
     echo ""
-    eris chains stop -rxf epm-tests-$uuid 1>/dev/null
-    eris chains rm -f epm-tests-$uuid 1>/dev/null
-    rm -rf ~/.eris/data/epm-tests-*
+    eris chains stop -rxf $chain_name 1>/dev/null
+    eris chains rm -f $chain_name 1>/dev/null
     if [ "$was_running" -eq 0 ]
     then
       eris services stop -rx keys
     fi
-    rm -rf $HOME/.eris/chains/epm-tests-$uuid
+    rm -rf $HOME/.eris/scratch/data/epm-tests-*
+    rm -rf $chain_dir
   fi
   echo ""
   if [ "$test_exit" -eq 0 ]
