@@ -36,3 +36,4 @@ deployment:
     branch: develop
     commands:
       - docs/build.sh
+      - docker push quay.io/eris/epm
