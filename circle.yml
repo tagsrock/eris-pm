@@ -29,11 +29,12 @@ deployment:
   master:
     branch: master
     commands:
-      - tests/build_tool.sh master
+      - tests/build_tool.sh
       - docker push quay.io/eris/epm
       - docs/build.sh master
   develop:
     branch: develop
     commands:
-      - docs/build.sh
+      - tests/build_tool.sh
       - docker push quay.io/eris/epm
+      - docs/build.sh
