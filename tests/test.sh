@@ -180,6 +180,8 @@ test_teardown(){
     fi
     rm -rf $HOME/.eris/scratch/data/epm-tests-*
     rm -rf $chain_dir
+  else
+    eris chains stop -f $chain_name 1>/dev/null
   fi
   echo ""
   if [ "$test_exit" -eq 0 ]
