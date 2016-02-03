@@ -132,11 +132,11 @@ jobs:
       wait: true
 ```
 
-For more about the jobs epm is capable of performing please see the [Jobs Specification](https://docs.erisindustries.com/documentation/eris-pm/jobs_specification/).
+For more about the jobs epm is capable of performing please see the [Jobs Specification](https://docs.erisindustries.com/documentation/eris-pm/latest/jobs_specification/).
 
 ## Variable Handling
 
-EPM will also handle variables; for more information please see the [Variables Specification](https://docs.erisindustries.com/documentation/eris-pm/variable_specification/).
+EPM will also handle variables; for more information please see the [Variables Specification](https://docs.erisindustries.com/documentation/eris-pm/latest/variable_specification/).
 
 EPM will save an `epm.log` file with the variables used and results of the jobs in the `pwd` unless another location is specified.
 
