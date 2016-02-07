@@ -30,6 +30,23 @@ start=`pwd`
 
 echo "Setting up a Machine for EPM Testing"
 docker-machine create --driver amazonec2 $machine 1>/dev/null
+if [ "$?" -ne 0 ]
+then
+  echo "Failed to create The Machine for EPM Testing"
+  exit 1
+fi
+docker-machine scp tests/docker.sh ${machine}:
+if [ "$?" -ne 0 ]
+then
+  echo "Failed to copy the 'docker.sh' script into the container"
+  exit 1
+fi
+docker-machine ssh $machine sudo env DOCKER_VERSION=$DOCKER_VERSION '$HOME/docker.sh'
+if [ "$?" -ne 0 ]
+then
+  echo "Failed to install Docker client into the container"
+  exit 1
+fi
 eval $(docker-machine env $machine)
 echo "Machine setup."
 echo
