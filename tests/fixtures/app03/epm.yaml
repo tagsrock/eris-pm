@@ -1,10 +1,5 @@
 jobs:
 
-- name: account_tgt
-  job:
-    set:
-      val: 58FD1799AA32DED3F6EAC096A1DC77834A446B9C
-
 - name: perm
   job:
     set:
@@ -19,7 +14,7 @@ jobs:
   job:
     permission:
       action: set_base
-      target: $account_tgt
+      target: $addr2
       permission: $perm
       value: "true"
       wait: true
@@ -28,7 +23,7 @@ jobs:
   job:
     permission:
       action: unset_base
-      target: $account_tgt
+      target: $addr2
       permission: $perm
       wait: true
 
@@ -36,7 +31,7 @@ jobs:
   job:
     permission:
       action: add_role
-      target: $account_tgt
+      target: $addr2
       role: $role
       wait: true
 
@@ -44,7 +39,7 @@ jobs:
   job:
     permission:
       action: rm_role
-      target: $account_tgt
+      target: $addr2
       role: $role
       wait: true
 
@@ -59,7 +54,7 @@ jobs:
 - name: queryPerm1
   job:
     query-account:
-      account: $account_tgt
+      account: $addr2
       field: permissions.roles
 
 - name: assertPerm1
@@ -72,7 +67,7 @@ jobs:
 - name: queryPerm2
   job:
     query-account:
-      account: $account_tgt
+      account: $addr2
       field: permissions.base
 
 - name: assertPerm2
@@ -80,4 +75,4 @@ jobs:
     assert:
       key: $queryPerm2
       relation: eq
-      val: "4"
+      val: 2118

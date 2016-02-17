@@ -172,12 +172,12 @@ test_teardown(){
   if [ "$ci" = false ]
   then
     echo ""
-    eris chains stop -rxf $chain_name 1>/dev/null
-    eris chains rm -f $chain_name 1>/dev/null
     if [ "$was_running" -eq 0 ]
     then
       eris services stop -rx keys
     fi
+    eris chains stop --force $chain_name 1>/dev/null
+    eris chains rm --file --data $chain_name 1>/dev/null
     rm -rf $HOME/.eris/scratch/data/epm-tests-*
     rm -rf $chain_dir
   else
