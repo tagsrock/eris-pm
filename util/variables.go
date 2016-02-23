@@ -58,11 +58,11 @@ func replaceBlockVariable(toReplace string, do *definitions.Do) (string, error) 
 		return "", err
 	}
 
-	if toReplace == "block" {
+	if toReplace == "$block" {
 		return block, nil
 	}
 
-	catchEr := regexp.MustCompile("block\\+(\\d*)")
+	catchEr := regexp.MustCompile("\\$block\\+(\\d*)")
 	if catchEr.MatchString(toReplace) {
 		height := catchEr.FindStringSubmatch(toReplace)[1]
 		h1, err := strconv.Atoi(height)
@@ -77,7 +77,7 @@ func replaceBlockVariable(toReplace string, do *definitions.Do) (string, error) 
 		return height, nil
 	}
 
-	catchEr = regexp.MustCompile("block\\-(\\d*)")
+	catchEr = regexp.MustCompile("\\$block\\-(\\d*)")
 	if catchEr.MatchString(toReplace) {
 		height := catchEr.FindStringSubmatch(toReplace)[1]
 		h1, err := strconv.Atoi(height)

@@ -8,7 +8,7 @@ import (
 
 	. "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 
-	//"github.com/eris-ltd/eris-keys/Godeps/_workspace/src/github.com/howeyc/gopass"
+	//"github.com/howeyc/gopass"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
 )
 
@@ -36,6 +36,15 @@ func cliKeygen(cmd *cobra.Command, args []string) {
 
 func cliLock(cmd *cobra.Command, args []string) {
 	r, err := Call("lock", map[string]string{"addr": KeyAddr, "name": KeyName})
+	if _, ok := err.(ErrConnectionRefused); ok {
+		ExitConnectErr(err)
+	}
+	IfExit(err)
+	logger.Println(r)
+}
+
+func cliConvert(cmd *cobra.Command, args []string) {
+	r, err := Call("mint", map[string]string{"addr": KeyAddr, "name": KeyName})
 	if _, ok := err.(ErrConnectionRefused); ok {
 		ExitConnectErr(err)
 	}
