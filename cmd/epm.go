@@ -1,18 +1,19 @@
 package commands
 
 import (
+	"fmt"
 	"os"
 	"strconv"
 	"strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
-	"github.com/eris-ltd/eris-pm/logger"
 	"github.com/eris-ltd/eris-pm/packages"
 	"github.com/eris-ltd/eris-pm/util"
 	"github.com/eris-ltd/eris-pm/version"
 
 	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	. "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
+	logger "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/log"
 	cfg "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/config"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
 )
@@ -131,7 +132,11 @@ func defaultSigner() string {
 }
 
 func defaultCompiler() string {
-	return setDefaultString("EPM_COMPILER_ADDR", "https://compilers.eris.industries:9090")
+	verSplit := strings.Split(version.VERSION, ".")
+	maj, _ := strconv.Atoi(verSplit[0])
+	min, _ := strconv.Atoi(verSplit[1])
+	pat, _ := strconv.Atoi(verSplit[2])
+	return setDefaultString("EPM_COMPILER_ADDR", fmt.Sprintf("https://compilers-new.eris.industries:1%01d%02d%01d", maj, min, pat))
 }
 
 func defaultAddr() string {

@@ -18,7 +18,7 @@
 
 # ----------------------------------------------------------
 # Set defaults
-
+set -e
 if [ "$CIRCLE_BRANCH" ]
 then
   repo=`pwd`

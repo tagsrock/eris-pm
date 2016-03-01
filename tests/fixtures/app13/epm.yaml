@@ -20,8 +20,8 @@ jobs:
 
 #Double check created address
 - name:  getGSAddr
-  job: 
-    query-contract: 
+  job:
+    query-contract:
       destination: $deployGSFactory
       data: getLast
 
@@ -34,10 +34,10 @@ jobs:
 
 #Going to throw in my mock-up of binding an abi to an address
 - name: GSabiBind
-    job:
-      bind-abi: 
-        destination: $createGSContract
-        abi: $deployGSFactory "GSContract" #This line is just a place holder for potential ways to reference stored abis from previous deploys
+  job:
+    bind-abi:
+      destination: $createGSContract
+      abi: $deployGSFactory "GSContract" #This line is just a place holder for potential ways to reference stored abis from previous deploys
 
 #Normal get set contract testing
 - name: setStorage

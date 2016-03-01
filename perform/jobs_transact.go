@@ -249,8 +249,12 @@ func BondJob(bond *definitions.Bond, do *definitions.Do) (string, error) {
 
 func UnbondJob(unbond *definitions.Unbond, do *definitions.Do) (string, error) {
 	// Process Variables
-	unbond.Account, _ = util.PreProcess(unbond.Account, do)
-	unbond.Height, _ = util.PreProcess(unbond.Height, do)
+	var err error
+	unbond.Account, err = util.PreProcess(unbond.Account, do)
+	unbond.Height, err = util.PreProcess(unbond.Height, do)
+	if err != nil {
+		return "", err
+	}
 
 	// Use defaults
 	unbond.Account = useDefault(unbond.Account, do.Package.Account)
@@ -285,8 +289,12 @@ func UnbondJob(unbond *definitions.Unbond, do *definitions.Do) (string, error) {
 
 func RebondJob(rebond *definitions.Rebond, do *definitions.Do) (string, error) {
 	// Process Variables
-	rebond.Account, _ = util.PreProcess(rebond.Account, do)
-	rebond.Height, _ = util.PreProcess(rebond.Height, do)
+	var err error
+	rebond.Account, err = util.PreProcess(rebond.Account, do)
+	rebond.Height, err = util.PreProcess(rebond.Height, do)
+	if err != nil {
+		return "", err
+	}
 
 	// Use defaults
 	rebond.Account = useDefault(rebond.Account, do.Package.Account)

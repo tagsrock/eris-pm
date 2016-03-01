@@ -1,4 +1,4 @@
-contract SimpleStorage {
+contract Storage {
   int storedData;
 
   function set(int x) {

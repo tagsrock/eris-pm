@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/ethereum/go-ethereum/crypto/sha3"
 )
@@ -100,9 +101,11 @@ func (abi ABI) Pack(name string, data []string) ([]byte, error) {
 	for i, a := range data {
 		input := method.Inputs[i]
 
-		logger.Debugf("ABI Pack. Name =>\t\t%s\n", input.Name)
-		logger.Debugf("ABI Pack. Type =>\t\t%s\n", input.Type.String())
-		logger.Debugf("ABI Pack. Value =>\t\t%s\n", a)
+		log.WithFields(log.Fields{
+			"name": input.Name,
+			"type": input.Type.String(),
+			"val":  a,
+		}).Debug("ABI Pack")
 		ret, err := PackProcessType(input.Type.String(), a)
 		if err != nil {
 			return nil, err
@@ -178,9 +181,11 @@ func (abi ABI) UnPack(name string, data []byte) ([]byte, error) {
 		ret[i].Name = method.Outputs[i].Name
 		ret[i].Type = method.Outputs[i].Type.String()
 		ret[i].Value = UnpackProcessType(ret[i].Type, data[start:next])
-		logger.Debugf("ABI Unpack. Name =>\t\t%s\n", ret[i].Name)
-		logger.Debugf("ABI Unpack. Type =>\t\t%s\n", ret[i].Type)
-		logger.Debugf("ABI Unpack. Value =>\t\t%s\n", ret[i].Value)
+		log.WithFields(log.Fields{
+			"name": ret[i].Name,
+			"type": ret[i].Type,
+			"val":  ret[i].Value,
+		}).Debug("ABI Unpack")
 
 		start = next
 	}

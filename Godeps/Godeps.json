@@ -44,23 +44,23 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/common/go/common",
-			"Rev": "26df169480eef97df7ed9f5419b7367895d077b4"
+			"Rev": "ad2fd09d8610bb86904b641fe1a852c5b0b92de9"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/common/go/log",
-			"Rev": "26df169480eef97df7ed9f5419b7367895d077b4"
+			"Rev": "ad2fd09d8610bb86904b641fe1a852c5b0b92de9"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-abi/abi",
-			"Rev": "5b33bc7350f36a5b7b2b840059c860e127b46805"
+			"Rev": "fd20eb4bc0427cbac8147593773dbc969b80a114"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-abi/core",
-			"Rev": "5b33bc7350f36a5b7b2b840059c860e127b46805"
+			"Rev": "fd20eb4bc0427cbac8147593773dbc969b80a114"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-compilers",
-			"Rev": "3e749ec8fc6ea55ac74fd9150052b98ac0221fe0"
+			"Rev": "6d865d36843e833cc8de20ef868fb3a749860f4b"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-keys/crypto",

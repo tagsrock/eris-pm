@@ -124,7 +124,7 @@ var Languages = map[string]LangConfig{
 		},
 		CompileCmd: []string{
 			"/usr/bin/solc",
-			"--combined-json", "bin", "abi",
+			"--combined-json", "bin,abi",
 			"_",
 		},
 	},

@@ -133,7 +133,7 @@ run_test(){
   cd $1
   if [ "$ci" = false ]
   then
-    eris pkgs do --chain "$chain_name" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub" --compiler 172.17.0.2:9099
+    eris pkgs do --chain "$chain_name" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub" #--compiler 172.17.0.3:9099 #--debug
   else
     eris pkgs do --chain "$chain_name" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub" --rm
   fi
@@ -204,12 +204,12 @@ echo ""
 echo "Building eris-pm in a docker container."
 set -e
 tests/build_tool.sh 1>/dev/null
-set +e
 if [ $? -ne 0 ]
 then
   echo "Could not build eris-pm. Debug via by directly running [`pwd`/tests/build_tool.sh]"
   exit 1
 fi
+set +e
 echo "Build complete."
 echo ""
 

@@ -52,12 +52,13 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 	} else {
 		p = filepath.Join(do.ContractsPath, deploy.Contract)
 	}
-	log.WithField("=>", p).Debug("Contract path")
+	log.WithField("=>", p).Info("Contract path")
 
 	// use the proper compiler
 	if do.Compiler != "" {
-		log.WithField("=>", do.Compiler).Debug("Setting compiler path")
+		log.WithField("=>", do.Compiler).Info("Setting compiler path")
 		if err := setCompiler(do, p); err != nil {
+			log.Debugf("Error setting compiler path", err)
 			return "", err
 		}
 	}
@@ -66,6 +67,8 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 	resp := compilers.Compile(p, deploy.Libraries)
 
 	if resp.Error != "" {
+		log.Errorln("Error compiling contracts")
+		log.Errorln(resp.Error)
 		return "", fmt.Errorf(resp.Error)
 	}
 
@@ -76,9 +79,9 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 		do.PublicKey = ""
 	}
 
-	//fmt.Println(resp)
+	// loop through objects returned from compiler
 	for _, r := range resp.Objects {
-		log.WithField("=>", string(r.ABI)).Debug("Abi spec")
+		log.WithField("=>", string(r.ABI)).Debug("ABI Specification (From Compilers)")
 		if r.Bytecode == nil {
 			continue
 		}
@@ -111,29 +114,33 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 			return "", err
 		}
 
-		if strings.ToLower(r.Objectname) == strings.ToLower(deploy.Instance) {
-			// Deploy contract
-			log.WithFields(log.Fields{
-				"source": deploy.Source,
-				"code":   contractCode,
-			}).Info("Deploying Contract")
+		// if strings.ToLower(r.Objectname) == strings.ToLower(deploy.Instance) {
+		// Deploy contract
+		log.WithFields(log.Fields{
+			"source": deploy.Source,
+			"code":   contractCode,
+		}).Info("Deploying Contract")
 
-			tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, deploy.Source, "", deploy.Amount, deploy.Nonce, deploy.Gas, deploy.Fee, contractCode)
-			if err != nil {
-				return "", fmt.Errorf("Error deploying contract %s: %v", p, err)
-			}
-
-			// Sign, broadcast, display
-			result, err = deployFinalize(do, tx, deploy.Wait)
-
-			// saving contract/library abi at abi/address
-			abiLocation := filepath.Join(do.ABIPath, result)
-			log.WithField("=>", abiLocation).Debug("Saving ABI")
-			if err := ioutil.WriteFile(abiLocation, []byte(r.ABI), 0664); err != nil {
-				return "", err
-			}
+		tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, deploy.Source, "", deploy.Amount, deploy.Nonce, deploy.Gas, deploy.Fee, contractCode)
+		if err != nil {
+			return "", fmt.Errorf("Error deploying contract %s: %v", p, err)
 		}
 
+		// Sign, broadcast, display
+		result, err = deployFinalize(do, tx, deploy.Wait)
+
+		// saving contract/library abi at abi/address
+		abiLocation = filepath.Join(do.ABIPath, result)
+		log.WithField("=>", abiLocation).Debug("Saving ABI")
+		if err := ioutil.WriteFile(abiLocation, []byte(r.ABI), 0664); err != nil {
+			return "", err
+		}
+		// } else {
+		// 	log.WithFields(log.Fields{
+		// 		"instance": deploy.Instance,
+		// 		"objName":  r.Objectname,
+		// 	}).Info("Not Deploying Contract")
+		// }
 	}
 
 	// Don't use pubKey if account override

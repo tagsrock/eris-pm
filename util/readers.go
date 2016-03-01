@@ -54,19 +54,18 @@ func ReadAbiFormulateCall(contract, dataRaw string, do *definitions.Do) (string,
 	if err != nil {
 		return "", err
 	}
-	log.WithField("=>", abiSpecBytes).Debug("ABI Spec")
+	log.WithField("=>", string(abiSpecBytes)).Debug("ABI Specification (Formulate)")
 
 	// Process and Pack the Call
 	funcName, args := abiPreProcess(dataRaw, do)
 
+	log.WithFields(log.Fields{
+		"function name": funcName,
+		"arguments":     args,
+	}).Debug("Packing Call via ABI")
 	var totalArgs []string
 	totalArgs = append(totalArgs, funcName)
 	totalArgs = append(totalArgs, args...)
-	arg := strings.Join(totalArgs, "\n")
-	log.WithFields(log.Fields{
-		"function name": funcName,
-		"arguments":     arg,
-	}).Debug("Packing Call via ABI =>")
 
 	return ebi.Packer(abiSpecBytes, totalArgs...)
 }
@@ -76,7 +75,7 @@ func ReadAndDecodeContractReturn(contract, dataRaw, resultRaw string, do *defini
 	if err != nil {
 		return "", err
 	}
-	log.WithField("=>", abiSpecBytes).Debug("ABI Spec")
+	log.WithField("=>", string(abiSpecBytes)).Debug("ABI Specification (Decode)")
 
 	// Process and Pack the Call
 	funcName, _ := abiPreProcess(dataRaw, do)
