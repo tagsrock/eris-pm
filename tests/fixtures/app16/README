@@ -1,0 +1,1 @@
+This is a simple factory contract test where the abi is not bound to the address but rather is supplied as a field to each interaction job to the created contract. (Jan's original suggestion)
