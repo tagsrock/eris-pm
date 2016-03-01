@@ -14,7 +14,7 @@ contract GSContract {
 contract GSFactory {
 	address lastCreated;
 	function create() returns (address GSAddr) {
-		lastCreated = new GSContract;
+		lastCreated = new GSContract();
 		return lastCreated;
 	}
 
