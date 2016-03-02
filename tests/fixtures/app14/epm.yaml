@@ -5,56 +5,35 @@ jobs:
     set:
       val: 5
 
-- name: deployGSFactoryFactory
+- name: deployGSFactory
   job:
     deploy:
-      contract: GSFactoryFactory.sol
+      contract: GSFactory.sol
+      instance: GSFactory
       wait: true
 
-- name: createGSFactory
+- name: deployGSABIFactory
   job:
-    call:
-      destination: $deployGSFactoryFactory
-      data: create
+    deploy:
+      contract: GSFactory.sol
+      instance: GSContract
       wait: true
-
-#Double check created address
-- name:  getGSFactoryAddr
-  job: 
-    query-contract: 
-      destination: $deployGSFactoryFactory
-      data: getLast
-
-- name: assertFactoryAddr
-  job:
-    assert:
-      key: $getGSFactoryAddr
-      relation: eq
-      val: $createGSFactory
-
-#Going to throw in my mock-up of binding an abi to an address
-- name: GSFactoryabiBind
-    job:
-      bind-abi: 
-        destination: $createGSFactory
-        abi: $deployGSFactoryFactory "GSFactory" #This line is just a place holder for potential ways to reference stored abis from previous deploys
-
-
-# Now talking to the factory-created factory...
 
 - name: createGSContract
   job:
     call:
-      destination: $createGSFactory
+      destination: $deployGSFactory
       data: create
+      abi: $deployGSFactory
       wait: true
 
 #Double check created address
 - name:  getGSAddr
-  job: 
-    query-contract: 
-      destination: $createGSFactory
+  job:
+    query-contract:
+      destination: $deployGSFactory
       data: getLast
+      abi: $deployGSFactory
 
 - name: assertAddr
   job:
@@ -63,19 +42,13 @@ jobs:
       relation: eq
       val: $createGSContract
 
-#Going to throw in my mock-up of binding an abi to an address
-- name: GSabiBind
-    job:
-      bind-abi: 
-        destination: $createGSContract
-        abi: $deployGSFactoryFactory "GSContract" #This line is just a place holder for potential ways to reference stored abis from previous deploys
-
 #Normal get set contract testing
 - name: setStorage
   job:
     call:
       destination: $createGSContract
       data: set $setStorageBase
+      abi: $deployGSABIFactory
       wait: true
 
 - name: queryStorage
@@ -83,6 +56,7 @@ jobs:
     query-contract:
       destination: $createGSContract
       data: get
+      abi: $deployGSABIFactory
 
 - name: assertStorage
   job:

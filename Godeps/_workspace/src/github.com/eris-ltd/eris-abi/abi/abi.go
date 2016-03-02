@@ -97,6 +97,10 @@ func (abi ABI) Pack(name string, data []string) ([]byte, error) {
 		return nil, fmt.Errorf("argument count mismatch: %d for %d", len(data), len(method.Inputs))
 	}
 
+	if len(data) == 0 {
+		log.Debug("Nothing to pack")
+	}
+
 	var arguments []byte
 	for i, a := range data {
 		input := method.Inputs[i]
@@ -175,7 +179,17 @@ func (abi ABI) UnPack(name string, data []byte) ([]byte, error) {
 
 		next = start + lengths["retBlock"]
 		if next > end {
-			return nil, fmt.Errorf("Too little data")
+			log.WithFields(log.Fields{
+				"name":   ret[i].Name,
+				"type":   ret[i].Type,
+				"val":    ret[i].Value,
+				"len":    lengths[method.Outputs[i].Type.String()],
+				"retBlk": lengths["retBlock"],
+				"start":  start,
+				"next":   next,
+				"end":    end,
+			}).Error("Too little data")
+			return nil, fmt.Errorf("Too little data; usually means a bad return from a contract")
 		}
 
 		ret[i].Name = method.Outputs[i].Name

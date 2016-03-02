@@ -9,6 +9,7 @@ jobs:
   job:
     deploy:
       contract: GSFactory.sol
+      instance: all
       wait: true
 
 - name: createGSContract
@@ -16,40 +17,31 @@ jobs:
     call:
       destination: $deployGSFactory
       data: create
+      abi: GSFactory
       wait: true
 
-- name: createGSContract2
+#Double check created address
+- name:  getGSAddr
   job:
-    call:
+    query-contract:
       destination: $deployGSFactory
-      data: create2
-      wait: true
+      data: getLast
+      abi: GSFactory
 
-
-
-#Going to throw in my mock-up of binding an abi to an address
-- name: GSabiBind
-    job:
-      bind-abi: 
-        destination: $createGSContract
-        abi: $deployGSFactory "GSContract" #This line is just a place holder for potential ways to reference stored abis from previous deploys
-
-- name: GSabiBind2
-    job:
-      bind-abi: 
-        destination: $createGSContract2
-        abi: $deployGSFactory "GSContract2" #This line is just a place holder for potential ways to reference stored abis from previous deploys
-
-
-
+- name: assertAddr
+  job:
+    assert:
+      key: $getGSAddr
+      relation: eq
+      val: $createGSContract
 
 #Normal get set contract testing
-#contract 1
 - name: setStorage
   job:
     call:
       destination: $createGSContract
       data: set $setStorageBase
+      abi: GSContract
       wait: true
 
 - name: queryStorage
@@ -57,28 +49,7 @@ jobs:
     query-contract:
       destination: $createGSContract
       data: get
-
-- name: assertStorage
-  job:
-    assert:
-      key: $queryStorage
-      relation: eq
-      val: $setStorageBase
-
-
-#contract 2
-- name: setStorage2
-  job:
-    call:
-      destination: $createGSContract2
-      data: set2 $setStorageBase
-      wait: true
-
-- name: queryStorage
-  job:
-    query-contract:
-      destination: $createGSContract2
-      data: get2
+      abi: GSContract
 
 - name: assertStorage
   job:

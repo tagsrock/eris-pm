@@ -9,6 +9,14 @@ jobs:
   job:
     deploy:
       contract: GSFactory.sol
+      instance: GSFactory
+      wait: true
+
+- name: deployGSABIFactory
+  job:
+    deploy:
+      contract: GSFactory.sol
+      instance: GSContract
       wait: true
 
 - name: createGSContract
@@ -16,14 +24,16 @@ jobs:
     call:
       destination: $deployGSFactory
       data: create
+      abi: $deployGSFactory
       wait: true
 
 #Double check created address
 - name:  getGSAddr
-  job: 
-    query-contract: 
+  job:
+    query-contract:
       destination: $deployGSFactory
       data: getLast
+      abi: $deployGSFactory
 
 - name: assertAddr
   job:
@@ -32,14 +42,13 @@ jobs:
       relation: eq
       val: $createGSContract
 
-
 #Normal get set contract testing
 - name: setStorage
   job:
     call:
       destination: $createGSContract
       data: set $setStorageBase
-      abi: $deployGSFactory "GSContract" #Potential more manual method for specifying the abi for a particular job (if not bound to destination)
+      abi: $deployGSABIFactory
       wait: true
 
 - name: queryStorage
@@ -47,7 +56,7 @@ jobs:
     query-contract:
       destination: $createGSContract
       data: get
-      abi: $deployGSFactory "GSContract" #same
+      abi: $deployGSABIFactory
 
 - name: assertStorage
   job:

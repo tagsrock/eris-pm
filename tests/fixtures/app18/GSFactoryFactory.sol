@@ -21,3 +21,15 @@ contract GSFactory {
 		return lastCreated;
 	}
 }
+
+contract GSFactoryFactory {
+	address lastCreated;
+	function create() returns (address GSAddr) {
+		lastCreated = new GSFactory();
+		return lastCreated;
+	}
+
+	function getLast() returns (address GSAddr) {
+		return lastCreated;
+	}
+}

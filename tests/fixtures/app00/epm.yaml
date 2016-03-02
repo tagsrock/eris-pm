@@ -63,9 +63,116 @@ jobs:
       relation: eq
       val: 1234
 
+# first test using "wordy" syntax, then symbol-y syntax
 - name: sendTxAssert3
   job:
     assert:
       key: $sendTxQuery3
       relation: eq
       val: 10000001233
+
+- name: sendTxAssert4
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: ne
+      val: 10000001234
+
+- name: sendTxAssert5
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: gt
+      val: 10000001232
+
+- name: sendTxAssert6
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: ge
+      val: 10000001233
+
+- name: sendTxAssert7
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: ge
+      val: 10000001232
+
+- name: sendTxAssert8
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: lt
+      val: 10000001234
+
+- name: sendTxAssert9
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: le
+      val: 10000001233
+
+- name: sendTxAssert10
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: le
+      val: 10000001234
+
+# second test using "symbol-y" syntax
+- name: sendTxAssert11
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: ==
+      val: 10000001233
+
+- name: sendTxAssert12
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: "!="
+      val: 10000001234
+
+- name: sendTxAssert13
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: ">"
+      val: 10000001232
+
+- name: sendTxAssert14
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: ">="
+      val: 10000001233
+
+- name: sendTxAssert15
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: ">="
+      val: 10000001232
+
+- name: sendTxAssert16
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: <
+      val: 10000001234
+
+- name: sendTxAssert17
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: <=
+      val: 10000001233
+
+- name: sendTxAssert18
+  job:
+    assert:
+      key: $sendTxQuery3
+      relation: <=
+      val: 10000001234

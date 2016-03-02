@@ -5,28 +5,52 @@ jobs:
     set:
       val: 5
 
-- name: deployGSFactory
+- name: deployGSFactoryFactory
   job:
     deploy:
       contract: GSFactory.sol
       instance: all
       wait: true
 
+- name: createGSFactory
+  job:
+    call:
+      destination: $deployGSFactoryFactory
+      data: create
+      abi: GSFactoryFactory
+      wait: true
+
+#Double check created address
+- name:  getGSFactoryAddr
+  job:
+    query-contract:
+      destination: $deployGSFactoryFactory
+      abi: GSFactoryFactory
+      data: getLast
+
+- name: assertFactoryAddr
+  job:
+    assert:
+      key: $getGSFactoryAddr
+      relation: eq
+      val: $createGSFactory
+
+# Now talking to the factory-created factory...
 - name: createGSContract
   job:
     call:
-      destination: $deployGSFactory
-      data: create
+      destination: $createGSFactory
       abi: GSFactory
+      data: create
       wait: true
 
 #Double check created address
 - name:  getGSAddr
   job:
     query-contract:
-      destination: $deployGSFactory
-      data: getLast
       abi: GSFactory
+      destination: $createGSFactory
+      data: getLast
 
 - name: assertAddr
   job:
@@ -48,8 +72,8 @@ jobs:
   job:
     query-contract:
       destination: $createGSContract
-      data: get
       abi: GSContract
+      data: get
 
 - name: assertStorage
   job:

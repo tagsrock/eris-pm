@@ -9,6 +9,7 @@ jobs:
   job:
     deploy:
       contract: storage.sol
+      instance: all
       wait: true
 
 - name: setStorage

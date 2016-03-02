@@ -52,11 +52,11 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-abi/abi",
-			"Rev": "fd20eb4bc0427cbac8147593773dbc969b80a114"
+			"Rev": "4392b685eb44dbbe0d609e4c50ba903733ec3df7"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-abi/core",
-			"Rev": "fd20eb4bc0427cbac8147593773dbc969b80a114"
+			"Rev": "4392b685eb44dbbe0d609e4c50ba903733ec3df7"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-compilers",

@@ -10,10 +10,28 @@ contract GSContract {
   }
 }
 
+contract GSContract2 {
+  uint storedData;
+
+  function set2(uint x) {
+    storedData = x;
+  }
+
+  function get2() constant returns (uint retVal) {
+    return storedData;
+  }
+}
+
+
 contract GSFactory {
 	address lastCreated;
 	function create() returns (address GSAddr) {
 		lastCreated = new GSContract();
+		return lastCreated;
+	}
+
+	function create2() returns (address GSAddr) {
+		lastCreated = new GSContract2();
 		return lastCreated;
 	}
 

@@ -1,4 +1,15 @@
-import "GSContract.sol";
+contract GSContract {
+  uint storedData;
+
+  function set(uint x) {
+    storedData = x;
+  }
+
+  function get() constant returns (uint retVal) {
+    return storedData;
+  }
+}
+
 
 contract GSFactory {
 	address lastCreated;

@@ -1,1 +1,0 @@
-This tests a more complex factory structure where firs a Factory Factory is deployed. This is then used to create a Factory contract. The Abi for this factory is bound to this address. Finally this factory is used to create a get set contract, abi bound to it and tested like normal.

@@ -17,7 +17,6 @@ jobs:
     call:
       destination: $deployGSFactory
       data: create
-      abi: GSFactory
       wait: true
 
 #Double check created address
@@ -26,7 +25,6 @@ jobs:
     query-contract:
       destination: $deployGSFactory
       data: getLast
-      abi: GSFactory
 
 - name: assertAddr
   job:

@@ -49,8 +49,8 @@ func ReadTxSignAndBroadcast(result *core.TxResult, err error) error {
 	return nil
 }
 
-func ReadAbiFormulateCall(contract, dataRaw string, do *definitions.Do) (string, error) {
-	abiSpecBytes, err := readAbi(do.ABIPath, contract)
+func ReadAbiFormulateCall(abiLocation, dataRaw string, do *definitions.Do) (string, error) {
+	abiSpecBytes, err := readAbi(do.ABIPath, abiLocation)
 	if err != nil {
 		return "", err
 	}
@@ -70,8 +70,8 @@ func ReadAbiFormulateCall(contract, dataRaw string, do *definitions.Do) (string,
 	return ebi.Packer(abiSpecBytes, totalArgs...)
 }
 
-func ReadAndDecodeContractReturn(contract, dataRaw, resultRaw string, do *definitions.Do) (string, error) {
-	abiSpecBytes, err := readAbi(do.ABIPath, contract)
+func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *definitions.Do) (string, error) {
+	abiSpecBytes, err := readAbi(do.ABIPath, abiLocation)
 	if err != nil {
 		return "", err
 	}

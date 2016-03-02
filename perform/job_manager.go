@@ -103,7 +103,7 @@ func RunJobs(do *definitions.Do) error {
 }
 
 func announce(job, typ string) {
-	log.WithField("=>", job).Warn("Executing Job Named")
+	log.WithField("=>", job).Warn("Executing Job")
 	log.WithField("=>", typ).Info("Type")
 }
 
