@@ -195,12 +195,17 @@ test_teardown(){
 }
 
 # ---------------------------------------------------------------------------
-# Get the things build and dependencies turned on
+# Setup
+
 
 echo "Hello! I'm the marmot that tests the eris-pm tooling."
 start=`pwd`
 cd $repo
-echo ""
+test_setup
+
+# ---------------------------------------------------------------------------
+# Get the things build and dependencies turned on
+echo
 echo "Building eris-pm in a docker container."
 set -e
 tests/build_tool.sh 1>/dev/null
@@ -212,11 +217,6 @@ fi
 set +e
 echo "Build complete."
 echo ""
-
-# ---------------------------------------------------------------------------
-# Setup
-
-test_setup
 
 # ---------------------------------------------------------------------------
 # Go!
