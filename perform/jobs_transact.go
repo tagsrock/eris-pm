@@ -11,7 +11,7 @@ import (
 
 	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/types"
+	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/types"
 )
 
 func SendJob(send *definitions.Send, do *definitions.Do) (string, error) {
@@ -40,8 +40,7 @@ func SendJob(send *definitions.Send, do *definitions.Do) (string, error) {
 
 	tx, err := core.Send(do.Chain, do.Signer, do.PublicKey, send.Source, send.Destination, send.Amount, send.Nonce)
 	if err != nil {
-		log.Error("ERROR =>")
-		return "", err
+		return util.MintChainErrorHandler(do, err)
 	}
 
 	// Don't use pubKey if account override
@@ -157,8 +156,7 @@ func registerNameTx(name *definitions.RegisterName, do *definitions.Do) (string,
 
 	tx, err := core.Name(do.Chain, do.Signer, do.PublicKey, name.Source, name.Amount, name.Nonce, name.Fee, name.Name, name.Data)
 	if err != nil {
-		log.Error("ERROR =>")
-		return "", err
+		return util.MintChainErrorHandler(do, err)
 	}
 
 	// Don't use pubKey if account override
@@ -208,8 +206,7 @@ func PermissionJob(perm *definitions.Permission, do *definitions.Do) (string, er
 
 	tx, err := core.Permissions(do.Chain, do.Signer, do.PublicKey, perm.Source, perm.Nonce, perm.Action, args)
 	if err != nil {
-		log.Error("ERROR =>")
-		return "", err
+		return util.MintChainErrorHandler(do, err)
 	}
 
 	// Don't use pubKey if account override
@@ -239,8 +236,7 @@ func BondJob(bond *definitions.Bond, do *definitions.Do) (string, error) {
 
 	tx, err := core.Bond(do.Chain, do.Signer, do.PublicKey, bond.Account, bond.Amount, bond.Nonce)
 	if err != nil {
-		log.Error("ERROR =>")
-		return "", err
+		return util.MintChainErrorHandler(do, err)
 	}
 
 	// Sign, broadcast, display
@@ -249,8 +245,12 @@ func BondJob(bond *definitions.Bond, do *definitions.Do) (string, error) {
 
 func UnbondJob(unbond *definitions.Unbond, do *definitions.Do) (string, error) {
 	// Process Variables
-	unbond.Account, _ = util.PreProcess(unbond.Account, do)
-	unbond.Height, _ = util.PreProcess(unbond.Height, do)
+	var err error
+	unbond.Account, err = util.PreProcess(unbond.Account, do)
+	unbond.Height, err = util.PreProcess(unbond.Height, do)
+	if err != nil {
+		return "", err
+	}
 
 	// Use defaults
 	unbond.Account = useDefault(unbond.Account, do.Package.Account)
@@ -270,8 +270,7 @@ func UnbondJob(unbond *definitions.Unbond, do *definitions.Do) (string, error) {
 
 	tx, err := core.Unbond(unbond.Account, unbond.Height)
 	if err != nil {
-		log.Error("ERROR =>")
-		return "", err
+		return util.MintChainErrorHandler(do, err)
 	}
 
 	// Don't use pubKey if account override
@@ -285,8 +284,12 @@ func UnbondJob(unbond *definitions.Unbond, do *definitions.Do) (string, error) {
 
 func RebondJob(rebond *definitions.Rebond, do *definitions.Do) (string, error) {
 	// Process Variables
-	rebond.Account, _ = util.PreProcess(rebond.Account, do)
-	rebond.Height, _ = util.PreProcess(rebond.Height, do)
+	var err error
+	rebond.Account, err = util.PreProcess(rebond.Account, do)
+	rebond.Height, err = util.PreProcess(rebond.Height, do)
+	if err != nil {
+		return "", err
+	}
 
 	// Use defaults
 	rebond.Account = useDefault(rebond.Account, do.Package.Account)
@@ -306,8 +309,7 @@ func RebondJob(rebond *definitions.Rebond, do *definitions.Do) (string, error) {
 
 	tx, err := core.Rebond(rebond.Account, rebond.Height)
 	if err != nil {
-		log.Error("ERROR =>")
-		return "", err
+		return util.MintChainErrorHandler(do, err)
 	}
 
 	// Don't use pubKey if account override
@@ -324,8 +326,7 @@ func txFinalize(do *definitions.Do, tx interface{}, wait bool) (string, error) {
 
 	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx.(types.Tx), true, true, wait)
 	if err != nil {
-		log.Error("ERROR =>")
-		return "", err
+		return util.MintChainErrorHandler(do, err)
 	}
 
 	if err := util.ReadTxSignAndBroadcast(res, err); err != nil {

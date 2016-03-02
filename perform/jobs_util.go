@@ -28,7 +28,7 @@ func SetAccountJob(account *definitions.Account, do *definitions.Do) (string, er
 	}
 
 	if err != nil {
-		return "", err
+		return util.KeysErrorHandler(do, err)
 	}
 
 	// Set result and return

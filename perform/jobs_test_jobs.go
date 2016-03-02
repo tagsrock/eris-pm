@@ -9,13 +9,14 @@ import (
 	"github.com/eris-ltd/eris-pm/util"
 
 	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/tendermint/tendermint/rpc/core_client"
+	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/rpc/core_client"
 )
 
 func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (string, error) {
 	// Preprocess variables. We don't preprocess data as it is processed by ReadAbiFormulateCall
 	query.Source, _ = util.PreProcess(query.Source, do)
 	query.Destination, _ = util.PreProcess(query.Destination, do)
+	query.ABI, _ = util.PreProcess(query.ABI, do)
 
 	// Set the from and the to
 	fromAddrBytes, err := hex.DecodeString(query.Source)
@@ -28,9 +29,14 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	}
 
 	// Get the packed data from the ABI functions
-	data, err := util.ReadAbiFormulateCall(query.Destination, query.Data, do)
+	var data string
+	if query.ABI == "" {
+		data, err = util.ReadAbiFormulateCall(query.Destination, query.Data, do)
+	} else {
+		data, err = util.ReadAbiFormulateCall(query.ABI, query.Data, do)
+	}
 	if err != nil {
-		return "", err
+		return util.ABIErrorHandler(do, err, nil, query)
 	}
 	dataBytes, err := hex.DecodeString(data)
 	if err != nil {
@@ -55,8 +61,14 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	}
 
 	// Formally process the return
-	log.WithField("=>", result).Debug("Decoding Raw Result")
-	result, err = util.ReadAndDecodeContractReturn(query.Destination, query.Data, result, do)
+	log.WithField("res", result).Debug("Decoding Raw Result")
+	if query.ABI == "" {
+		log.WithField("abi", query.Destination).Debug()
+		result, err = util.ReadAndDecodeContractReturn(query.Destination, query.Data, result, do)
+	} else {
+		log.WithField("abi", query.ABI).Debug()
+		result, err = util.ReadAndDecodeContractReturn(query.ABI, query.Data, result, do)
+	}
 	if err != nil {
 		return "", err
 	}
@@ -138,15 +150,15 @@ func AssertJob(assertion *definitions.Assert, do *definitions.Do) (string, error
 	switch assertion.Relation {
 	case "==", "eq":
 		if assertion.Key == assertion.Value {
-			return assertPass()
+			return assertPass("==", assertion.Key, assertion.Value)
 		} else {
-			return assertFail(assertion.Key, assertion.Value)
+			return assertFail("==", assertion.Key, assertion.Value)
 		}
 	case "!=", "ne":
 		if assertion.Key != assertion.Value {
-			return assertPass()
+			return assertPass("!=", assertion.Key, assertion.Value)
 		} else {
-			return assertFail(assertion.Key, assertion.Value)
+			return assertFail("!=", assertion.Key, assertion.Value)
 		}
 	case ">", "gt":
 		k, v, err := bulkConvert(assertion.Key, assertion.Value)
@@ -154,9 +166,9 @@ func AssertJob(assertion *definitions.Assert, do *definitions.Do) (string, error
 			return convFail()
 		}
 		if k > v {
-			return assertPass()
+			return assertPass(">", assertion.Key, assertion.Value)
 		} else {
-			return assertFail(assertion.Key, assertion.Value)
+			return assertFail(">", assertion.Key, assertion.Value)
 		}
 	case ">=", "ge":
 		k, v, err := bulkConvert(assertion.Key, assertion.Value)
@@ -164,9 +176,9 @@ func AssertJob(assertion *definitions.Assert, do *definitions.Do) (string, error
 			return convFail()
 		}
 		if k >= v {
-			return assertPass()
+			return assertPass(">=", assertion.Key, assertion.Value)
 		} else {
-			return assertFail(assertion.Key, assertion.Value)
+			return assertFail(">=", assertion.Key, assertion.Value)
 		}
 	case "<", "lt":
 		k, v, err := bulkConvert(assertion.Key, assertion.Value)
@@ -174,9 +186,9 @@ func AssertJob(assertion *definitions.Assert, do *definitions.Do) (string, error
 			return convFail()
 		}
 		if k < v {
-			return assertPass()
+			return assertPass("<", assertion.Key, assertion.Value)
 		} else {
-			return assertFail(assertion.Key, assertion.Value)
+			return assertFail("<", assertion.Key, assertion.Value)
 		}
 	case "<=", "le":
 		k, v, err := bulkConvert(assertion.Key, assertion.Value)
@@ -184,9 +196,9 @@ func AssertJob(assertion *definitions.Assert, do *definitions.Do) (string, error
 			return convFail()
 		}
 		if k <= v {
-			return assertPass()
+			return assertPass("<=", assertion.Key, assertion.Value)
 		} else {
-			return assertFail(assertion.Key, assertion.Value)
+			return assertFail("<=", assertion.Key, assertion.Value)
 		}
 	}
 
@@ -205,13 +217,14 @@ func bulkConvert(key, value string) (int, int, error) {
 	return k, v, nil
 }
 
-func assertPass() (string, error) {
-	log.Warn("Assertion Succeeded")
+func assertPass(typ, key, val string) (string, error) {
+	log.WithField("=>", fmt.Sprintf("%s %s %s", key, typ, val)).Warn("Assertion Succeeded")
 	return "passed", nil
 }
 
-func assertFail(expect, receive string) (string, error) {
-	return "failed", fmt.Errorf("Assertion Failed =>\t\t%s:%s\n\t%v:%v", expect, receive, []byte(expect), []byte(receive))
+func assertFail(typ, key, val string) (string, error) {
+	log.WithField("=>", fmt.Sprintf("%s %s %s", key, typ, val)).Warn("Assertion Failed")
+	return "failed", fmt.Errorf("assertion failed")
 }
 
 func convFail() (string, error) {

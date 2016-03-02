@@ -52,6 +52,8 @@ echo "Machine setup."
 echo
 docker version
 echo
+eris version
+echo
 
 # ----------------------------------------------------------
 # Run tests
