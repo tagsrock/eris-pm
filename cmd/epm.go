@@ -136,7 +136,7 @@ func defaultCompiler() string {
 	maj, _ := strconv.Atoi(verSplit[0])
 	min, _ := strconv.Atoi(verSplit[1])
 	pat, _ := strconv.Atoi(verSplit[2])
-	return setDefaultString("EPM_COMPILER_ADDR", fmt.Sprintf("https://compilers-new.eris.industries:1%01d%02d%01d", maj, min, pat))
+	return setDefaultString("EPM_COMPILER_ADDR", fmt.Sprintf("https://compilers.eris.industries:1%01d%02d%01d", maj, min, pat))
 }
 
 func defaultAddr() string {
