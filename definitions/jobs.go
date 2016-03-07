@@ -133,7 +133,10 @@ type Deploy struct {
 	// (Optional) the name of contract to instantiate (it has to be one of the contracts present)
 	// in the file defined in Contract above.
 	// When none is provided, the system will choose the contract with the same name as that file.
-	// use "all" to override and deploy all contracts in order
+	// use "all" to override and deploy all contracts in order. if "all" is selected the result
+	// of the job will default to the address of the contract which was deployed that matches
+	// the name of the file (or the last one deployed if there are no matching names; not the "last"
+	// one deployed" strategy is non-deterministic and should not be used).
 	Instance string `mapstructure:"instance" json:"instance" yaml:"instance" toml:"instance"`
 	// (Optional) list of Name:Address separated by spaces of libraries (see solc --help)
 	Libraries string `mapstructure:"libraries" json:"libraries" yaml:"libraries" toml:"libraries"`
@@ -172,6 +175,8 @@ type Call struct {
 	// know what you're doing)
 	Nonce string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
 	// (Optional) location of the abi file to use (can be relative path or in abi path)
+	// deployed contracts save ABI artifacts in the abi folder as *both* the name of the contract
+	// and the address where the contract was deployed to
 	ABI string `mapstructure:"abi" json:"abi" yaml:"abi" toml:"abi"`
 	// (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
 	Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
@@ -211,6 +216,8 @@ type QueryContract struct {
 	// transaction. QueryContract will usually be used with "accessor" functions in contracts
 	Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
 	// (Optional) location of the abi file to use (can be relative path or in abi path)
+	// deployed contracts save ABI artifacts in the abi folder as *both* the name of the contract
+	// and the address where the contract was deployed to
 	ABI string `mapstructure:"abi" json:"abi" yaml:"abi" toml:"abi"`
 }
 

@@ -91,6 +91,7 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 		}
 	case deploy.Instance == "all":
 		log.WithField("path", p).Info("Deploying all contracts")
+		var baseObj string
 		for _, r := range resp.Objects {
 			if r.Bytecode == nil {
 				continue
@@ -99,6 +100,12 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 			if err != nil {
 				return "", err
 			}
+			if strings.ToLower(r.Objectname) == strings.ToLower(strings.TrimSuffix(filepath.Base(deploy.Contract), filepath.Ext(filepath.Base(deploy.Contract)))) {
+				baseObj = result
+			}
+		}
+		if baseObj != "" {
+			result = baseObj
 		}
 	default:
 		log.WithField("contr", deploy.Instance).Info("Deploying a single contract")

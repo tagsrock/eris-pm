@@ -196,7 +196,7 @@ func (abi ABI) UnPack(name string, data []byte) ([]byte, error) {
 				"next":   next,
 				"end":    end,
 			}).Error("Too little data")
-			return nil, fmt.Errorf("Too little data; usually means a bad return from a contract")
+			return nil, fmt.Errorf("Too little data; usually means the wrong abi was used")
 		}
 
 		ret[i].Name = method.Outputs[i].Name
