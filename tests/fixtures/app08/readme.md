@@ -1,1 +1,1 @@
-* [csk] I have no idea what this is testing.
+* tests initialization constructors within contracts.

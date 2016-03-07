@@ -68,7 +68,6 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 
 	if resp.Error != "" {
 		log.Errorln("Error compiling contracts")
-		log.Errorln(resp.Error)
 		return "", fmt.Errorf(resp.Error)
 	}
 
@@ -102,7 +101,7 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 			}
 		}
 	default:
-		log.WithField("contr", deploy.Instance).Info("Deploying a single contract from file")
+		log.WithField("contr", deploy.Instance).Info("Deploying a single contract")
 		for _, r := range resp.Objects {
 			if r.Bytecode == nil {
 				continue

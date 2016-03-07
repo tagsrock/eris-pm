@@ -1,40 +1,15 @@
 jobs:
 
-- name: setStorageBaseBool
-  job:
-    set:
-      val: true
-
-- name: setStorageBaseInt
-  job:
-    set:
-      val: 50000
-
-- name: setStorageBaseUint
-  job:
-    set:
-      val: 9999999
-
-- name: setStorageBaseAddress
-  job:
-    set:
-      val: "1040E6521541DAB4E7EE57F21226DD17CE9F0FB7"
-
-- name: setStorageBaseBytes
-  job:
-    set:
-      val: marmatoshi
-
-- name: setStorageBaseString
-  job:
-    set:
-      val: nakaburrow
-
 - name: deployStorageK
   job:
     deploy:
       contract: storage.sol
       wait: true
+
+- name: setStorageBaseBool
+  job:
+    set:
+      val: true
 
 - name: setStorageBool
   job:
@@ -56,6 +31,11 @@ jobs:
       relation: eq
       val: $setStorageBaseBool
 
+- name: setStorageBaseInt
+  job:
+    set:
+      val: 50000
+
 - name: setStorageInt
   job:
     call:
@@ -75,6 +55,11 @@ jobs:
       key: $queryStorageInt
       relation: eq
       val: $setStorageBaseInt
+
+- name: setStorageBaseUint
+  job:
+    set:
+      val: 9999999
 
 - name: setStorageUint
   job:
@@ -96,6 +81,11 @@ jobs:
       relation: eq
       val: $setStorageBaseUint
 
+- name: setStorageBaseAddress
+  job:
+    set:
+      val: "1040E6521541DAB4E7EE57F21226DD17CE9F0FB7"
+
 - name: setStorageAddress
   job:
     call:
@@ -115,6 +105,11 @@ jobs:
       key: $queryStorageAddress
       relation: eq
       val: $setStorageBaseAddress
+
+- name: setStorageBaseBytes
+  job:
+    set:
+      val: marmatoshi
 
 - name: setStorageBytes
   job:
@@ -136,23 +131,28 @@ jobs:
       relation: eq
       val: $setStorageBaseBytes
 
-# - name: setStorageString
-#   job:
-#     call:
-#       destination: $deployStorageK
-#       data: setString $setStorageBaseString
-#       wait: true
+- name: setStorageBaseString
+  job:
+    set:
+      val: nakaburrow
 
-# - name: queryStorageString
-#   job:
-#     query-contract:
-#       destination: $deployStorageK
-#       data: getString
+- name: setStorageString
+  job:
+    call:
+      destination: $deployStorageK
+      data: setString $setStorageBaseString
+      wait: true
 
-# - name: assertStorageString
-#   job:
-#     assert:
-#       key: $queryStorageString
-#       relation: eq
-#       val: $setStorageBaseString
+- name: queryStorageString
+  job:
+    query-contract:
+      destination: $deployStorageK
+      data: getString
+
+- name: assertStorageString
+  job:
+    assert:
+      key: $queryStorageString
+      relation: eq
+      val: $setStorageBaseString
 

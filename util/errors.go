@@ -98,7 +98,7 @@ of jobs. The ABIs are saved after the deploy events. So if there was a glitch in
 matrix, we apologize in advance.
 
 The marmot recovery checklist is...
-  * ensure that your contracts successfully deployed
+  * ensure that your contracts successfully deployed (do you have enough validators running?)
   * if you used imports you may need to correct the instance variable
   * if you have more than one contract in a single file you may need to correct the instance variable
 `)

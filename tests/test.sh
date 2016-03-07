@@ -145,6 +145,10 @@ run_test(){
   fi
   test_exit=$?
 
+  rm -rf ./abi &>/dev/null
+  rm ./epm.json &>/dev/null
+  rm ./epm.csv &>/dev/null
+
   # Reset for next run
   goto_base
   return $test_exit
@@ -199,6 +203,7 @@ test_teardown(){
 
 
 echo "Hello! I'm the marmot that tests the eris-pm tooling."
+echo
 start=`pwd`
 cd $repo
 test_setup
