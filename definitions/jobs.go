@@ -178,6 +178,11 @@ type Call struct {
 	// deployed contracts save ABI artifacts in the abi folder as *both* the name of the contract
 	// and the address where the contract was deployed to
 	ABI string `mapstructure:"abi" json:"abi" yaml:"abi" toml:"abi"`
+	// (Optional) by default the call job will "store" the return from the contract as the
+	// result of the job. If you would like to store the transaction hash instead of the
+	// return from the call job as the result of the call job then select "tx" on the save
+	// variable. Anything other than "tx" in this field will use the default.
+	Save string `mapstructure:"save" json:"save" yaml:"save" toml:"save"`
 	// (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
 	Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }

@@ -58,9 +58,6 @@ func RunJobs(do *definitions.Do) error {
 		case job.Job.Deploy != nil:
 			announce(job.JobName, "Deploy")
 			job.JobResult, err = DeployJob(job.Job.Deploy, do)
-		case job.Job.PackageDeploy != nil:
-			announce(job.JobName, "PackageDeploy")
-			job.JobResult, err = PackageDeployJob(job.Job.PackageDeploy, do)
 		case job.Job.Call != nil:
 			announce(job.JobName, "Call")
 			job.JobResult, err = CallJob(job.Job.Call, do)

@@ -275,6 +275,12 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 
 	// Finalize
 	log.WithField("=>", result).Warn("Return Value")
+
+	if call.Save == "tx" {
+		log.Info("Saving tx hash instead of contract return")
+		result = fmt.Sprintf("%X", res.Hash)
+	}
+
 	return result, nil
 }
 

@@ -237,6 +237,7 @@ Contracts jobs exposed through eris:pm are available in the following job types:
 The deploy job will parse the following information:
 
 ```go
+// Contract compile and send to the chain functions
 type Deploy struct {
   // (Optional, if account job or global account set) address of the account from which to send (the
   // public key for the account must be available to eris-keys)
@@ -277,6 +278,7 @@ type Deploy struct {
 The call job will parse the following information:
 
 ```go
+// Sends a transaction to a contract. Will utilize eris-abi under the hood to perform all of the heavy lifting
 type Call struct {
   // (Optional, if account job or global account set) address of the account from which to send (the
   // public key for the account must be available to eris-keys)
@@ -299,6 +301,11 @@ type Call struct {
   // deployed contracts save ABI artifacts in the abi folder as *both* the name of the contract
   // and the address where the contract was deployed to
   ABI string `mapstructure:"abi" json:"abi" yaml:"abi" toml:"abi"`
+  // (Optional) by default the call job will "store" the return from the contract as the
+  // result of the job. If you would like to store the transaction hash instead of the
+  // return from the call job as the result of the call job then select "tx" on the save
+  // variable. Anything other than "tx" in this field will use the default.
+  Save string `mapstructure:"save" json:"save" yaml:"save" toml:"save"`
   // (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
   Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }

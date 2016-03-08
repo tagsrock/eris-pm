@@ -21,8 +21,6 @@ type Job struct {
 	Set *Set `mapstructure:"set" json:"set" yaml:"set" toml:"set"`
 	// Contract compile and send to the chain functions
 	Deploy *Deploy `mapstructure:"deploy" json:"deploy" yaml:"deploy" toml:"deploy"`
-	// @dennismckinnon working on this
-	PackageDeploy *PackageDeploy `mapstructure:"package-deploy" json:"package-deploy" yaml:"package-deploy" toml:"package-deploy"`
 	// Send tokens from one account to another
 	Send *Send `mapstructure:"send" json:"send" yaml:"send" toml:"send"`
 	// Utilize eris:db's native name registry to register a name
