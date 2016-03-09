@@ -1,5 +1,6 @@
 contract SimpleStorage {
   bool storedBool;
+  bool storedBool2;
   int storedInt;
   uint storedUint;
   address storedAddress;
@@ -12,6 +13,14 @@ contract SimpleStorage {
 
   function getBool() constant returns (bool retBool) {
     return storedBool;
+  }
+
+  function setBool2(bool x) {
+    storedBool2 = x;
+  }
+
+  function getBool2() constant returns (bool retBool) {
+    return storedBool2;
   }
 
   function setInt(int x) {

@@ -31,6 +31,27 @@ jobs:
       relation: eq
       val: $setStorageBaseBool
 
+# tests string bools: #71
+- name: setStorageBool2
+  job:
+    call:
+      destination: $deployStorageK
+      data: setBool2 true
+      wait: true
+
+- name: queryStorageBool2
+  job:
+    query-contract:
+      destination: $deployStorageK
+      data: getBool2
+
+- name: assertStorageBool2
+  job:
+    assert:
+      key: $queryStorageBool2
+      relation: eq
+      val: true
+
 - name: setStorageBaseInt
   job:
     set:

@@ -153,7 +153,7 @@ func PackProcessType(typ string, value string) ([]byte, error) {
 	case "address":
 		return common.LeftPadBytes(common.AddressStringToBytes(value), lengths["retBlock"]), nil
 	case "bool":
-		if value == "1" {
+		if value == "1" || value == "true" {
 			return common.LeftPadBytes(common.Big1.Bytes(), lengths["retBlock"]), nil
 		} else {
 			return common.LeftPadBytes(common.Big0.Bytes(), lengths["retBlock"]), nil

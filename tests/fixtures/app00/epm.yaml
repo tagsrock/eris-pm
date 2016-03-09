@@ -5,6 +5,21 @@ jobs:
     set:
       val: 1234
 
+- name: less
+  job:
+    set:
+      val: 10000001232
+
+- name: same
+  job:
+    set:
+      val: 10000001233
+
+- name: more
+  job:
+    set:
+      val: 10000001234
+
 - name: receipient
   job:
     set:
@@ -54,14 +69,14 @@ jobs:
     assert:
       key: $sendTxQuery1
       relation: eq
-      val: 1234
+      val: $val1
 
 - name: sendTxAssert2
   job:
     assert:
       key: $sendTxQuery2
       relation: eq
-      val: 1234
+      val: $val1
 
 # first test using "wordy" syntax, then symbol-y syntax
 - name: sendTxAssert3
@@ -69,56 +84,56 @@ jobs:
     assert:
       key: $sendTxQuery3
       relation: eq
-      val: 10000001233
+      val: $same
 
 - name: sendTxAssert4
   job:
     assert:
       key: $sendTxQuery3
       relation: ne
-      val: 10000001234
+      val: $more
 
 - name: sendTxAssert5
   job:
     assert:
       key: $sendTxQuery3
       relation: gt
-      val: 10000001232
+      val: $less
 
 - name: sendTxAssert6
   job:
     assert:
       key: $sendTxQuery3
       relation: ge
-      val: 10000001233
+      val: $same
 
 - name: sendTxAssert7
   job:
     assert:
       key: $sendTxQuery3
       relation: ge
-      val: 10000001232
+      val: $less
 
 - name: sendTxAssert8
   job:
     assert:
       key: $sendTxQuery3
       relation: lt
-      val: 10000001234
+      val: $more
 
 - name: sendTxAssert9
   job:
     assert:
       key: $sendTxQuery3
       relation: le
-      val: 10000001233
+      val: $same
 
 - name: sendTxAssert10
   job:
     assert:
       key: $sendTxQuery3
       relation: le
-      val: 10000001234
+      val: $more
 
 # second test using "symbol-y" syntax
 - name: sendTxAssert11
@@ -126,53 +141,53 @@ jobs:
     assert:
       key: $sendTxQuery3
       relation: ==
-      val: 10000001233
+      val: $same
 
 - name: sendTxAssert12
   job:
     assert:
       key: $sendTxQuery3
       relation: "!="
-      val: 10000001234
+      val: $more
 
 - name: sendTxAssert13
   job:
     assert:
       key: $sendTxQuery3
       relation: ">"
-      val: 10000001232
+      val: $less
 
 - name: sendTxAssert14
   job:
     assert:
       key: $sendTxQuery3
       relation: ">="
-      val: 10000001233
+      val: $same
 
 - name: sendTxAssert15
   job:
     assert:
       key: $sendTxQuery3
       relation: ">="
-      val: 10000001232
+      val: $less
 
 - name: sendTxAssert16
   job:
     assert:
       key: $sendTxQuery3
       relation: <
-      val: 10000001234
+      val: $more
 
 - name: sendTxAssert17
   job:
     assert:
       key: $sendTxQuery3
       relation: <=
-      val: 10000001233
+      val: $same
 
 - name: sendTxAssert18
   job:
     assert:
       key: $sendTxQuery3
       relation: <=
-      val: 10000001234
+      val: $more
