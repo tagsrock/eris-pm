@@ -5,9 +5,10 @@ import (
 	"encoding/hex"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"path"
+
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 )
 
 //This file is for storage and retrieval functions of abi's in abi subdirectory

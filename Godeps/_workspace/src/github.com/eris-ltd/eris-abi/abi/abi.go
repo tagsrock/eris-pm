@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/ethereum/go-ethereum/crypto/sha3"
 )
@@ -96,13 +97,19 @@ func (abi ABI) Pack(name string, data []string) ([]byte, error) {
 		return nil, fmt.Errorf("argument count mismatch: %d for %d", len(data), len(method.Inputs))
 	}
 
+	if len(data) == 0 {
+		log.Debug("Nothing to pack")
+	}
+
 	var arguments []byte
 	for i, a := range data {
 		input := method.Inputs[i]
 
-		logger.Debugf("ABI Pack. Name =>\t\t%s\n", input.Name)
-		logger.Debugf("ABI Pack. Type =>\t\t%s\n", input.Type.String())
-		logger.Debugf("ABI Pack. Value =>\t\t%s\n", a)
+		log.WithFields(log.Fields{
+			"name": input.Name,
+			"type": input.Type.String(),
+			"val":  a,
+		}).Debug("ABI Pack")
 		ret, err := PackProcessType(input.Type.String(), a)
 		if err != nil {
 			return nil, err
@@ -118,12 +125,19 @@ func (abi ABI) Pack(name string, data []string) ([]byte, error) {
 	return packed, nil
 }
 
-//Conversion to []byte based on "Type"
+// Conversion to []byte based on "Type"
+// https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#formal-specification-of-the-encoding
 func PackProcessType(typ string, value string) ([]byte, error) {
 	t := getMajorType(typ)
 	switch t {
-	case "byte", "string":
+	case "byte":
 		return common.RightPadBytes([]byte(value), lengths["retBlock"]), nil
+	case "string":
+		val := []byte{}
+		val = append(val, U2U256(uint64(0x20))...)
+		val = append(val, U2U256(uint64(len(value)))...)
+		val = append(val, common.RightPadBytes([]byte(value), lengths["retBlock"])...)
+		return val, nil
 	case "uint":
 		val, err := strconv.ParseUint(value, 10, 64)
 		if err != nil {
@@ -139,7 +153,7 @@ func PackProcessType(typ string, value string) ([]byte, error) {
 	case "address":
 		return common.LeftPadBytes(common.AddressStringToBytes(value), lengths["retBlock"]), nil
 	case "bool":
-		if value == "1" {
+		if value == "1" || value == "true" {
 			return common.LeftPadBytes(common.Big1.Bytes(), lengths["retBlock"]), nil
 		} else {
 			return common.LeftPadBytes(common.Big0.Bytes(), lengths["retBlock"]), nil
@@ -167,26 +181,48 @@ func (abi ABI) UnPack(name string, data []byte) ([]byte, error) {
 
 		_, ok := lengths[method.Outputs[i].Type.String()]
 		if !ok {
-			return nil, fmt.Errorf("Unrecognized return type")
+			return nil, fmt.Errorf("Unrecognized return type (%s)", method.Outputs[i].Type.String())
 		}
 
 		next = start + lengths["retBlock"]
 		if next > end {
-			return nil, fmt.Errorf("Too little data")
+			log.WithFields(log.Fields{
+				"name":   ret[i].Name,
+				"type":   ret[i].Type,
+				"val":    ret[i].Value,
+				"len":    lengths[method.Outputs[i].Type.String()],
+				"retBlk": lengths["retBlock"],
+				"start":  start,
+				"next":   next,
+				"end":    end,
+			}).Error("Too little data")
+			return nil, fmt.Errorf("Too little data; usually means the wrong abi was used")
 		}
 
 		ret[i].Name = method.Outputs[i].Name
 		ret[i].Type = method.Outputs[i].Type.String()
-		ret[i].Value = UnpackProcessType(ret[i].Type, data[start:next])
-		logger.Debugf("ABI Unpack. Name =>\t\t%s\n", ret[i].Name)
-		logger.Debugf("ABI Unpack. Type =>\t\t%s\n", ret[i].Type)
-		logger.Debugf("ABI Unpack. Value =>\t\t%s\n", ret[i].Value)
+		ret[i].Value, next = UnpackProcessType(ret[i].Type, data[start:next], start)
+		log.WithFields(log.Fields{
+			"name": ret[i].Name,
+			"type": ret[i].Type,
+			"val":  ret[i].Value,
+		}).Debug("ABI Unpack")
 
 		start = next
 	}
 
 	if start != end {
-		return nil, fmt.Errorf("Too much data")
+		log.WithFields(log.Fields{
+			"name":   ret[len(ret)-1].Name,
+			"type":   ret[len(ret)-1].Type,
+			"val":    ret[len(ret)-1].Value,
+			"len":    lengths[method.Outputs[len(ret)-1].Type.String()],
+			"retBlk": lengths["retBlock"],
+			"start":  start,
+			"next":   next,
+			"end":    end,
+		}).Error("Too much data")
+		return nil, fmt.Errorf("Too much data; usually this means difficulty in rendering the return from the contract")
 	}
 
 	retbytes, err := json.Marshal(ret)
@@ -201,17 +237,19 @@ func (abi ABI) UnPack(name string, data []byte) ([]byte, error) {
 //utility Functions
 
 //Conversion to string based on "Type"
-func UnpackProcessType(typ string, value []byte) string {
+func UnpackProcessType(typ string, value []byte, start int) (string, int) {
 	t := getMajorType(typ)
 	switch t {
-	case "byte", "string":
-		return string(common.UnRightPadBytes(value))
+	case "byte":
+		return string(common.UnRightPadBytes(value)), (start + lengths["retBlock"])
+	case "string":
+		return unpackByteArray(value, start)
 	case "uint":
 		val := common.StripZeros(common.BigD(value).String())
 		if val == "" {
-			return "0"
+			return "0", (start + lengths["retBlock"])
 		}
-		return val
+		return val, (start + lengths["retBlock"])
 	case "int":
 		// there is weird encoding solidity does with negative ints
 		//   it prepends with 01 instead of 00.
@@ -223,24 +261,56 @@ func UnpackProcessType(typ string, value []byte) string {
 				}
 			}
 			val := common.BigD(value[i:]).String()
-			return ("-" + val)
+			return ("-" + val), (start + lengths["retBlock"])
 		}
 
 		val := common.StripZeros(common.BigD(value).String())
 
 		// blank strings will be zero after all the decoding finishes
 		if val == "" {
-			return "0"
+			return "0", (start + lengths["retBlock"])
 		}
 
-		return val
+		return val, (start + lengths["retBlock"])
 	case "address":
-		return strings.ToUpper(hex.EncodeToString(common.Address(value)))
+		return strings.ToUpper(hex.EncodeToString(common.Address(value))), (start + lengths["retBlock"])
 	case "bool":
-		return new(big.Int).SetBytes(value).String()
+		return new(big.Int).SetBytes(value).String(), (start + lengths["retBlock"])
 	default:
-		return hex.EncodeToString(value)
+		return hex.EncodeToString(value), (start + lengths["retBlock"])
 	}
+}
+
+func unpackByteArray(value []byte, start int) (string, int) {
+	var next int
+
+	// first we get the bytes delimiter
+	next = start + lengths["retBlock"]
+	v1 := value[start:next]
+	delim, _ := strconv.Atoi(common.StripZeros(common.BigD(v1).String()))
+	start = next
+
+	// next we get the length of string
+	next = start + lengths["retBlock"]
+	v2 := value[start:next]
+	length, _ := strconv.Atoi(common.StripZeros(common.BigD(v2).String()))
+	start = next
+
+	// now we unmarshall
+	blocks := ((length - 1) / delim) + 1          // number of "chunks to use"
+	next = start + (lengths["retBlock"] * blocks) // how much of the byte array to use
+	var val string
+	if length%delim == 0 {
+		val = string(value[start:next]) // strings exactly length%32==0 do not marshall with UnRightPad
+	} else {
+		val = string(common.UnRightPadBytes(value[start:next]))
+	}
+	log.WithFields(log.Fields{
+		"len":      length,
+		"delimter": delim,
+		"val":      val,
+	}).Debug("Strings unpack")
+	return val, next
 }
 
 func UnpackPrettyPrint(injson []byte) (string, error) {
@@ -322,6 +392,9 @@ func Sha3(data []byte) []byte {
 
 func getMajorType(typ string) string {
 	var t bool
+	if typ == "bytes" {
+		return "string"
+	}
 	t, _ = regexp.MatchString("byte", typ)
 	if t {
 		return "byte"

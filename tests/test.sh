@@ -58,7 +58,7 @@ fi
 was_running=0
 test_exit=0
 chains_dir=$HOME/.eris/chains
-chain_name=epm-tests-$uuid
+chain_name=eris-pm-tests-$uuid
 name_full="$chain_name"_full_000
 name_part="$chain_name"_participant_000
 chain_dir=$chains_dir/$chain_name
@@ -110,7 +110,7 @@ test_setup(){
   ensure_running keys
 
   # make a chain
-  eris chains make --account-types=Full:1,Participant:1 epm-tests-$uuid 1>/dev/null
+  eris chains make --account-types=Full:1,Participant:1 $chain_name #1>/dev/null
   key1_addr=$(cat $chain_dir/addresses.csv | grep $name_full | cut -d ',' -f 1)
   key2_addr=$(cat $chain_dir/addresses.csv | grep $name_part | cut -d ',' -f 1)
   key2_pub=$(cat $chain_dir/accounts.csv | grep $name_part | cut -d ',' -f 1)
@@ -128,16 +128,26 @@ goto_base(){
 run_test(){
   # Run the epm deploy
   echo ""
-  echo -e "Testing EPM using fixture =>\t$1"
+  echo -e "Testing eris-pm using fixture =>\t$1"
   goto_base
   cd $1
   if [ "$ci" = false ]
   then
-    eris pkgs do --chain "$chain_name" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub"
+    echo
+    cat readme.md
+    echo
+    eris pkgs do --chain "$chain_name" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub" #--debug
   else
+    echo
+    cat readme.md
+    echo
     eris pkgs do --chain "$chain_name" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub" --rm
   fi
   test_exit=$?
+
+  rm -rf ./abi &>/dev/null
+  rm ./epm.json &>/dev/null
+  rm ./epm.csv &>/dev/null
 
   # Reset for next run
   goto_base
@@ -163,21 +173,15 @@ perform_tests(){
 }
 
 test_teardown(){
-  if [ $test_exit -ne 0 ]
-  then
-    echo ""
-    echo "EPM Log on Failed Test."
-    cat $failing_dir/epm.json
-  fi
   if [ "$ci" = false ]
   then
     echo ""
-    eris chains stop -rxf $chain_name 1>/dev/null
-    eris chains rm -f $chain_name 1>/dev/null
     if [ "$was_running" -eq 0 ]
     then
       eris services stop -rx keys
     fi
+    eris chains stop --force $chain_name 1>/dev/null
+    eris chains rm --file --data $chain_name 1>/dev/null
     rm -rf $HOME/.eris/scratch/data/epm-tests-*
     rm -rf $chain_dir
   else
@@ -195,28 +199,29 @@ test_teardown(){
 }
 
 # ---------------------------------------------------------------------------
-# Get the things build and dependencies turned on
+# Setup
+
 
 echo "Hello! I'm the marmot that tests the eris-pm tooling."
+echo
 start=`pwd`
 cd $repo
-echo ""
+test_setup
+
+# ---------------------------------------------------------------------------
+# Get the things build and dependencies turned on
+echo
 echo "Building eris-pm in a docker container."
 set -e
 tests/build_tool.sh 1>/dev/null
-set +e
 if [ $? -ne 0 ]
 then
   echo "Could not build eris-pm. Debug via by directly running [`pwd`/tests/build_tool.sh]"
   exit 1
 fi
+set +e
 echo "Build complete."
 echo ""
-
-# ---------------------------------------------------------------------------
-# Setup
-
-test_setup
 
 # ---------------------------------------------------------------------------
 # Go!

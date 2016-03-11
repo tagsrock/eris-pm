@@ -237,6 +237,7 @@ Contracts jobs exposed through eris:pm are available in the following job types:
 The deploy job will parse the following information:
 
 ```go
+// Contract compile and send to the chain functions
 type Deploy struct {
   // (Optional, if account job or global account set) address of the account from which to send (the
   // public key for the account must be available to eris-keys)
@@ -245,7 +246,17 @@ type Deploy struct {
   // relative to the contracts path established via the --contracts-path flag or the $EPM_CONTRACTS_PATH
   // environment variable
   Contract string `mapstructure:"contract" json:"contract" yaml:"contract" toml:"contract"`
-  // (Optional) additional arguments to send along with the contract code
+  // (Optional) the name of contract to instantiate (it has to be one of the contracts present)
+  // in the file defined in Contract above.
+  // When none is provided, the system will choose the contract with the same name as that file.
+  // use "all" to override and deploy all contracts in order. if "all" is selected the result
+  // of the job will default to the address of the contract which was deployed that matches
+  // the name of the file (or the last one deployed if there are no matching names; not the "last"
+  // one deployed" strategy is non-deterministic and should not be used).
+  Instance string `mapstructure:"instance" json:"instance" yaml:"instance" toml:"instance"`
+  // (Optional) list of Name:Address separated by spaces of libraries (see solc --help)
+  Libraries string `mapstructure:"libraries" json:"libraries" yaml:"libraries" toml:"libraries"`
+  // (Optional) TODO: additional arguments to send along with the contract code
   Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
   // (Optional) amount of tokens to send to the contract which will (after deployment) reside in the
   // contract's account
@@ -267,6 +278,7 @@ type Deploy struct {
 The call job will parse the following information:
 
 ```go
+// Sends a transaction to a contract. Will utilize eris-abi under the hood to perform all of the heavy lifting
 type Call struct {
   // (Optional, if account job or global account set) address of the account from which to send (the
   // public key for the account must be available to eris-keys)
@@ -285,6 +297,15 @@ type Call struct {
   // (Optional, advanced only) nonce to use when eris-keys signs the transaction (do not use unless you
   // know what you're doing)
   Nonce string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
+  // (Optional) location of the abi file to use (can be relative path or in abi path)
+  // deployed contracts save ABI artifacts in the abi folder as *both* the name of the contract
+  // and the address where the contract was deployed to
+  ABI string `mapstructure:"abi" json:"abi" yaml:"abi" toml:"abi"`
+  // (Optional) by default the call job will "store" the return from the contract as the
+  // result of the job. If you would like to store the transaction hash instead of the
+  // return from the call job as the result of the call job then select "tx" on the save
+  // variable. Anything other than "tx" in this field will use the default.
+  Save string `mapstructure:"save" json:"save" yaml:"save" toml:"save"`
   // (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
   Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
 }
@@ -331,6 +352,10 @@ type QueryContract struct {
   // (Required) data which should be called. will use the eris-abi tooling under the hood to formalize the
   // transaction. QueryContract will usually be used with "accessor" functions in contracts
   Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+  // (Optional) location of the abi file to use (can be relative path or in abi path)
+  // deployed contracts save ABI artifacts in the abi folder as *both* the name of the contract
+  // and the address where the contract was deployed to
+  ABI string `mapstructure:"abi" json:"abi" yaml:"abi" toml:"abi"`
 }
 ```
 

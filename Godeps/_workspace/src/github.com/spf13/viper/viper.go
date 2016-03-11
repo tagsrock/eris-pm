@@ -35,6 +35,7 @@ import (
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cast"
 	jww "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/jwalterweatherman"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/pflag"
+	crypt "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/xordataexchange/crypt/config"
 )
 
 var v *Viper
@@ -42,14 +43,6 @@ var v *Viper
 func init() {
 	v = New()
 }
-
-type remoteConfigFactory interface {
-	Get(rp RemoteProvider) (io.Reader, error)
-	Watch(rp RemoteProvider) (io.Reader, error)
-}
-
-// RemoteConfig is optional, see the remote package
-var RemoteConfig remoteConfigFactory
 
 // Denotes encountering an unsupported
 // configuration filetype.
@@ -77,16 +70,6 @@ type RemoteConfigError string
 // Returns the formatted remote provider error
 func (rce RemoteConfigError) Error() string {
 	return fmt.Sprintf("Remote Configurations Error: %s", string(rce))
-}
-
-// Denotes failing to find configuration file.
-type ConfigFileNotFoundError struct {
-	name, locations string
-}
-
-// Returns the formatted configuration error.
-func (fnfe ConfigFileNotFoundError) Error() string {
-	return fmt.Sprintf("Config File %q Not Found in %q", fnfe.name, fnfe.locations)
 }
 
 // Viper is a prioritized configuration registry. It
@@ -132,7 +115,7 @@ type Viper struct {
 	configPaths []string
 
 	// A set of remote providers to search for the configuration
-	remoteProviders []*defaultRemoteProvider
+	remoteProviders []*remoteProvider
 
 	// Name of file to look for inside the path
 	configName string
@@ -177,38 +160,15 @@ func Reset() {
 	SupportedRemoteProviders = []string{"etcd", "consul"}
 }
 
-type defaultRemoteProvider struct {
+// remoteProvider stores the configuration necessary
+// to connect to a remote key/value store.
+// Optional secretKeyring to unencrypt encrypted values
+// can be provided.
+type remoteProvider struct {
 	provider      string
 	endpoint      string
 	path          string
 	secretKeyring string
-}
-
-func (rp defaultRemoteProvider) Provider() string {
-	return rp.provider
-}
-
-func (rp defaultRemoteProvider) Endpoint() string {
-	return rp.endpoint
-}
-
-func (rp defaultRemoteProvider) Path() string {
-	return rp.path
-}
-
-func (rp defaultRemoteProvider) SecretKeyring() string {
-	return rp.secretKeyring
-}
-
-// RemoteProvider stores the configuration necessary
-// to connect to a remote key/value store.
-// Optional secretKeyring to unencrypt encrypted values
-// can be provided.
-type RemoteProvider interface {
-	Provider() string
-	Endpoint() string
-	Path() string
-	SecretKeyring() string
 }
 
 // Universally supported extensions.
@@ -292,7 +252,7 @@ func (v *Viper) AddRemoteProvider(provider, endpoint, path string) error {
 	}
 	if provider != "" && endpoint != "" {
 		jww.INFO.Printf("adding %s:%s to remote provider list", provider, endpoint)
-		rp := &defaultRemoteProvider{
+		rp := &remoteProvider{
 			endpoint: endpoint,
 			provider: provider,
 			path:     path,
@@ -324,11 +284,10 @@ func (v *Viper) AddSecureRemoteProvider(provider, endpoint, path, secretkeyring 
 	}
 	if provider != "" && endpoint != "" {
 		jww.INFO.Printf("adding %s:%s to remote provider list", provider, endpoint)
-		rp := &defaultRemoteProvider{
-			endpoint:      endpoint,
-			provider:      provider,
-			path:          path,
-			secretKeyring: secretkeyring,
+		rp := &remoteProvider{
+			endpoint: endpoint,
+			provider: provider,
+			path:     path,
 		}
 		if !v.providerPathExists(rp) {
 			v.remoteProviders = append(v.remoteProviders, rp)
@@ -337,7 +296,7 @@ func (v *Viper) AddSecureRemoteProvider(provider, endpoint, path, secretkeyring 
 	return nil
 }
 
-func (v *Viper) providerPathExists(p *defaultRemoteProvider) bool {
+func (v *Viper) providerPathExists(p *remoteProvider) bool {
 	for _, y := range v.remoteProviders {
 		if reflect.DeepEqual(y, p) {
 			return true
@@ -354,8 +313,6 @@ func (v *Viper) searchMap(source map[string]interface{}, path []string) interfac
 
 	if next, ok := source[path[0]]; ok {
 		switch next.(type) {
-		case map[interface{}]interface{}:
-			return v.searchMap(cast.ToStringMap(next), path[1:])
 		case map[string]interface{}:
 			// Type assertion is safe here since it is only reached
 			// if the type of `next` is the same as the type being asserted
@@ -532,11 +489,11 @@ func (v *Viper) BindPFlag(key string, flag *pflag.Flag) (err error) {
 
 	switch flag.Value.Type() {
 	case "int", "int8", "int16", "int32", "int64":
-		v.SetDefault(key, cast.ToInt(flag.Value.String()))
+		SetDefault(key, cast.ToInt(flag.Value.String()))
 	case "bool":
-		v.SetDefault(key, cast.ToBool(flag.Value.String()))
+		SetDefault(key, cast.ToBool(flag.Value.String()))
 	default:
-		v.SetDefault(key, flag.Value.String())
+		SetDefault(key, flag.Value.String())
 	}
 	return nil
 }
@@ -748,19 +705,22 @@ func (v *Viper) ReadInConfig() error {
 
 	v.config = make(map[string]interface{})
 
-	return v.marshalReader(bytes.NewReader(file), v.config)
+	v.marshalReader(bytes.NewReader(file), v.config)
+	return nil
 }
 
 func ReadConfig(in io.Reader) error { return v.ReadConfig(in) }
 func (v *Viper) ReadConfig(in io.Reader) error {
 	v.config = make(map[string]interface{})
-	return v.marshalReader(in, v.config)
+	v.marshalReader(in, v.config)
+	return nil
 }
 
 // func ReadBufConfig(buf *bytes.Buffer) error { return v.ReadBufConfig(buf) }
 // func (v *Viper) ReadBufConfig(buf *bytes.Buffer) error {
 // 	v.config = make(map[string]interface{})
-// 	return v.marshalReader(buf, v.config)
+// 	v.marshalReader(buf, v.config)
+// 	return nil
 // }
 
 // Attempts to get configuration from a remote source
@@ -785,12 +745,9 @@ func (v *Viper) WatchRemoteConfig() error {
 
 // Marshall a Reader into a map
 // Should probably be an unexported function
-func marshalReader(in io.Reader, c map[string]interface{}) error {
-	return v.marshalReader(in, c)
-}
-
-func (v *Viper) marshalReader(in io.Reader, c map[string]interface{}) error {
-	return marshallConfigReader(in, c, v.getConfigType())
+func marshalReader(in io.Reader, c map[string]interface{}) { v.marshalReader(in, c) }
+func (v *Viper) marshalReader(in io.Reader, c map[string]interface{}) {
+	marshallConfigReader(in, c, v.getConfigType())
 }
 
 func (v *Viper) insensitiviseMaps() {
@@ -802,10 +759,6 @@ func (v *Viper) insensitiviseMaps() {
 
 // retrieve the first found remote configuration
 func (v *Viper) getKeyValueConfig() error {
-	if RemoteConfig == nil {
-		return RemoteConfigError("Enable the remote features by doing a blank import of the viper/remote package: '_ github.com/spf13/viper/remote'")
-	}
-
 	for _, rp := range v.remoteProviders {
 		val, err := v.getRemoteConfig(rp)
 		if err != nil {
@@ -817,13 +770,37 @@ func (v *Viper) getKeyValueConfig() error {
 	return RemoteConfigError("No Files Found")
 }
 
-func (v *Viper) getRemoteConfig(provider *defaultRemoteProvider) (map[string]interface{}, error) {
+func (v *Viper) getRemoteConfig(provider *remoteProvider) (map[string]interface{}, error) {
+	var cm crypt.ConfigManager
+	var err error
 
-	reader, err := RemoteConfig.Get(provider)
+	if provider.secretKeyring != "" {
+		kr, err := os.Open(provider.secretKeyring)
+		defer kr.Close()
+		if err != nil {
+			return nil, err
+		}
+		if provider.provider == "etcd" {
+			cm, err = crypt.NewEtcdConfigManager([]string{provider.endpoint}, kr)
+		} else {
+			cm, err = crypt.NewConsulConfigManager([]string{provider.endpoint}, kr)
+		}
+	} else {
+		if provider.provider == "etcd" {
+			cm, err = crypt.NewStandardEtcdConfigManager([]string{provider.endpoint})
+		} else {
+			cm, err = crypt.NewStandardConsulConfigManager([]string{provider.endpoint})
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
-	err = v.marshalReader(reader, v.kvstore)
+	b, err := cm.Get(provider.path)
+	if err != nil {
+		return nil, err
+	}
+	reader := bytes.NewReader(b)
+	v.marshalReader(reader, v.kvstore)
 	return v.kvstore, err
 }
 
@@ -840,12 +817,40 @@ func (v *Viper) watchKeyValueConfig() error {
 	return RemoteConfigError("No Files Found")
 }
 
-func (v *Viper) watchRemoteConfig(provider *defaultRemoteProvider) (map[string]interface{}, error) {
-	reader, err := RemoteConfig.Watch(provider)
+func (v *Viper) watchRemoteConfig(provider *remoteProvider) (map[string]interface{}, error) {
+	var cm crypt.ConfigManager
+	var err error
+
+	if provider.secretKeyring != "" {
+		kr, err := os.Open(provider.secretKeyring)
+		defer kr.Close()
+		if err != nil {
+			return nil, err
+		}
+		if provider.provider == "etcd" {
+			cm, err = crypt.NewEtcdConfigManager([]string{provider.endpoint}, kr)
+		} else {
+			cm, err = crypt.NewConsulConfigManager([]string{provider.endpoint}, kr)
+		}
+	} else {
+		if provider.provider == "etcd" {
+			cm, err = crypt.NewStandardEtcdConfigManager([]string{provider.endpoint})
+		} else {
+			cm, err = crypt.NewStandardConsulConfigManager([]string{provider.endpoint})
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
-	err = v.marshalReader(reader, v.kvstore)
+	resp := <-cm.Watch(provider.path, nil)
+	// b, err := cm.Watch(provider.path, nil)
+	err = resp.Error
+	if err != nil {
+		return nil, err
+	}
+
+	reader := bytes.NewReader(resp.Value)
+	v.marshalReader(reader, v.kvstore)
 	return v.kvstore, err
 }
 
@@ -953,7 +958,6 @@ func (v *Viper) searchInPath(in string) (filename string) {
 // search all configPaths for any config file.
 // Returns the first path that exists (and is a config file)
 func (v *Viper) findConfigFile() (string, error) {
-
 	jww.INFO.Println("Searching for config in ", v.configPaths)
 
 	for _, cp := range v.configPaths {
@@ -962,7 +966,14 @@ func (v *Viper) findConfigFile() (string, error) {
 			return file, nil
 		}
 	}
-	return "", ConfigFileNotFoundError{v.configName, fmt.Sprintf("%s", v.configPaths)}
+
+	// try the current working directory
+	wd, _ := os.Getwd()
+	file := v.searchInPath(wd)
+	if file != "" {
+		return file, nil
+	}
+	return "", fmt.Errorf("config file not found in: %s", v.configPaths)
 }
 
 // Prints all configuration registries for debugging

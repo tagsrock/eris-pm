@@ -1,4 +1,4 @@
-package lllcserver
+package compilers
 
 import (
 	"crypto/sha256"
@@ -9,6 +9,8 @@ import (
 	"path"
 	"regexp"
 	"strings"
+
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 )
 
 // cache compiled regex expressions
@@ -55,7 +57,7 @@ func (c *CompileClient) includeReplacer(r *regexp.Regexp, i int, s []byte, dir s
 	p := path.Join(dir, string(match))
 	incl_code, err := ioutil.ReadFile(p)
 	if err != nil {
-		logger.Errorln("failed to read include file", err)
+		log.Errorln("failed to read include file", err)
 		return nil, fmt.Errorf("Failed to read include file: %s", err.Error())
 	}
 
@@ -89,7 +91,7 @@ func (c *CompileClient) includeReplacer(r *regexp.Regexp, i int, s []byte, dir s
 // check the cache for all includes, cache those not cached yet
 func (c *CompileClient) checkCacheIncludes(includes map[string][]byte) bool {
 	cached := true
-	for k, _ := range includes {
+	for k := range includes {
 		f := path.Join(ClientCache, c.Ext(k))
 		if _, err := os.Stat(f); err != nil {
 			cached = false
@@ -120,19 +122,40 @@ func (c *CompileClient) checkCached(code []byte, includes map[string][]byte) (st
 
 // return cached byte code as a response
 func (c *CompileClient) cachedResponse(hash string) (*Response, error) {
-	f := path.Join(ClientCache, c.Ext(hash))
-	b, err := ioutil.ReadFile(f)
-	if err != nil {
-		return nil, err
+	d := path.Join(ClientCache, c.Ext(hash))
+	var resp *Response
+	files, _ := ioutil.ReadDir(d)
+	respItemArray := make([]ResponseItem, len(files))
+	i := 0
+	for _, f := range files {
+		fileName := f.Name()
+		b, err := ioutil.ReadFile(path.Join(d, fileName, "bin"))
+		if err != nil {
+			return nil, err
+		}
+		abi, _ := ioutil.ReadFile(path.Join(d, fileName, "abi"))
+
+		respItem := ResponseItem{
+			Objectname: fileName,
+			Bytecode:   b,
+			ABI:        string(abi),
+		}
+		respItemArray[i] = respItem
+		i++
+
 	}
-	f = path.Join(ClientCache, c.Ext(hash+"-abi"))
-	abi, _ := ioutil.ReadFile(f)
-	return NewResponse(b, string(abi), nil), nil
+	resp = &Response{
+		Objects: respItemArray,
+		Error:   "",
+	}
+
+	return resp, nil
 }
 
 // cache a file to disk
-func (c *CompileClient) cacheFile(b []byte, hash string) error {
-	f := path.Join(ClientCache, c.Ext(hash))
+func (c *CompileClient) cacheFile(b []byte, hash string, name string, ext string) error {
+	f := path.Join(ClientCache, c.Ext(hash), name, ext)
+	os.MkdirAll(path.Dir(f), 0744)
 	if b != nil {
 		if err := ioutil.WriteFile(f, b, 0644); err != nil {
 			return err
@@ -142,22 +165,21 @@ func (c *CompileClient) cacheFile(b []byte, hash string) error {
 }
 
 // check cache for server
-func checkCache(hash []byte) (*Response, error) {
-	f := path.Join(ClientCache, hex.EncodeToString(hash))
+func checkCache(objectName string) (*Response, error) {
+	f := path.Join(ServerCache, objectName)
 	if _, err := os.Stat(f); err == nil {
 		b, err := ioutil.ReadFile(f)
 		if err != nil {
 			return nil, err
 		}
-		f += "-abi"
-		abi, _ := ioutil.ReadFile(f)
-		return NewResponse(b, string(abi), nil), nil
+		abi, _ := ioutil.ReadFile(f + "-abi")
+		return NewResponse(objectName, b, string(abi), nil), nil
 	}
 	return nil, fmt.Errorf("Not cached")
 }
 
-func cacheResult(hash, compiled []byte, docs string) {
-	f := path.Join(ClientCache, hex.EncodeToString(hash))
+func cacheResult(objectName string, compiled []byte, docs string) {
+	f := path.Join(ServerCache, objectName)
 	ioutil.WriteFile(f, compiled, 0600)
 	ioutil.WriteFile(f+"-abi", []byte(docs), 0600)
 }

@@ -18,7 +18,7 @@
 
 # ----------------------------------------------------------
 # Set defaults
-
+set -e
 if [ "$CIRCLE_BRANCH" ]
 then
   repo=`pwd`
@@ -38,8 +38,8 @@ release_maj=$(echo $release_min | cut -d . -f 1-2)
 if [[ "$branch" = "master" ]]
 then
   docker build -t $testimage:latest $repo
-  docker tag -f $testimage:latest $testimage:$release_maj
-  docker tag -f $testimage:latest $testimage:$release_min
+  docker tag $testimage:latest $testimage:$release_maj
+  docker tag $testimage:latest $testimage:$release_min
 else
   docker build -t $testimage:$release_min $repo
 fi

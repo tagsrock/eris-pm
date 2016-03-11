@@ -1,4 +1,4 @@
-package lllcserver
+package compilers
 
 import (
 	"bytes"
@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 	"os/exec"
@@ -16,12 +15,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/ebuchman/go-shell-pipes"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/go-martini/martini"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/martini-contrib/gorelic"
+	// "github.com/eris-ltd/eris-compilers/Godeps/_workspace/src/github.com/martini-contrib/gorelic"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/martini-contrib/secure"
-	segment "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/segmentio/analytics-go"
+	// segment "github.com/eris-ltd/eris-compilers/Godeps/_workspace/src/github.com/segmentio/analytics-go"
 )
 
 var (
@@ -47,32 +47,30 @@ func ProxyHandler(w http.ResponseWriter, r *http.Request) {
 	// read the request body
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		logger.Errorln("err on read http request body", err)
+		log.Errorln("err on read http request body", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	fmt.Println("body:", string(body))
+	log.WithField("=>", string(body)).Debug("Body")
 	req := new(ProxyReq)
 	err = json.Unmarshal(body, req)
 	if err != nil {
-		logger.Errorln("err on read http request body", err)
+		log.Errorln("err on read http request body", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	var code []byte
-	var abi string
+	var resp *Response
 	if req.Literal {
-		code, abi, err = CompileLiteral(req.Source, req.Language)
+		resp = CompileLiteral(req.Source, req.Language)
 	} else {
-		code, abi, err = Compile(req.Source)
+		resp = Compile(req.Source, req.Libraries)
 	}
-	resp := NewProxyResponse(code, abi, err)
 
 	respJ, err := json.Marshal(resp)
 	if err != nil {
-		logger.Errorln("failed to marshal", err)
+		log.Errorln("failed to marshal", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 	w.Write(respJ)
@@ -87,7 +85,7 @@ func CompileHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	respJ, err := json.Marshal(resp)
 	if err != nil {
-		logger.Errorln("failed to marshal", err)
+		log.Errorln("failed to marshal", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
@@ -100,9 +98,12 @@ func CompileHandlerJs(w http.ResponseWriter, r *http.Request) {
 	if resp == nil {
 		return
 	}
-	code := resp.Bytecode
-	hexx := hex.EncodeToString(code)
-	w.Write([]byte(fmt.Sprintf(`{"bytecode": "%s"}`, hexx)))
+	respJ, err := json.Marshal(resp)
+	if err != nil {
+		log.Errorln("failed to marshal", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+	w.Write(respJ)
 }
 
 // read in the files from the request, compile them
@@ -110,7 +111,7 @@ func compileResponse(w http.ResponseWriter, r *http.Request) *Response {
 	// read the request body
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		logger.Errorln("err on read http request body", err)
+		log.Errorln("err on read http request body", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return nil
 	}
@@ -119,37 +120,36 @@ func compileResponse(w http.ResponseWriter, r *http.Request) *Response {
 	req := new(Request)
 	err = json.Unmarshal(body, req)
 	if err != nil {
-		logger.Errorln("err on json unmarshal of request", err)
+		log.Errorln("err on json unmarshal of request", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return nil
 	}
 
-	logger.Debugf("New Request =>\t\t%v\n", req)
+	log.WithFields(log.Fields{
+		"name": req.ScriptName,
+		"lang": req.Language,
+		// "script": string(req.Script),
+		// "libs":   req.Libraries,
+		// "incl":   req.Includes,
+	}).Debug("New Request")
 	resp := compileServerCore(req)
-
-	// track
-	if SEGMENT_KEY != "" {
-		informSegment(req.Language, r)
-	}
 
 	return resp
 }
 
 // core compile functionality. used by the server and locally to mimic the server
 func compileServerCore(req *Request) *Response {
-	var name string
 	lang := req.Language
 	compiler := Languages[lang]
 
 	c := req.Script
 	if c == nil || len(c) == 0 {
-		return NewResponse(nil, "", fmt.Errorf("No script provided"))
+		return NewResponse("", nil, "", fmt.Errorf("No script provided"))
 	}
 
-	// take sha2 of request object to get tmp filename
+	// take sha256 of request object to get tmp filename
 	hash := sha256.Sum256(c)
 	filename := path.Join(ServerCache, compiler.Ext(hex.EncodeToString(hash[:])))
-	name = filename
 
 	maybeCached := true
 
@@ -157,8 +157,10 @@ func compileServerCore(req *Request) *Response {
 	// check if filename already exists. if not, write
 	if _, err := os.Stat(filename); err != nil {
 		ioutil.WriteFile(filename, c, 0644)
-		logger.Debugln(filename, "does not exist. Writing")
+		log.WithField("file", filename).Debug("Writing uncached file.")
 		maybeCached = false
+	} else {
+		log.WithField("file", filename).Debug("File exists. About to compile")
 	}
 
 	// loop through includes, also save to drive
@@ -174,53 +176,29 @@ func compileServerCore(req *Request) *Response {
 
 	// check cache
 	if maybeCached {
-		r, err := checkCache(hash[:])
+		r, err := checkCache(filename) // TODO:  use checkCached?
 		if err == nil {
 			return r
 		}
 	}
 
-	var resp *Response
 	//compile scripts, return bytecode and error
-	compiled, docs, err := CompileWrapper(name, lang, includes)
+	resp := CompileWrapper(filename, lang, includes, req.Libraries)
 
 	// cache
-	if err == nil {
-		cacheResult(hash[:], compiled, docs)
+	if resp.Error == "" {
+		// iterate over the array
+		for _, r := range resp.Objects {
+			// TODO: cache results using the cacheFile?
+			cacheResult(r.Objectname, r.Bytecode, r.ABI)
+		}
 	}
-
-	resp = NewResponse(compiled, docs, err)
-
 	return resp
-}
-
-func informSegment(lang string, r *http.Request) {
-	seg := segment.New(SEGMENT_KEY)
-
-	con := make(map[string]interface{})
-	ip := strings.Split(r.RemoteAddr, ":")[0]
-	con["ip"] = ip
-
-	prp := make(map[string]interface{})
-	prp["name"] = lang
-	prp["path"] = "/compile/" + lang
-	prp["url"] = DefaultUrl + lang
-
-	t := &segment.Page{
-		Context:     con,
-		Traits:      prp,
-		AnonymousId: ip,
-		// Category:    lang,
-		Name: "Compile lang: " + lang,
-	}
-
-	logger.Debugln("Sending notification to Segment.")
-	seg.Page(t)
 }
 
 func commandWrapper_(prgrm string, args []string) (string, error) {
 	a := fmt.Sprint(args)
-	logger.Infoln(fmt.Sprintf("Running command %s %s ", prgrm, a))
+	log.Infoln(fmt.Sprintf("Running command %s %s ", prgrm, a))
 	cmd := exec.Command(prgrm, args...)
 	var out bytes.Buffer
 	cmd.Stdout = &out
@@ -241,7 +219,7 @@ func commandWrapper(tokens ...string) (string, error) {
 }
 
 // wrapper to cli
-func CompileWrapper(filename string, lang string, includes []string) ([]byte, string, error) {
+func CompileWrapper(filename string, lang string, includes []string, libraries string) *Response {
 	// we need to be in the same dir as the files for sake of includes
 	cur, _ := os.Getwd()
 	dir := path.Dir(filename)
@@ -249,7 +227,7 @@ func CompileWrapper(filename string, lang string, includes []string) ([]byte, st
 	filename = path.Base(filename)
 
 	if _, ok := Languages[lang]; !ok {
-		return nil, "", UnknownLang(lang)
+		return NewResponse(filename, nil, "", UnknownLang(lang))
 	}
 
 	os.Chdir(dir)
@@ -257,39 +235,88 @@ func CompileWrapper(filename string, lang string, includes []string) ([]byte, st
 		os.Chdir(cur)
 	}()
 
-	tokens := Languages[lang].Cmd(filename, includes)
+	tokens := Languages[lang].Cmd(filename, includes, libraries)
+
+	log.WithField("=>", tokens).Info("Compiling")
 	hexCode, err := commandWrapper(tokens...)
+
 	if err != nil {
-		logger.Errorln("Couldn't compile!!", err)
-		logger.Errorf("Command =>\t\t\t%v\n", tokens)
-		return nil, "", err
+		log.WithFields(log.Fields{
+			"err":    err,
+			"tokens": tokens,
+		}).Error("Could not compile", err)
+		return NewResponse(filename, nil, "", err)
 	}
 
-	tokens = Languages[lang].Abi(filename, includes)
-	jsonAbi, err := commandWrapper(tokens...)
-	if err != nil {
-		logger.Errorln("Couldn't produce abi doc!!", err)
-		// we swallow this error, but maybe we shouldnt...
+	var resp *Response
+	// attempt to decode as a solc json return structure // TODO proper logging
+	solcResp := BlankSolcResponse()
+
+	// log.Warn("Compiler Result\t\t\t\t=> %s\n", hexCode)
+	err = json.Unmarshal([]byte(hexCode), solcResp)
+
+	if err == nil {
+
+		respItemArray := make([]ResponseItem, 0)
+
+		for contract, item := range solcResp.Contracts {
+			b, err := hex.DecodeString(strings.TrimSpace(item.Bin))
+			if err == nil {
+				respItem := ResponseItem{
+					Objectname: strings.TrimSpace(contract),
+					Bytecode:   b,
+					ABI:        strings.TrimSpace(item.Abi),
+				}
+				respItemArray = append(respItemArray, respItem)
+			} else {
+				fmt.Errorf("Error decoding contract string\t=>\n%v\n", err)
+				return &Response{
+					Objects: nil,
+					Error:   fmt.Sprintf("%v", err),
+				}
+			}
+		}
+
+		for _, re := range respItemArray {
+			log.WithFields(log.Fields{
+				"name": re.Objectname,
+				// "bin":  hex.EncodeToString(re.Bytecode),
+				// "abi":  re.ABI,
+			}).Warn("Response formulated")
+		}
+		return &Response{
+			Objects: respItemArray,
+			Error:   "",
+		}
+	} else {
+		// if doesn't work, then not a solc response
+		tokens = Languages[lang].Abi(filename, includes)
+		jsonAbi, err := commandWrapper(tokens...)
+
+		if err != nil {
+			// [atq] we swallow this error, but maybe we shouldnt...
+			log.WithField("=>", err).Error("Couldn't produce abi doc")
+		}
+
+		b, err := hex.DecodeString(hexCode)
+		if err != nil {
+			// in that case, the bytecode is not valid, so it should be flagged.
+			resp = NewResponse(filename, nil, "", err)
+		} else {
+			resp = NewResponse(filename, b, jsonAbi, nil)
+		}
 	}
-
-	b, err := hex.DecodeString(hexCode)
-	if err != nil {
-
-		return nil, "", err
-	}
-
-	return b, jsonAbi, nil
+	log.WithField("=>", resp).Warn("Response")
+	return resp
 }
 
 // Start the compile server
 func StartServer(addrUnsecure, addrSecure, key, cert string) {
-	martini.Env = martini.Prod
+	log.Warn("Hello I'm the marmots' compilers server")
+	martini.Env = martini.Dev
 	srv := martini.New()
-	srv.Use(martini.Logger())
+	// srv.Use(martini.Logger())
 	srv.Use(martini.Recovery())
-
-	// Static files
-	srv.Use(martini.Static("./web"))
 
 	// Routes
 	r := martini.NewRouter()
@@ -299,20 +326,10 @@ func StartServer(addrUnsecure, addrSecure, key, cert string) {
 	r.Post("/compile", CompileHandler)
 	r.Post("/compile2", CompileHandlerJs)
 
-	// new relic for error reporting
-	if NEWRELIC_KEY != "" {
-		logger.Infoln("Starting new relic.")
-		gorelic.InitNewrelicAgent(NEWRELIC_KEY, NEWRELIC_APP, false)
-		srv.Use(gorelic.Handler)
-	}
-
 	// Use SSL ?
 	if addrSecure == "" {
-
 		srv.RunOnAddr(addrUnsecure)
-
 	} else {
-
 		srv.Use(secure.Secure(secure.Options{
 			SSLRedirect: true,
 			SSLHost:     addrSecure,
@@ -322,7 +339,7 @@ func StartServer(addrUnsecure, addrSecure, key, cert string) {
 		if addrUnsecure != "" {
 			go func() {
 				if err := http.ListenAndServe(addrUnsecure, srv); err != nil {
-					fmt.Println("Cannot serve on http port: ", err)
+					log.Error("Cannot serve on http port: ", err)
 					os.Exit(1)
 				}
 			}()
@@ -330,7 +347,7 @@ func StartServer(addrUnsecure, addrSecure, key, cert string) {
 
 		// HTTPS
 		if err := http.ListenAndServeTLS(addrSecure, cert, key, srv); err != nil {
-			fmt.Println("Cannot serve on https port: ", err)
+			log.Error("Cannot serve on https port: ", err)
 			os.Exit(1)
 		}
 	}
