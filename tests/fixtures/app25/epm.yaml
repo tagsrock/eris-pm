@@ -1,0 +1,58 @@
+jobs:
+
+- name: setStorageBase
+  job:
+    set:
+      val: 5
+
+- name: deployGSFactory
+  job:
+    deploy:
+      contract: GSFactory.sol
+      instance: GSFactory
+      wait: true
+
+- name: deployGSABIFactory
+  job:
+    deploy:
+      contract: GSFactory.sol
+      instance: GSContract
+      wait: true
+
+- name: createGSContract
+  job:
+    call:
+      destination: $deployGSFactory
+      data: create $setStorageBase
+      abi: $deployGSFactory
+      wait: true
+
+#Double check created address
+- name:  getGSAddr
+  job:
+    query-contract:
+      destination: $deployGSFactory
+      data: getLast
+      abi: $deployGSFactory
+
+- name: assertAddr
+  job:
+    assert:
+      key: $getGSAddr
+      relation: eq
+      val: $createGSContract
+
+#Test initialized value from construction is equal to setStorageBase
+- name: queryStorage
+  job:
+    query-contract:
+      destination: $createGSContract
+      data: get
+      abi: $deployGSABIFactory
+
+- name: assertStorage
+  job:
+    assert:
+      key: $queryStorage
+      relation: eq
+      val: $setStorageBase
