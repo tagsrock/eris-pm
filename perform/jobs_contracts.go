@@ -38,7 +38,8 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 
 	// trim the extension
 	contractName := strings.TrimSuffix(deploy.Contract, filepath.Ext(deploy.Contract))
-	// Use default
+
+	// Use defaults
 	deploy.Source = useDefault(deploy.Source, do.Package.Account)
 	deploy.Instance = useDefault(deploy.Instance, contractName)
 	deploy.Amount = useDefault(deploy.Amount, do.DefaultAmount)
@@ -167,9 +168,13 @@ func deployContract(deploy *definitions.Deploy, do *definitions.Do, r compilers.
 
 	// Deploy contract
 	log.WithFields(log.Fields{
+		"name": r.Objectname,
+	}).Warn("Deploying Contract")
+
+	log.WithFields(log.Fields{
 		"source": deploy.Source,
 		"code":   contractCode,
-	}).Info("Deploying Contract")
+	}).Info()
 
 	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, deploy.Source, "", deploy.Amount, deploy.Nonce, deploy.Gas, deploy.Fee, contractCode)
 	if err != nil {

@@ -35,8 +35,8 @@ func ReadTxSignAndBroadcast(result *core.TxResult, err error) error {
 	ret := fmt.Sprintf("%X", result.Return)
 
 	if result.Address != nil {
-		log.WithField("=>", addr).Warn("Contract Address")
-		log.WithField("=>", hash).Warn("Transaction Hash")
+		log.WithField("addr", addr).Warn()
+		log.WithField("txHash", hash).Info()
 	} else {
 		log.WithField("=>", hash).Warn("Transaction Hash")
 		log.WithField("=>", blkHash).Debug("Block Hash")
