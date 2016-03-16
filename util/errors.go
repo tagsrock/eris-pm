@@ -87,19 +87,21 @@ func ABIErrorHandler(do *definitions.Do, err error, call *definitions.Call, quer
 	}
 
 	return "", fmt.Errorf(`
-There has been an error in finding your ABI. ABI's are "Application Binary Interface"
-and they are what let us know how to talk to smart contracts. These little json files
-can be read by a variety of things which need to talk to smart contracts so they are
-quite necessary to be able to find.
+There has been an error in finding or in using your ABI. ABI's are "Application Binary
+Interface" and they are what let us know how to talk to smart contracts.
 
-Usually this error is the result of a bad deploy event. Sometimes the marmots are
-not told that there has been an error when there really was and do not stop a running
-of jobs. The ABIs are saved after the deploy events. So if there was a glitch in the
-matrix, we apologize in advance.
+These little json files can be read by a variety of things which need to talk to smart
+contracts so they are quite necessary to be able to find and use properly.
+
+The ABIs are saved after the deploy events. So if there was a glitch in the matrix,
+we apologize in advance.
 
 The marmot recovery checklist is...
-  * ensure that your contracts successfully deployed (do you have enough validators running?)
-  * if you used imports you may need to correct the instance variable
-  * if you have more than one contract in a single file you may need to correct the instance variable
+  * ensure your chain is running and you have enough validators online
+  * ensure that your contracts successfully deployed
+  * if you used imports or have multiple contracts in one file check the instance
+    variable in the deploy and the abi variable in the call/query-contract
+  * make sure you're calling or querying the right function
+  * make sure you're using the correct variables for job results
 `)
 }

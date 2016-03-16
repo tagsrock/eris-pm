@@ -269,12 +269,15 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 		if err != nil {
 			return "", err
 		}
+
+		if result != "" {
+			log.WithField("=>", result).Warn("Return Value")
+		} else {
+			log.Debug("No return.")
+		}
 	} else {
 		log.Debug("No return from contract.")
 	}
-
-	// Finalize
-	log.WithField("=>", result).Warn("Return Value")
 
 	if call.Save == "tx" {
 		log.Info("Saving tx hash instead of contract return")

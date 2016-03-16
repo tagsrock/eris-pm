@@ -58,7 +58,8 @@ fi
 was_running=0
 test_exit=0
 chains_dir=$HOME/.eris/chains
-chain_name=eris-pm-tests-$uuid
+name_base=eris-pm-tests
+chain_name=$name_base-$uuid
 name_full="$chain_name"_full_000
 name_part="$chain_name"_participant_000
 chain_dir=$chains_dir/$chain_name
@@ -182,7 +183,7 @@ test_teardown(){
     fi
     eris chains stop --force $chain_name 1>/dev/null
     eris chains rm --file --data $chain_name 1>/dev/null
-    rm -rf $HOME/.eris/scratch/data/epm-tests-*
+    rm -rf $HOME/.eris/scratch/data/$name_base-*
     rm -rf $chain_dir
   else
     eris chains stop -f $chain_name 1>/dev/null

@@ -74,7 +74,11 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	}
 
 	// Finalize
-	log.WithField("=>", result).Warn("Return Value")
+	if result != "" {
+		log.WithField("=>", result).Warn("Return Value")
+	} else {
+		log.Debug("No return.")
+	}
 	return result, nil
 }
 
@@ -93,7 +97,11 @@ func QueryAccountJob(query *definitions.QueryAccount, do *definitions.Do) (strin
 	}
 
 	// Result
-	log.WithField("=>", result).Warn("Return Value")
+	if result != "" {
+		log.WithField("=>", result).Warn("Return Value")
+	} else {
+		log.Debug("No return.")
+	}
 	return result, nil
 }
 
@@ -112,7 +120,11 @@ func QueryNameJob(query *definitions.QueryName, do *definitions.Do) (string, err
 		return "", err
 	}
 
-	log.WithField("=>", result).Warn("Return Value")
+	if result != "" {
+		log.WithField("=>", result).Warn("Return Value")
+	} else {
+		log.Debug("No return.")
+	}
 	return result, nil
 }
 
@@ -129,7 +141,11 @@ func QueryValsJob(query *definitions.QueryVals, do *definitions.Do) (string, err
 		return "", err
 	}
 
-	log.WithField("=>", result).Warn("Return Value")
+	if result != "" {
+		log.WithField("=>", result).Warn("Return Value")
+	} else {
+		log.Debug("No return.")
+	}
 	return result, nil
 }
 
