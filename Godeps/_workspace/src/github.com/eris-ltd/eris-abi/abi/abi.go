@@ -81,6 +81,17 @@ func (m Method) Id() []byte {
 	return Sha3([]byte(m.String()))[:4]
 }
 
+// Populates the parameters for packing according to the abi specification
+type PackType struct {
+	Name       string
+	Type       string
+	Raw        string
+	Dynamic    bool
+	Data       []byte
+	DataLength []byte
+	ArgNumber  int
+}
+
 // Pack the given method name to conform the ABI. Method call's data
 // will consist of method_id, args0, arg1, ... argN. Method id consists
 // of 4 bytes and arguments are all 32 bytes.
@@ -101,22 +112,32 @@ func (abi ABI) Pack(name string, data []string) ([]byte, error) {
 		log.Debug("Nothing to pack")
 	}
 
+	var packer []*PackType
 	var arguments []byte
 	for i, a := range data {
 		input := method.Inputs[i]
+		thisPacked := &PackType{}
+
+		thisPacked.Name = input.Name
+		thisPacked.Type = input.Type.String()
+		thisPacked.Raw = a
+		thisPacked.ArgNumber = i
 
 		log.WithFields(log.Fields{
-			"name": input.Name,
-			"type": input.Type.String(),
-			"val":  a,
+			"name":   thisPacked.Name,
+			"type":   thisPacked.Type,
+			"val":    thisPacked.Raw,
+			"argNum": thisPacked.ArgNumber,
 		}).Debug("ABI Pack")
-		ret, err := PackProcessType(input.Type.String(), a)
+		err := PackProcessType(thisPacked)
 		if err != nil {
 			return nil, err
 		}
 
-		arguments = append(arguments, ret...)
+		packer = append(packer, thisPacked)
 	}
+
+	arguments = ProcessPackedTypes(packer)
 
 	// Set function id; final formulation of call
 	packed := method.Id()
@@ -125,41 +146,78 @@ func (abi ABI) Pack(name string, data []string) ([]byte, error) {
 	return packed, nil
 }
 
+// Order all the arguments as they should be ordered
+func ProcessPackedTypes(packer []*PackType) []byte {
+	var arguments []byte
+	var argumentsData []byte
+
+	// first we loop through and assemble the dynamic types
+	for _, thisPacked := range packer {
+		if !thisPacked.Dynamic {
+			continue // these will get populated in the next range through
+		} else {
+			argumentsData = append(argumentsData, thisPacked.DataLength...)
+			argumentsData = append(argumentsData, thisPacked.Data...)
+		}
+	}
+
+	// second we loop through and find the length pointers (dynamic types) and raw data (static types)
+	for i, thisPacked := range packer {
+		if !thisPacked.Dynamic {
+			arguments = append(arguments, thisPacked.Data...)
+		} else {
+			arguments = append(arguments, findOffset(packer, i)...)
+		}
+	}
+
+	return append(arguments, argumentsData...)
+}
+
 // Conversion to []byte based on "Type"
 // https://github.com/ethereum/wiki/wiki/Ethereum-Contract-ABI#formal-specification-of-the-encoding
-func PackProcessType(typ string, value string) ([]byte, error) {
-	t := getMajorType(typ)
+func PackProcessType(thisPacked *PackType) error {
+	t := getMajorType(thisPacked.Type)
 	switch t {
 	case "byte":
-		return common.RightPadBytes([]byte(value), lengths["retBlock"]), nil
+		thisPacked.Dynamic = false
+		thisPacked.Data = common.RightPadBytes([]byte(thisPacked.Raw), lengths["retBlock"])
+		return nil
 	case "string":
-		val := []byte{}
-		val = append(val, U2U256(uint64(0x20))...)
-		val = append(val, U2U256(uint64(len(value)))...)
-		val = append(val, common.RightPadBytes([]byte(value), lengths["retBlock"])...)
-		return val, nil
+		thisPacked.Dynamic = true
+		thisPacked.DataLength = U2U256(uint64(len(thisPacked.Raw)))
+		thisPacked.Data = common.RightPadBytes([]byte(thisPacked.Raw), lengths["retBlock"])
+		return nil
 	case "uint":
-		val, err := strconv.ParseUint(value, 10, 64)
+		thisPacked.Dynamic = false
+		val, err := strconv.ParseUint(thisPacked.Raw, 10, 64)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		return U2U256(val), nil
+		thisPacked.Data = U2U256(val)
+		return nil
 	case "int":
-		val, err := strconv.ParseInt(value, 10, 64)
+		thisPacked.Dynamic = false
+		val, err := strconv.ParseInt(thisPacked.Raw, 10, 64)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		return S2S256(val), nil
+		thisPacked.Data = S2S256(val)
+		return nil
 	case "address":
-		return common.LeftPadBytes(common.AddressStringToBytes(value), lengths["retBlock"]), nil
+		thisPacked.Dynamic = false
+		thisPacked.Data = common.LeftPadBytes(common.AddressStringToBytes(thisPacked.Raw), lengths["retBlock"])
+		return nil
 	case "bool":
-		if value == "1" || value == "true" {
-			return common.LeftPadBytes(common.Big1.Bytes(), lengths["retBlock"]), nil
+		thisPacked.Dynamic = false
+		if thisPacked.Raw == "1" || thisPacked.Raw == "true" {
+			thisPacked.Data = common.LeftPadBytes(common.Big1.Bytes(), lengths["retBlock"])
+			return nil
 		} else {
-			return common.LeftPadBytes(common.Big0.Bytes(), lengths["retBlock"]), nil
+			thisPacked.Data = common.LeftPadBytes(common.Big0.Bytes(), lengths["retBlock"])
+			return nil
 		}
 	default:
-		return nil, fmt.Errorf("Unknown type. Cannot pack.")
+		return fmt.Errorf("Unknown type. Cannot pack.")
 	}
 }
 
@@ -312,6 +370,24 @@ func unpackByteArray(value []byte, start int) (string, int) {
 	}).Debug("Strings unpack")
 	return val, next
 }
+
+func findOffset(packer []*PackType, i int) []byte {
+	offset := len(packer) // number of arguments
+
+	if i == 0 {
+		return U2U256(uint64(32 * offset))
+	}
+	for i = i - 1; i >= 0; i-- { // loop thru backwards
+		if packer[i].Dynamic {
+			offset++                                     // data length slot
+			offset = offset + (len(packer[i].Data) / 32) // length of additional slots
+		}
+	}
+
+	return U2U256(uint64(32 * offset))
+}
+
+// ________ to we used these? ---------------------|
 
 func UnpackPrettyPrint(injson []byte) (string, error) {
 	var ret []Argpairs

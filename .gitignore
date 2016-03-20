@@ -32,3 +32,4 @@ epm.json
 tests/fixtures/*/abi
 docs/eris-pm
 tests/fixtures/chaindata/genesis.json
+tests/fixtures/error*.log
