@@ -1,1 +1,1 @@
-* tests initialization constructors within contracts.
+* tests basic initialization constructors within contracts.

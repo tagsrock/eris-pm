@@ -2,8 +2,9 @@ package abi
 
 var (
 	lengths = map[string]int{
-		"string":   32, // hack. this is currently a reserved word in solidity https://ethereumbuilders.gitbooks.io/guide/content/en/solidity_features.html#hashxx-and-stringxx-to-bytesxx
-		"bytes":    32, // hack. this is currently a reserved word in solidity https://ethereumbuilders.gitbooks.io/guide/content/en/solidity_features.html#byte-arrays
+		"retBlock": 32,
+		"string":   32,
+		"bytes":    32,
 		"byte":     1,
 		"bytes1":   1,
 		"bytes2":   2,
@@ -137,6 +138,5 @@ var (
 		"int256":   32,
 		"bool":     32,
 		"address":  20,
-		"retBlock": 32,
 	}
 )
