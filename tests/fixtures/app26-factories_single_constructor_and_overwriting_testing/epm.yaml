@@ -5,6 +5,11 @@ jobs:
     set:
       val: 5
 
+- name: setStorageBase2
+  job:
+    set:
+      val: 17
+
 - name: deployGSFactory
   job:
     deploy:
@@ -23,11 +28,11 @@ jobs:
   job:
     call:
       destination: $deployGSFactory
-      data: create
+      data: create $setStorageBase
       abi: $deployGSFactory
       wait: true
 
-#Double check created address
+# Double check created address
 - name:  getGSAddr
   job:
     query-contract:
@@ -42,15 +47,7 @@ jobs:
       relation: eq
       val: $createGSContract
 
-#Normal get set contract testing
-- name: setStorage
-  job:
-    call:
-      destination: $createGSContract
-      data: set $setStorageBase
-      abi: $deployGSABIFactory
-      wait: true
-
+# Test initialized value from construction is equal to setStorageBase
 - name: queryStorage
   job:
     query-contract:
@@ -64,3 +61,26 @@ jobs:
       key: $queryStorage
       relation: eq
       val: $setStorageBase
+
+# Set a new value to ensure constructors can be overwritten
+- name: setStorage
+  job:
+    call:
+      destination: $createGSContract
+      data: set $setStorageBase2
+      abi: $deployGSABIFactory
+      wait: true
+
+- name: queryStorageNew
+  job:
+    query-contract:
+      destination: $createGSContract
+      data: get
+      abi: $deployGSABIFactory
+
+- name: assertStorageNew
+  job:
+    assert:
+      key: $queryStorageNew
+      relation: eq
+      val: $setStorageBase2
