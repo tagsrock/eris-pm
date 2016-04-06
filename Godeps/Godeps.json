@@ -88,11 +88,11 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/mint-client/mintx/core",
-			"Rev": "93acdc93b5b9c05125d95d905950291f386197e9"
+			"Rev": "a44fb28cc58c9fcaeaaf74f0234b5896d8896d2f"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/mint-client/utils",
-			"Rev": "93acdc93b5b9c05125d95d905950291f386197e9"
+			"Rev": "a44fb28cc58c9fcaeaaf74f0234b5896d8896d2f"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/account",
