@@ -17,7 +17,7 @@ contract multiReturn {
 		) {
 		myAddress = this;
 		elaborate = "is";
-		funNumber = 1;		
+		funNumber = 1;
 	}
 }
 

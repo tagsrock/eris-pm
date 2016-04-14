@@ -22,7 +22,9 @@ type Type struct {
 	Type       reflect.Type
 	Size       int
 	T          byte   // Our own type checking
+	isSlice    bool
 	stringKind string // holds the unparsed string for deriving signatures
+	baseType   string // holds our base type for slices
 }
 
 func (t Type) MarshalJSON() ([]byte, error) {
@@ -83,25 +85,28 @@ func NewType(t string) (typ Type, err error) {
 	if isslice {
 		typ.Kind = reflect.Slice
 		typ.Size = size
+		typ.isSlice = true
 		switch vtype {
-		case "int":
+		case "int", "bool":
 			typ.Type = big_ts
 		case "uint":
 			typ.Type = ubig_ts
+		case "address", "bytes":
+			typ.Type = byte_ts
 		default:
 			return Type{}, fmt.Errorf("unsupported arg slice type: %s", t)
 		}
 	} else {
+		typ.isSlice = false
+		typ.Size = 1
 		switch vtype {
 		case "int":
 			typ.Kind = reflect.Ptr
 			typ.Type = big_t
-			typ.Size = 256
 			typ.T = IntTy
 		case "uint":
 			typ.Kind = reflect.Ptr
 			typ.Type = ubig_t
-			typ.Size = 256
 			typ.T = UintTy
 		case "bool":
 			typ.Kind = reflect.Bool
@@ -110,23 +115,23 @@ func NewType(t string) (typ Type, err error) {
 		case "address":
 			typ.Kind = reflect.Slice
 			typ.Type = byte_ts
-			typ.Size = 20
 			typ.T = AddressTy
 		case "string", "bytes":
 			typ.Kind = reflect.String
-			typ.Size = -1
-			if vsize > 0 {
-				typ.Size = 32
-			}
 		default:
 			return Type{}, fmt.Errorf("unsupported arg type: %s", t)
 		}
 	}
 	typ.stringKind = t
+	typ.baseType = res[1]
 
 	return
 }
 
 func (t Type) String() (out string) {
 	return t.stringKind
+}
+
+func (t Type) BaseType() (out string) {
+	return t.baseType
 }

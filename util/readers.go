@@ -120,6 +120,7 @@ func abiPreProcess(dataRaw string, do *definitions.Do) (string, []string) {
 	var dataNew []string
 
 	data := strings.Split(dataRaw, " ")
+	log.WithField("=>", data).Debug("Data after splitting")
 	for _, d := range data {
 		d, _ = PreProcess(d, do)
 		dataNew = append(dataNew, d)
@@ -127,6 +128,8 @@ func abiPreProcess(dataRaw string, do *definitions.Do) (string, []string) {
 
 	funcName := dataNew[0]
 	args := dataNew[1:]
+
+	log.WithField("=>", len(args)).Debug("Length of Args")
 
 	return funcName, args
 }

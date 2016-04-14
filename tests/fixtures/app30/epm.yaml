@@ -48,7 +48,7 @@ jobs:
       query-contract:
         destination: $deploy0
         data: getBytes
-  
+
   - name: bytesValue
     job:
       set:
