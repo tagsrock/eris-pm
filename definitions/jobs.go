@@ -122,6 +122,11 @@ type PackageDeploy struct {
 	// TODO
 }
 
+type Variable struct {
+	Name string
+	Value string
+}
+
 type Deploy struct {
 	// (Optional, if account job or global account set) address of the account from which to send (the
 	// public key for the account must be available to eris-keys)
@@ -154,6 +159,8 @@ type Deploy struct {
 	Nonce string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
 	// (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
 	Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+	// (Optional) todo
+	Variables []*Variable
 }
 
 type Call struct {
@@ -185,6 +192,8 @@ type Call struct {
 	Save string `mapstructure:"save" json:"save" yaml:"save" toml:"save"`
 	// (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
 	Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+	// (Optional) the call job's returned variables 
+	Variables []*Variable
 }
 
 // ------------------------------------------------------------------------
@@ -224,6 +233,8 @@ type QueryContract struct {
 	// deployed contracts save ABI artifacts in the abi folder as *both* the name of the contract
 	// and the address where the contract was deployed to
 	ABI string `mapstructure:"abi" json:"abi" yaml:"abi" toml:"abi"`
+
+	Variables []*Variable
 }
 
 type QueryAccount struct {

@@ -9,6 +9,7 @@ Variables come in the following types:
 * [job result variables](#jobResultVars)
 * [set variables](#setVars)
 * [reserved variables](#reservedVars)
+* [tuple returns](#tupleReturns)
 
 ## <a name="jobResultVars"></a>Job Result Variable
 
@@ -41,3 +42,27 @@ The following are reserved variables:
 * `$block`: will return a string version of the current block height
 * `$block+X`: where `X` can be any digit; will return a string version of the current block height `+X` blocks
 * `$block-X`: where `X` can be any digit; will return a string version of the current block heigh `-X` blocks
+
+## <a name="tupleReturns"></a>Tuples and Returns
+
+eris:pm can now effectively handle multiple return values for all static types such as
+
+* `address` `int` `uint` `bool` `bytes(1-32)`
+
+You can access these in your jobs by specifying the name of the value returned. If you have not appended a name to the value returned, simply call them by the order in which they are returned. For example:
+
+```
+contract tuples { 
+// for a job $getBools we could call this by 
+// $getBools.0 to get true and $getBools.1 to get false
+    function getBools() returns (bool, bool) { return (true, false); }
+// for a job $getInts here we would call $getInts.a == 3,$getInts.b == 5
+    function getInts() returns (uint a, int b) { return (3, 5) }
+}
+```
+
+for now the epm cannot handle dynamic types such as
+
+* `string` `bytes` `struct`
+
+Hold with us while the marmots get those in control :)

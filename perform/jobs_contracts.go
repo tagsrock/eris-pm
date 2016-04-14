@@ -202,7 +202,7 @@ func deployContract(deploy *definitions.Deploy, do *definitions.Do, r compilers.
 	return result, err
 }
 
-func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
+func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions.Variable, error) {
 	// Preprocess variables
 	call.Source, _ = util.PreProcess(call.Source, do)
 	call.Destination, _ = util.PreProcess(call.Destination, do)
@@ -229,7 +229,8 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 		call.Data, err = util.ReadAbiFormulateCall(call.ABI, call.Data, do)
 	}
 	if err != nil {
-		return util.ABIErrorHandler(do, err, call, nil)
+		var str, err = util.ABIErrorHandler(do, err, call, nil)
+		return str, make([]*definitions.Variable, 0), err
 	}
 
 	// Don't use pubKey if account override
@@ -246,7 +247,7 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 
 	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, call.Source, call.Destination, call.Amount, call.Nonce, call.Gas, call.Fee, call.Data)
 	if err != nil {
-		return "", err
+		return "", make([]*definitions.Variable, 0), err
 	}
 
 	// Don't use pubKey if account override
@@ -259,7 +260,8 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 
 	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, call.Wait)
 	if err != nil {
-		return util.MintChainErrorHandler(do, err)
+		var str, err = util.MintChainErrorHandler(do, err)
+		return str, make([]*definitions.Variable, 0), err
 	}
 	result = fmt.Sprintf("%X", res.Return)
 
@@ -267,19 +269,21 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 	if result != "" {
 		log.WithField("=>", result).Debug("Decoding Raw Result")
 		if call.ABI == "" {
-			result, err = util.ReadAndDecodeContractReturn(call.Destination, originalData, result, do)
+			call.Variables, err = util.ReadAndDecodeContractReturn(call.Destination, originalData, result, do)
 		} else {
-			result, err = util.ReadAndDecodeContractReturn(call.ABI, originalData, result, do)
+			call.Variables, err = util.ReadAndDecodeContractReturn(call.ABI, originalData, result, do)
 		}
 		if err != nil {
-			return "", err
+			return "", make([]*definitions.Variable, 0), err
 		}
-
+		log.WithField("=>", call.Variables).Debug("call variables:")
+		result = util.GetReturnValue(call.Variables)
 		if result != "" {
 			log.WithField("=>", result).Warn("Return Value")
 		} else {
 			log.Debug("No return.")
 		}
+
 	} else {
 		log.Debug("No return from contract.")
 	}
@@ -289,7 +293,8 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, error) {
 		result = fmt.Sprintf("%X", res.Hash)
 	}
 
-	return result, nil
+
+	return result, call.Variables, nil
 }
 
 func setCompiler(do *definitions.Do, tocompile string) error {

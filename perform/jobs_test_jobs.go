@@ -12,7 +12,7 @@ import (
 	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/rpc/core_client"
 )
 
-func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (string, error) {
+func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (string, []*definitions.Variable, error) {
 	// Preprocess variables. We don't preprocess data as it is processed by ReadAbiFormulateCall
 	query.Source, _ = util.PreProcess(query.Source, do)
 	query.Destination, _ = util.PreProcess(query.Destination, do)
@@ -21,11 +21,11 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	// Set the from and the to
 	fromAddrBytes, err := hex.DecodeString(query.Source)
 	if err != nil {
-		return "", err
+		return "", make([]*definitions.Variable, 0), err
 	}
 	toAddrBytes, err := hex.DecodeString(query.Destination)
 	if err != nil {
-		return "", err
+		return "", make([]*definitions.Variable, 0), err
 	}
 
 	// Get the packed data from the ABI functions
@@ -36,50 +36,52 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 		data, err = util.ReadAbiFormulateCall(query.ABI, query.Data, do)
 	}
 	if err != nil {
-		return util.ABIErrorHandler(do, err, nil, query)
+		var str, err = util.ABIErrorHandler(do, err, nil, query)
+		return str, make([]*definitions.Variable, 0), err
 	}
 	dataBytes, err := hex.DecodeString(data)
 	if err != nil {
-		return "", err
+		return "", make([]*definitions.Variable, 0), err
 	}
 
 	// Call the client
 	client := cclient.NewClient(do.Chain, "HTTP")
 	retrn, err := client.Call(fromAddrBytes, toAddrBytes, dataBytes)
 	if err != nil {
-		return "", err
+		return "", make([]*definitions.Variable, 0), err
 	}
 
 	// Preprocess return
 	result, err := util.FormatOutput([]string{"return"}, 0, retrn)
 	if err != nil {
-		return "", err
+		return "", make([]*definitions.Variable, 0), err
 	}
 	result, err = strconv.Unquote(result)
 	if err != nil {
-		return "", err
+		return "", make([]*definitions.Variable, 0), err
 	}
 
 	// Formally process the return
 	log.WithField("res", result).Debug("Decoding Raw Result")
 	if query.ABI == "" {
 		log.WithField("abi", query.Destination).Debug()
-		result, err = util.ReadAndDecodeContractReturn(query.Destination, query.Data, result, do)
+		query.Variables, err = util.ReadAndDecodeContractReturn(query.Destination, query.Data, result, do)
 	} else {
 		log.WithField("abi", query.ABI).Debug()
-		result, err = util.ReadAndDecodeContractReturn(query.ABI, query.Data, result, do)
+		query.Variables, err = util.ReadAndDecodeContractReturn(query.ABI, query.Data, result, do)
 	}
 	if err != nil {
-		return "", err
+		return "", make([]*definitions.Variable, 0), err
 	}
 
+	result = util.GetReturnValue(query.Variables)
 	// Finalize
 	if result != "" {
 		log.WithField("=>", result).Warn("Return Value")
 	} else {
 		log.Debug("No return.")
 	}
-	return result, nil
+	return result, query.Variables, nil
 }
 
 func QueryAccountJob(query *definitions.QueryAccount, do *definitions.Do) (string, error) {
