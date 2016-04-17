@@ -2,6 +2,9 @@ package perform
 
 import (
 	"strings"
+	"os"
+	"bufio"
+	"fmt"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
@@ -23,7 +26,24 @@ func RunJobs(do *definitions.Do) error {
 		defaultAddrJob(do)
 	}
 
-	for _, job := range do.Package.Jobs {
+	for index, job := range do.Package.Jobs {
+		for _, checkForDup := range do.Package.Jobs[0:index] {
+			if checkForDup.JobName == job.JobName {
+				reader := bufio.NewReader(os.Stdin)
+				fmt.Print("You are about to overwrite a previous job name, continue?(Y/n): ")
+				text, _ := reader.ReadString('\n')
+				fmt.Println(text)
+				for strings.ToLower(text) != "y" && strings.ToLower(text) != "n" {
+					reader := bufio.NewReader(os.Stdin)
+					fmt.Print("The marmots still require an answer! Shall we smite thine old job name?(Y/n): ")
+					text, _ := reader.ReadString('\n')
+					fmt.Println(text)
+				}
+				if strings.ToLower(text) == "n" {
+					continue
+				}
+			}
+		}
 		switch {
 
 		// Util jobs
@@ -86,7 +106,6 @@ func RunJobs(do *definitions.Do) error {
 		case job.Job.Assert != nil:
 			announce(job.JobName, "Assert")
 			job.JobResult, err = AssertJob(job.Job.Assert, do)
-
 		}
 
 		if err != nil {
@@ -126,6 +145,7 @@ func defaultSetJobs(do *definitions.Do) {
 
 	for _, setr := range do.DefaultSets {
 		blowdUp := strings.Split(setr, "=")
+		log.WithField("BlowedUP:", blowdUp).Debug("blown up job")
 		if blowdUp[0] != "" {
 			newJobs = append(newJobs, &definitions.Jobs{
 				JobName: blowdUp[0],
