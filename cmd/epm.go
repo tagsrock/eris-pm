@@ -98,6 +98,7 @@ func AddGlobalFlags() {
 	EPMCmd.PersistentFlags().StringVarP(&do.DefaultFee, "fee", "n", defaultFee(), "default fee to use; default respects $EPM_FEE")
 	EPMCmd.PersistentFlags().StringVarP(&do.DefaultAmount, "amount", "u", defaultAmount(), "default amount to use; default respects $EPM_AMOUNT")
 	EPMCmd.PersistentFlags().StringVarP(&do.DefaultOutput, "output", "o", defaultOutput(), "output format which epm should use [csv,json]; default respects $EPM_OUTPUT_FORMAT")
+	EPMCmd.PersistentFlags().BoolVarP(&do.Overwrite, "overwrite", "w", defaultOverwrite(), "overwrite jobs of similar names; defaults respects $EPM_OVERWRITE_APPROVE")
 	EPMCmd.PersistentFlags().BoolVarP(&do.SummaryTable, "summary", "t", defaultSummaryTable(), "output a table summarizing epm jobs; default respects $EPM_SUMMARY_TABLE")
 	EPMCmd.PersistentFlags().BoolVarP(&do.Verbose, "verbose", "v", defaultVerbose(), "verbose output; more output than no output flags; less output than debug level; default respects $EPM_VERBOSE")
 	EPMCmd.PersistentFlags().BoolVarP(&do.Debug, "debug", "d", defaultDebug(), "debug level output; the most output available for epm; if it is too chatty use verbose flag; default respects $EPM_DEBUG")
@@ -169,6 +170,10 @@ func defaultSummaryTable() bool {
 
 func defaultVerbose() bool {
 	return setDefaultBool("EPM_VERBOSE", false)
+}
+
+func defaultOverwrite() bool {
+	return setDefaultBool("EPM_OVERWRITE_APPROVE", false)
 }
 
 func defaultDebug() bool {
