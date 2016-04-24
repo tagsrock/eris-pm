@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"strconv"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
@@ -74,10 +75,10 @@ func ReadAbiFormulateCall(abiLocation, dataRaw string, do *definitions.Do) (stri
 	return ebi.Packer(abiSpecBytes, totalArgs...)
 }
 
-func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *definitions.Do) (string, error) {
+func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *definitions.Do) ([]*definitions.Variable, error) {
 	abiSpecBytes, err := readAbi(do.ABIPath, abiLocation)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	log.WithField("=>", string(abiSpecBytes)).Debug("ABI Specification (Decode)")
 
@@ -87,7 +88,7 @@ func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *def
 	// Unpack the result
 	res, err := ebi.UnPacker(abiSpecBytes, funcName, resultRaw, false)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Wrangle these returns
@@ -99,11 +100,19 @@ func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *def
 	var resTotal []ContractReturn
 	err = json.Unmarshal([]byte(res), &resTotal)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	// Get the value
-	result := resTotal[0].Value
+	// Get the values and put them into neat little structs
+	result := make([]*definitions.Variable, len(resTotal))
+	for index, i := range resTotal {
+		if i.Name == "" {
+			result[index] = &definitions.Variable{strconv.Itoa(index), i.Value}
+		} else {
+			result[index] = &definitions.Variable{i.Name, i.Value}
+		}
+	}
+	
 	return result, nil
 }
 

@@ -38,9 +38,9 @@ func (t Type) MarshalJSON() ([]byte, error) {
 //
 // Examples:
 //
-//      string     int       uint       real
+//      string     int       uint       fixed
 //      string32   int8      uint8      uint[]
-//      address    int256    uint256    real[2]
+//      address    int256    uint256    fixed[2]
 func NewType(t string) (typ Type, err error) {
 	// parse eg. uint32 || uint32[] || uint32[20]
 	// 1. full string 2. type 3. (opt.) is slice 4. (opt.) size
@@ -105,7 +105,7 @@ func NewType(t string) (typ Type, err error) {
 			typ.T = UintTy
 		case "bool":
 			typ.Kind = reflect.Bool
-		case "real": // TODO
+		case "fixed": // TODO
 			typ.Kind = reflect.Invalid
 		case "address":
 			typ.Kind = reflect.Slice

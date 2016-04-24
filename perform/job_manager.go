@@ -87,8 +87,10 @@ func RunJobs(do *definitions.Do) error {
 			job.JobResult, err = DeployJob(job.Job.Deploy, do)
 		case job.Job.Call != nil:
 			announce(job.JobName, "Call")
-			job.JobResult, err = CallJob(job.Job.Call, do)
-
+			job.JobResult, job.JobVars, err = CallJob(job.Job.Call, do)
+			if len(job.JobVars) != 0 {
+				log.WithField("=>", job.JobVars).Info("Job Vars")
+			}
 		// State jobs
 		case job.Job.RestoreState != nil:
 			announce(job.JobName, "RestoreState")
@@ -103,7 +105,10 @@ func RunJobs(do *definitions.Do) error {
 			job.JobResult, err = QueryAccountJob(job.Job.QueryAccount, do)
 		case job.Job.QueryContract != nil:
 			announce(job.JobName, "QueryContract")
-			job.JobResult, err = QueryContractJob(job.Job.QueryContract, do)
+			job.JobResult, job.JobVars, err = QueryContractJob(job.Job.QueryContract, do)
+			if len(job.JobVars) != 0 {
+				log.WithField("=>", job.JobVars).Info("Job Vars")
+			}
 		case job.Job.QueryName != nil:
 			announce(job.JobName, "QueryName")
 			job.JobResult, err = QueryNameJob(job.Job.QueryName, do)

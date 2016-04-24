@@ -1,6 +1,7 @@
 {
 	"ImportPath": "github.com/eris-ltd/eris-pm",
 	"GoVersion": "go1.5",
+	"GodepVersion": "v62",
 	"Packages": [
 		"./..."
 	],
@@ -52,11 +53,11 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-abi/abi",
-			"Rev": "751a11447b91777ff928df13155037fd11ca58a3"
+			"Rev": "499e4f64471885f1cabb8ba8c6e0305a7048b167"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-abi/core",
-			"Rev": "751a11447b91777ff928df13155037fd11ca58a3"
+			"Rev": "499e4f64471885f1cabb8ba8c6e0305a7048b167"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-compilers",
