@@ -30,7 +30,7 @@ Made with <3 by Eris Industries.
 Complete documentation is available at https://docs.erisindustries.com
 
 Version:
-  0.11.4
+  0.12.0
 
 Usage:
   epm [flags]
