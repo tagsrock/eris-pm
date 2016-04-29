@@ -283,7 +283,6 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 		} else {
 			log.Debug("No return.")
 		}
-
 	} else {
 		log.Debug("No return from contract.")
 	}
