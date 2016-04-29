@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/account"
 	ptypes "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/permission/types"
 	rtypes "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/rpc/core/types"
@@ -71,6 +72,7 @@ func Call(nodeAddr, signAddr, pubkey, addr, toAddr, amtS, nonceS, gasS, feeS, da
 
 	dataBytes, err := hex.DecodeString(data)
 	if err != nil {
+		log.Info("Got bad string")
 		return nil, fmt.Errorf("data is bad hex: %v", err)
 	}
 

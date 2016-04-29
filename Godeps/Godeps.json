@@ -1,6 +1,7 @@
 {
 	"ImportPath": "github.com/eris-ltd/eris-pm",
 	"GoVersion": "go1.5",
+	"GodepVersion": "v62",
 	"Packages": [
 		"./..."
 	],
@@ -52,15 +53,15 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-abi/abi",
-			"Rev": "0f2c5c39a451bb4f2c9e18ad4ac0c0222f943512"
+			"Rev": "ba70b742d8959a0b4baa5a82c72974d50e4d7fc6"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-abi/core",
-			"Rev": "0f2c5c39a451bb4f2c9e18ad4ac0c0222f943512"
+			"Rev": "ba70b742d8959a0b4baa5a82c72974d50e4d7fc6"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-compilers",
-			"Rev": "03d69c340047dc8ccb549e789cfa296aece4d39d"
+			"Rev": "2d7a4a8c4a07d366f2a7c16c2bc53b23d83d35f4"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/eris-keys/crypto",
@@ -88,81 +89,81 @@
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/mint-client/mintx/core",
-			"Rev": "93acdc93b5b9c05125d95d905950291f386197e9"
+			"Rev": "93360d4d3b2aa369cca664f4574100c1f85644d4"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/mint-client/utils",
-			"Rev": "93acdc93b5b9c05125d95d905950291f386197e9"
+			"Rev": "93360d4d3b2aa369cca664f4574100c1f85644d4"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/account",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/common",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/config",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/config/tendermint",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/db",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/logger",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/merkle",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/permission/types",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/rpc/core/types",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/rpc/core_client",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/rpc/types",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/state/types",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/types",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/eris-ltd/tendermint/wire",
 			"Comment": "0.1-66-g635ad92",
-			"Rev": "635ad928efbd9132d880b9568e8a261a876afcfd"
+			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
 			"ImportPath": "github.com/ethereum/go-ethereum/crypto/sha3",

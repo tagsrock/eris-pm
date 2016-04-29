@@ -22,7 +22,9 @@ type Type struct {
 	Type       reflect.Type
 	Size       int
 	T          byte   // Our own type checking
+	isSlice    bool
 	stringKind string // holds the unparsed string for deriving signatures
+	baseType   string // holds our base type for slices
 }
 
 func (t Type) MarshalJSON() ([]byte, error) {
@@ -38,9 +40,9 @@ func (t Type) MarshalJSON() ([]byte, error) {
 //
 // Examples:
 //
-//      string     int       uint       real
+//      string     int       uint       fixed
 //      string32   int8      uint8      uint[]
-//      address    int256    uint256    real[2]
+//      address    int256    uint256    fixed[2]
 func NewType(t string) (typ Type, err error) {
 	// parse eg. uint32 || uint32[] || uint32[20]
 	// 1. full string 2. type 3. (opt.) is slice 4. (opt.) size
@@ -83,50 +85,53 @@ func NewType(t string) (typ Type, err error) {
 	if isslice {
 		typ.Kind = reflect.Slice
 		typ.Size = size
+		typ.isSlice = true
 		switch vtype {
-		case "int":
+		case "int", "bool":
 			typ.Type = big_ts
 		case "uint":
 			typ.Type = ubig_ts
+		case "address", "bytes":
+			typ.Type = byte_ts
 		default:
 			return Type{}, fmt.Errorf("unsupported arg slice type: %s", t)
 		}
 	} else {
+		typ.isSlice = false
+		typ.Size = 1
 		switch vtype {
 		case "int":
 			typ.Kind = reflect.Ptr
 			typ.Type = big_t
-			typ.Size = 256
 			typ.T = IntTy
 		case "uint":
 			typ.Kind = reflect.Ptr
 			typ.Type = ubig_t
-			typ.Size = 256
 			typ.T = UintTy
 		case "bool":
 			typ.Kind = reflect.Bool
-		case "real": // TODO
+		case "fixed": // TODO
 			typ.Kind = reflect.Invalid
 		case "address":
 			typ.Kind = reflect.Slice
 			typ.Type = byte_ts
-			typ.Size = 20
 			typ.T = AddressTy
 		case "string", "bytes":
 			typ.Kind = reflect.String
-			typ.Size = -1
-			if vsize > 0 {
-				typ.Size = 32
-			}
 		default:
 			return Type{}, fmt.Errorf("unsupported arg type: %s", t)
 		}
 	}
 	typ.stringKind = t
+	typ.baseType = res[1]
 
 	return
 }
 
 func (t Type) String() (out string) {
 	return t.stringKind
+}
+
+func (t Type) BaseType() (out string) {
+	return t.baseType
 }

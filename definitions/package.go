@@ -12,6 +12,8 @@ type Jobs struct {
 	Job *Job `mapstructure:"job" json:"job" yaml:"job" toml:"job"`
 	// Not marshalled
 	JobResult string
+	// For multiple values
+	JobVars []*Variable
 }
 
 type Job struct {

@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"strings"
+	"strconv"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
@@ -35,13 +36,17 @@ func ReadTxSignAndBroadcast(result *core.TxResult, err error) error {
 	ret := fmt.Sprintf("%X", result.Return)
 
 	if result.Address != nil {
-		log.WithField("=>", addr).Warn("Contract Address")
-		log.WithField("=>", hash).Warn("Transaction Hash")
+		log.WithField("addr", addr).Warn()
+		log.WithField("txHash", hash).Info()
 	} else {
 		log.WithField("=>", hash).Warn("Transaction Hash")
 		log.WithField("=>", blkHash).Debug("Block Hash")
 		if len(result.Return) != 0 {
-			log.WithField("=>", ret).Warn("Return Value")
+			if ret != "" {
+				log.WithField("=>", ret).Warn("Return Value")
+			} else {
+				log.Debug("No return.")
+			}
 			log.WithField("=>", result.Exception).Debug("Exception")
 		}
 	}
@@ -70,10 +75,10 @@ func ReadAbiFormulateCall(abiLocation, dataRaw string, do *definitions.Do) (stri
 	return ebi.Packer(abiSpecBytes, totalArgs...)
 }
 
-func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *definitions.Do) (string, error) {
+func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *definitions.Do) ([]*definitions.Variable, error) {
 	abiSpecBytes, err := readAbi(do.ABIPath, abiLocation)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	log.WithField("=>", string(abiSpecBytes)).Debug("ABI Specification (Decode)")
 
@@ -83,7 +88,7 @@ func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *def
 	// Unpack the result
 	res, err := ebi.UnPacker(abiSpecBytes, funcName, resultRaw, false)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
 	// Wrangle these returns
@@ -95,11 +100,19 @@ func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *def
 	var resTotal []ContractReturn
 	err = json.Unmarshal([]byte(res), &resTotal)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 
-	// Get the value
-	result := resTotal[0].Value
+	// Get the values and put them into neat little structs
+	result := make([]*definitions.Variable, len(resTotal))
+	for index, i := range resTotal {
+		if i.Name == "" {
+			result[index] = &definitions.Variable{strconv.Itoa(index), i.Value}
+		} else {
+			result[index] = &definitions.Variable{i.Name, i.Value}
+		}
+	}
+	
 	return result, nil
 }
 
@@ -107,6 +120,7 @@ func abiPreProcess(dataRaw string, do *definitions.Do) (string, []string) {
 	var dataNew []string
 
 	data := strings.Split(dataRaw, " ")
+	log.WithField("=>", data).Debug("Data after splitting")
 	for _, d := range data {
 		d, _ = PreProcess(d, do)
 		dataNew = append(dataNew, d)
@@ -114,6 +128,8 @@ func abiPreProcess(dataRaw string, do *definitions.Do) (string, []string) {
 
 	funcName := dataNew[0]
 	args := dataNew[1:]
+
+	log.WithField("=>", len(args)).Debug("Length of Args")
 
 	return funcName, args
 }

@@ -58,7 +58,8 @@ fi
 was_running=0
 test_exit=0
 chains_dir=$HOME/.eris/chains
-chain_name=eris-pm-tests-$uuid
+name_base=eris-pm-tests
+chain_name=$name_base-$uuid
 name_full="$chain_name"_full_000
 name_part="$chain_name"_participant_000
 chain_dir=$chains_dir/$chain_name
@@ -181,8 +182,12 @@ test_teardown(){
       eris services stop -rx keys
     fi
     eris chains stop --force $chain_name 1>/dev/null
+    # eris chains logs $chain_name -t 500 # uncomment me to dump recent VM/Chain logs
+    # eris chains logs $chain_name -t all # uncomment me to dump all VM/Chain logs
+    # eris chains logs $chain_name -t all | grep 'CALLDATALOAD\|Calling' # uncomment me to dump all VM/Chain logs and parse for Calls/Calldataload
+    # eris chains logs $chain_name -t all | grep 'CALLDATALOAD\|Calling' > error.log # uncomment me to dump all VM/Chain logs and parse for Calls/Calldataload dump to a file
     eris chains rm --file --data $chain_name 1>/dev/null
-    rm -rf $HOME/.eris/scratch/data/epm-tests-*
+    rm -rf $HOME/.eris/scratch/data/$name_base-*
     rm -rf $chain_dir
   else
     eris chains stop -f $chain_name 1>/dev/null
