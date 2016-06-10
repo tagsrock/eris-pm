@@ -1,11 +1,6 @@
 # Pull base image.
-FROM quay.io/eris/base:alpine
+FROM quay.io/eris/build:arm
 MAINTAINER Eris Industries <support@erisindustries.com>
-
-#-----------------------------------------------------------------------------
-# dependencies
-RUN apk update && \
-  apk add g++ gmp-dev jq
 
 #-----------------------------------------------------------------------------
 # install epm
