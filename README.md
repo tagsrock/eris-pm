@@ -1,6 +1,7 @@
-[![Circle CI](https://circleci.com/gh/eris-ltd/eris-pm/tree/master.svg?style=svg)](https://circleci.com/gh/eris-ltd/eris-pm/tree/master)
-
-[![GoDoc](https://godoc.org/github.com/eris-pm?status.png)](https://godoc.org/github.com/eris-ltd/eris-pm)
+|[![GoDoc](https://godoc.org/github.com/eris-pm?status.png)](https://godoc.org/github.com/eris-ltd/eris-pm) | Linux |
+|---|-------|
+| Master | [![Circle CI](https://circleci.com/gh/eris-ltd/eris-pm/tree/master.svg?style=svg)](https://circleci.com/gh/eris-ltd/eris-pm/tree/master) |
+| Develop | [![Circle CI](https://circleci.com/gh/eris-ltd/eris-pm/tree/develop.svg?style=svg)](https://circleci.com/gh/eris-ltd/eris-pm/tree/develop) |
 
 # Eris Package Manager: The Smart Contract Package Manager
 
@@ -16,8 +17,12 @@ In EPM a *job* is a single action which is performed (such as a transaction, a c
 
 ## Install
 
+`epm` is intended to be used by [eris-cli](https://github.com/eris-ltd/eris-cli), e.g., by running `eris pkgs do`.
+
+### For Developers
+
 1. [Install go](https://golang.org/doc/install)
-2. Ensure you have gmp installed (sudo apt-get install libgmp3-dev || brew install gmp)
+2. Ensure you have `gmp` installed (`sudo apt-get install libgmp3-dev || brew install gmp`)
 3. `go get github.com/eris-ltd/eris-pm/cmd/epm`
 
 ## Usage
@@ -30,7 +35,7 @@ Made with <3 by Eris Industries.
 Complete documentation is available at https://docs.erisindustries.com
 
 Version:
-  0.11.4
+  0.12.0
 
 Usage:
   epm [flags]
