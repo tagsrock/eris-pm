@@ -1,7 +1,6 @@
 package perform
 
 import (
-	"encoding/hex"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -13,7 +12,8 @@ import (
 
 	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
-	compilers "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-compilers"
+	compilers "github.com/eris-ltd/eris-compilers/network"
+	response "github.com/eris-ltd/eris-compilers/util"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/types"
 )
@@ -58,16 +58,12 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 	// use the proper compiler
 	if do.Compiler != "" {
 		log.WithField("=>", do.Compiler).Info("Setting compiler path")
-		if err := setCompiler(do, p); err != nil {
-			log.Debugf("Error setting compiler path", err)
-			return "", err
-		}
 	}
 
 	// compile
-	resp := compilers.Compile(p, deploy.Libraries)
+	resp, err := compilers.BeginCompile(do.Compiler, p, false, deploy.Libraries)
 
-	if resp.Error != "" {
+	if err != nil {
 		log.Errorln("Error compiling contracts")
 		return "", fmt.Errorf(resp.Error)
 	}
@@ -84,7 +80,7 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 	case len(resp.Objects) == 1:
 		log.WithField("path", p).Info("Deploying the only contract in file")
 		r := resp.Objects[0]
-		if r.Bytecode != nil {
+		if r.Bytecode != "" {
 			result, err = deployContract(deploy, do, r, p)
 			if err != nil {
 				return "", err
@@ -94,7 +90,7 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 		log.WithField("path", p).Info("Deploying all contracts")
 		var baseObj string
 		for _, r := range resp.Objects {
-			if r.Bytecode == nil {
+			if r.Bytecode == "" {
 				continue
 			}
 			result, err = deployContract(deploy, do, r, p)
@@ -111,7 +107,7 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 	default:
 		log.WithField("contr", deploy.Instance).Info("Deploying a single contract")
 		for _, r := range resp.Objects {
-			if r.Bytecode == nil {
+			if r.Bytecode == "" {
 				continue
 			}
 			if strings.ToLower(r.Objectname) == strings.ToLower(deploy.Instance) {
@@ -131,9 +127,9 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 	return result, nil
 }
 
-func deployContract(deploy *definitions.Deploy, do *definitions.Do, r compilers.ResponseItem, p string) (string, error) {
+func deployContract(deploy *definitions.Deploy, do *definitions.Do, r response.ResponseItem, p string) (string, error) {
 	log.WithField("=>", string(r.ABI)).Debug("ABI Specification (From Compilers)")
-	contractCode := hex.EncodeToString(r.Bytecode)
+	contractCode := r.Bytecode
 
 	// additional data may be sent along with the contract
 	// these are naively added to the end of the contract code using standard
@@ -294,17 +290,6 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 
 
 	return result, call.Variables, nil
-}
-
-func setCompiler(do *definitions.Do, tocompile string) error {
-	lang, err := compilers.LangFromFile(tocompile)
-	if err != nil {
-		return err
-	}
-
-	url := do.Compiler + "/" + "compile"
-	compilers.SetLanguageURL(lang, url)
-	return nil
 }
 
 func deployFinalize(do *definitions.Do, tx interface{}, wait bool) (string, error) {

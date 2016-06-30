@@ -9,7 +9,7 @@ MAINTAINER Eris Industries <support@erisindustries.com>
 ENV REPO $GOPATH/src/github.com/eris-ltd/eris-pm
 COPY . $REPO
 WORKDIR $REPO/cmd/epm
-RUN go build -o /usr/local/bin/epm
+RUN go install ./
 RUN chown --recursive $USER:$USER $REPO
 
 #-----------------------------------------------------------------------------
