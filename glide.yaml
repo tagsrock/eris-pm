@@ -1,0 +1,6 @@
+package: github.com/eris-ltd/eris-pm
+import:
+- package: github.com/eris-ltd/eris-compilers
+- package: github.com/eris-ltd/common
+  subpackages:
+  - go/common
