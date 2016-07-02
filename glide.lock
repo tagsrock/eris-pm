@@ -28,7 +28,7 @@ imports:
   subpackages:
   - go/common
 - name: github.com/eris-ltd/eris-compilers
-  version: 92d7ec4dd3359bb4b3cd953c9ad09ae16b8b0a0f
+  version: fd06d8b03470d8c66c26f027aaf73fffcee9b1d8
   subpackages:
   - network
   - util
