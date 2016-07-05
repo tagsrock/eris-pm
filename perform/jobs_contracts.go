@@ -65,6 +65,9 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 
 	if err != nil {
 		log.Errorln("Error compiling contracts")
+		return "", err
+	} else if resp.Error != "" {
+		log.Errorln("Error compiling contracts")
 		return "", fmt.Errorf(resp.Error)
 	}
 
