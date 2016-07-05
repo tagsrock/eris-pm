@@ -215,18 +215,21 @@ test_setup
 
 # ---------------------------------------------------------------------------
 # Get the things build and dependencies turned on
-echo
-echo "Building eris-pm in a docker container."
-set -e
-tests/build_tool.sh 1>/dev/null
-if [ $? -ne 0 ]
+if [ "$SKIP_BUILD" != "true" ]
 then
-  echo "Could not build eris-pm. Debug via by directly running [`pwd`/tests/build_tool.sh]"
-  exit 1
+  echo
+  echo "Building eris-pm in a docker container."
+  set -e
+  tests/build_tool.sh 1>/dev/null
+  if [ $? -ne 0 ]
+  then
+    echo "Could not build eris-pm. Debug via by directly running [`pwd`/tests/build_tool.sh]"
+    exit 1
+  fi
+  set +e
+  echo "Build complete."
+  echo ""
 fi
-set +e
-echo "Build complete."
-echo ""
 
 # ---------------------------------------------------------------------------
 # Go!
