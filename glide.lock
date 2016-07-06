@@ -24,7 +24,7 @@ imports:
 - name: github.com/ebuchman/go-shell-pipes
   version: 83e1324808622485314bff0fd97b8b944200a7a4
 - name: github.com/eris-ltd/common
-  version: 875c64ec7e1525b3c8e0efed7d4974665fff4942
+  version: 7060a2f920470e6bad335c36719c309ca7d6b198
   subpackages:
   - go/common
 - name: github.com/eris-ltd/eris-compilers
