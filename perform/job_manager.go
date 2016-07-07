@@ -1,14 +1,12 @@
 package perform
 
 import (
-	"bufio"
-	"fmt"
-	"os"
 	"strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
 
+	"github.com/eris-ltd/common/go/common"
 	log "github.com/eris-ltd/eris-logger"
 )
 
@@ -36,17 +34,9 @@ func RunJobs(do *definitions.Do) error {
 		if do.Overwrite == true && dup == true {
 			log.WithField("Overwriting job name", job.JobName)
 		} else if do.Overwrite == false && dup == true {
-			reader := bufio.NewReader(os.Stdin)
-			fmt.Print("You are about to overwrite a previous job name, continue? (Y/n): ")
-			text, _ := reader.ReadString('\n')
-			fmt.Println(text)
-			for strings.ToLower(text) != "y" && strings.ToLower(text) != "n" && text != "\n" {
-				reader := bufio.NewReader(os.Stdin)
-				fmt.Print("The marmots still require an answer! Shall we smite thine old job name? (Y/n): ")
-				text, _ := reader.ReadString('\n')
-				fmt.Println(text)
-			}
-			if strings.ToLower(text) == "n" {
+			overwriteWarning := "You are about to overwrite a previous job name, continue?"
+
+			if common.QueryYesOrNo(overwriteWarning) == common.No {
 				continue
 			}
 		}
