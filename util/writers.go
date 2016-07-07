@@ -74,7 +74,6 @@ func WriteJobResultJSON(results map[string]string) error {
 	if err != nil {
 		return err
 	}
-
 	if _, err = file.Write(res); err != nil {
 		return err
 	}

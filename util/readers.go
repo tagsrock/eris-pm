@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"strings"
 	"strconv"
+	"strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
@@ -112,7 +112,7 @@ func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *def
 			result[index] = &definitions.Variable{i.Name, i.Value}
 		}
 	}
-	
+
 	return result, nil
 }
 
