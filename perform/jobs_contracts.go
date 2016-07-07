@@ -10,8 +10,8 @@ import (
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
 
-	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
+	log "github.com/eris-ltd/eris-logger"
+	"github.com/eris-ltd/common/go/common"
 	compilers "github.com/eris-ltd/eris-compilers/network"
 	response "github.com/eris-ltd/eris-compilers/util"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"

@@ -7,7 +7,7 @@ import (
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
-	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	log "github.com/eris-ltd/eris-logger"
 )
 
 func PreProcess(toProcess string, do *definitions.Do) (string, error) {

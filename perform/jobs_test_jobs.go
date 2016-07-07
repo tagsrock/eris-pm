@@ -8,7 +8,7 @@ import (
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
 
-	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	log "github.com/eris-ltd/eris-logger"
 	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/rpc/core_client"
 )
 

@@ -10,7 +10,7 @@ import (
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
-	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	log "github.com/eris-ltd/eris-logger"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/wire"
 )
 
