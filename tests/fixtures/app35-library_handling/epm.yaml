@@ -1,0 +1,14 @@
+jobs:
+  - name: deploySingleLib
+    job:
+      deploy:
+        contract: single-lib.sol
+        instance: Search
+        wait: true
+
+  - name: deployConsumingContract
+    job:
+      deploy:
+        contract: consuming-contract.sol
+        libraries: Search:$deploySingleLib
+        wait: true

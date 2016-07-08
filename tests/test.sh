@@ -137,7 +137,7 @@ run_test(){
     echo
     cat readme.md
     echo
-    eris pkgs do --chain "$chain_name" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub" #--debug
+    eris pkgs do --chain "$chain_name" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub" --debug
   else
     echo
     cat readme.md
@@ -240,7 +240,7 @@ then
   if ! [ -z "$1" ]
   then
     echo "Running One Test..."
-    run_test "$1/"
+    run_test "$1*/"
   else
     echo "Running All Tests..."
     perform_tests

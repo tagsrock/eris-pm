@@ -137,6 +137,21 @@ func replaceBlockVariable(toReplace string, do *definitions.Do) (string, error) 
 	return toReplace, nil
 }
 
+func PreProcessLibs(libs string, do *definitions.Do) (string, error) {
+	libraries, _ := PreProcess(libs, do)
+	if libraries != "" {
+		pairs := strings.Split(libraries, ",")
+		for _, pair := range pairs {
+			libAndAddr := strings.Split(pair, ":")
+			libAndAddr[1] = strings.ToLower(libAndAddr[1])
+			pair = strings.Join(libAndAddr, ":")
+		}
+		libraries = strings.Join(pairs, " ")
+	}
+	log.WithField("=>", libraries).Debug("Library String")
+	return libraries, nil
+}
+
 func GetReturnValue(vars []*definitions.Variable) string {
 	var result []string;
 	//log.WithField("=>", vars).Debug("GetReturnValue")

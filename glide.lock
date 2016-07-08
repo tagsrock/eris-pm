@@ -21,14 +21,12 @@ imports:
   - pkg/term/windows
 - name: github.com/docker/go-units
   version: f2d77a61e3c169b43402a0a1e84f06daf29b8190
-- name: github.com/ebuchman/go-shell-pipes
-  version: 83e1324808622485314bff0fd97b8b944200a7a4
 - name: github.com/eris-ltd/common
   version: 7060a2f920470e6bad335c36719c309ca7d6b198
   subpackages:
   - go/common
 - name: github.com/eris-ltd/eris-compilers
-  version: fd06d8b03470d8c66c26f027aaf73fffcee9b1d8
+  version: fbd54e08be9777ac15905f2a7b82597c297714aa
   subpackages:
   - network
   - util
