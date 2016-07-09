@@ -5,11 +5,20 @@ MAINTAINER Eris Industries <support@erisindustries.com>
 #-----------------------------------------------------------------------------
 # install epm
 
-# set the repo and install epm
+# set the repo and copy in files
 ENV REPO $GOPATH/src/github.com/eris-ltd/eris-pm
 COPY . $REPO
-WORKDIR $REPO/cmd/epm
-RUN go install ./
+
+# install glide; use glide; remove its traces
+WORKDIR $REPO
+RUN go get github.com/Masterminds/glide && \
+  glide install --strip-vcs --strip-vendor && \
+  rm -rf $GOPATH/pkg/* && \
+  rm -rf $GOPATH/bin/* && \
+  rm -rf $GOPATH/src/github.com/Masterminds
+
+# install eris-pm
+RUN go install ./cmd/epm
 RUN chown --recursive $USER:$USER $REPO
 
 #-----------------------------------------------------------------------------

@@ -244,7 +244,9 @@ type Deploy struct {
   Source string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
   // (Required) the filepath to the contract file. this should be relative to the current path **or**
   // relative to the contracts path established via the --contracts-path flag or the $EPM_CONTRACTS_PATH
-  // environment variable
+  // environment variable. If contract has a "bin" file extension then it will not be sent to the
+  // compilers but rather will just be sent to the chain. Note, if you use a "call" job after deploying
+  // a binary contract then you will be **required** to utilize an abi field in the call job.
   Contract string `mapstructure:"contract" json:"contract" yaml:"contract" toml:"contract"`
   // (Optional) the name of contract to instantiate (it has to be one of the contracts present)
   // in the file defined in Contract above.
@@ -265,11 +267,16 @@ type Deploy struct {
   Fee string `mapstructure:"fee" json:"fee" yaml:"fee" toml:"fee"`
   // (Optional) amount of gas which should be sent along with the contract deployment transaction
   Gas string `mapstructure:"gas" json:"gas" yaml:"gas" toml:"gas"`
+  // (Optional) after compiling the contract save the binary in filename.bin in same directory
+  // where the *.sol or *.se file is located. This will speed up subsequent installs
+  SaveBinary bool `mapstructure:"save" json:"save" yaml:"save" toml:"save"`
   // (Optional, advanced only) nonce to use when eris-keys signs the transaction (do not use unless you
   // know what you're doing)
   Nonce string `mapstructure:"nonce" json:"nonce" yaml:"nonce" toml:"nonce"`
   // (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
   Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+  // (Optional) todo
+  Variables []*Variable
 }
 ```
 

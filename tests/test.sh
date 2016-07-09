@@ -147,6 +147,7 @@ run_test(){
   test_exit=$?
 
   rm -rf ./abi &>/dev/null
+  rm *.bin &>/dev/null
   rm ./epm.json &>/dev/null
   rm ./epm.csv &>/dev/null
 
