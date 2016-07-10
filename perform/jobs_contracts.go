@@ -10,10 +10,10 @@ import (
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
 
-	log "github.com/eris-ltd/eris-logger"
 	"github.com/eris-ltd/common/go/common"
 	compilers "github.com/eris-ltd/eris-compilers/network"
 	response "github.com/eris-ltd/eris-compilers/util"
+	log "github.com/eris-ltd/eris-logger"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/types"
 )
@@ -60,17 +60,6 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 		log.WithField("=>", do.Compiler).Info("Setting compiler path")
 	}
 
-	// compile
-	resp, err := compilers.BeginCompile(do.Compiler, p, false, deploy.Libraries)
-
-	if err != nil {
-		log.Errorln("Error compiling contracts")
-		return "", err
-	} else if resp.Error != "" {
-		log.Errorln("Error compiling contracts")
-		return "", fmt.Errorf(resp.Error)
-	}
-
 	// Don't use pubKey if account override
 	var oldKey string
 	if deploy.Source != do.Package.Account {
@@ -78,45 +67,77 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 		do.PublicKey = ""
 	}
 
-	// loop through objects returned from compiler
-	switch {
-	case len(resp.Objects) == 1:
-		log.WithField("path", p).Info("Deploying the only contract in file")
-		r := resp.Objects[0]
-		if r.Bytecode != "" {
-			result, err = deployContract(deploy, do, r, p)
-			if err != nil {
-				return "", err
-			}
+	// compile
+	if filepath.Ext(deploy.Contract) == ".bin" {
+		log.Info("Binary file detected. Using binary deploy sequence.")
+		// binary deploy sequence
+		contractCode, err := ioutil.ReadFile(p)
+		if err != nil {
+			result := "could not read binary file"
+			return result, err
 		}
-	case deploy.Instance == "all":
-		log.WithField("path", p).Info("Deploying all contracts")
-		var baseObj string
-		for _, r := range resp.Objects {
-			if r.Bytecode == "" {
-				continue
-			}
-			result, err = deployContract(deploy, do, r, p)
-			if err != nil {
-				return "", err
-			}
-			if strings.ToLower(r.Objectname) == strings.ToLower(strings.TrimSuffix(filepath.Base(deploy.Contract), filepath.Ext(filepath.Base(deploy.Contract)))) {
-				baseObj = result
-			}
+		tx, err := deployRaw(do, deploy, contractName, string(contractCode))
+		if err != nil {
+			result := "could not deploy binary contract"
+			return result, err
 		}
-		if baseObj != "" {
-			result = baseObj
+		result, err := deployFinalize(do, tx, deploy.Wait)
+		if err != nil {
+			return "", fmt.Errorf("Error finalizing contract deploy %s: %v", p, err)
 		}
-	default:
-		log.WithField("contr", deploy.Instance).Info("Deploying a single contract")
-		for _, r := range resp.Objects {
-			if r.Bytecode == "" {
-				continue
-			}
-			if strings.ToLower(r.Objectname) == strings.ToLower(deploy.Instance) {
+		return result, err
+	} else {
+		// normal compilation/deploy sequence
+		resp, err := compilers.BeginCompile(do.Compiler, p, false, deploy.Libraries)
+
+		if err != nil {
+			log.Errorln("Error compiling contracts")
+			return "", err
+		} else if resp.Error != "" {
+			log.Errorln("Error compiling contracts")
+			return "", fmt.Errorf(resp.Error)
+		}
+
+		// loop through objects returned from compiler
+		switch {
+		case len(resp.Objects) == 1:
+			log.WithField("path", p).Info("Deploying the only contract in file")
+			r := resp.Objects[0]
+			if r.Bytecode != "" {
 				result, err = deployContract(deploy, do, r, p)
 				if err != nil {
 					return "", err
+				}
+			}
+		case deploy.Instance == "all":
+			log.WithField("path", p).Info("Deploying all contracts")
+			var baseObj string
+			for _, r := range resp.Objects {
+				if r.Bytecode == "" {
+					continue
+				}
+				result, err = deployContract(deploy, do, r, p)
+				if err != nil {
+					return "", err
+				}
+				if strings.ToLower(r.Objectname) == strings.ToLower(strings.TrimSuffix(filepath.Base(deploy.Contract), filepath.Ext(filepath.Base(deploy.Contract)))) {
+					baseObj = result
+				}
+			}
+			if baseObj != "" {
+				result = baseObj
+			}
+		default:
+			log.WithField("contract", deploy.Instance).Info("Deploying a single contract")
+			for _, r := range resp.Objects {
+				if r.Bytecode == "" {
+					continue
+				}
+				if strings.ToLower(r.Objectname) == strings.ToLower(deploy.Instance) {
+					result, err = deployContract(deploy, do, r, p)
+					if err != nil {
+						return "", err
+					}
 				}
 			}
 		}
@@ -165,19 +186,21 @@ func deployContract(deploy *definitions.Deploy, do *definitions.Do, r response.R
 		log.Debug("Objectname from compilers is blank. Not saving abi.")
 	}
 
-	// Deploy contract
-	log.WithFields(log.Fields{
-		"name": r.Objectname,
-	}).Warn("Deploying Contract")
+	// saving binary
+	if deploy.SaveBinary {
+		contractDir := filepath.Dir(deploy.Contract)
+		contractName := filepath.Join(contractDir, fmt.Sprintf("%s.bin", strings.TrimSuffix(deploy.Contract, filepath.Ext(deploy.Contract))))
+		log.WithField("=>", contractName).Info("Saving Binary")
+		if err := ioutil.WriteFile(contractName, []byte(contractCode), 0664); err != nil {
+			return "", err
+		}
+	} else {
+		log.Debug("Not saving binary.")
+	}
 
-	log.WithFields(log.Fields{
-		"source": deploy.Source,
-		"code":   contractCode,
-	}).Info()
-
-	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, deploy.Source, "", deploy.Amount, deploy.Nonce, deploy.Gas, deploy.Fee, contractCode)
+	tx, err := deployRaw(do, deploy, r.Objectname, contractCode)
 	if err != nil {
-		return "", fmt.Errorf("Error deploying contract %s: %v", p, err)
+		return "", err
 	}
 
 	// Sign, broadcast, display
@@ -199,6 +222,26 @@ func deployContract(deploy *definitions.Deploy, do *definitions.Do, r response.R
 	}
 
 	return result, err
+}
+
+func deployRaw(do *definitions.Do, deploy *definitions.Deploy, contractName, contractCode string) (*types.CallTx, error) {
+
+	// Deploy contract
+	log.WithFields(log.Fields{
+		"name": contractName,
+	}).Warn("Deploying Contract")
+
+	log.WithFields(log.Fields{
+		"source": deploy.Source,
+		"code":   contractCode,
+	}).Info()
+
+	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, deploy.Source, "", deploy.Amount, deploy.Nonce, deploy.Gas, deploy.Fee, contractCode)
+	if err != nil {
+		return &types.CallTx{}, fmt.Errorf("Error deploying contract %s: %v", contractName, err)
+	}
+
+	return tx, err
 }
 
 func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions.Variable, error) {
@@ -290,7 +333,6 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 		log.Info("Saving tx hash instead of contract return")
 		result = fmt.Sprintf("%X", res.Hash)
 	}
-
 
 	return result, call.Variables, nil
 }
