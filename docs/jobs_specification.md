@@ -256,7 +256,7 @@ type Deploy struct {
   // the name of the file (or the last one deployed if there are no matching names; not the "last"
   // one deployed" strategy is non-deterministic and should not be used).
   Instance string `mapstructure:"instance" json:"instance" yaml:"instance" toml:"instance"`
-  // (Optional) list of Name:Address separated by spaces of libraries (see solc --help)
+  // (Optional) list of Name:Address separated by commas of libraries (see app35)
   Libraries string `mapstructure:"libraries" json:"libraries" yaml:"libraries" toml:"libraries"`
   // (Optional) TODO: additional arguments to send along with the contract code
   Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`

@@ -30,7 +30,6 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 	deploy.Source, _ = util.PreProcess(deploy.Source, do)
 	deploy.Contract, _ = util.PreProcess(deploy.Contract, do)
 	deploy.Instance, _ = util.PreProcess(deploy.Instance, do)
-	log.Debug("Instance: ", deploy.Instance)
 	deploy.Libraries, _ = util.PreProcessLibs(deploy.Libraries, do)
 	deploy.Amount, _ = util.PreProcess(deploy.Amount, do)
 	deploy.Nonce, _ = util.PreProcess(deploy.Nonce, do)
@@ -89,7 +88,6 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 		return result, err
 	} else {
 		// normal compilation/deploy sequence
-		log.Debug("What is compilers being sent: ", deploy.Libraries)
 		resp, err := compilers.BeginCompile(do.Compiler, p, false, deploy.Libraries)
 
 		if err != nil {
