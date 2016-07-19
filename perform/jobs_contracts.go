@@ -30,7 +30,7 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 	deploy.Source, _ = util.PreProcess(deploy.Source, do)
 	deploy.Contract, _ = util.PreProcess(deploy.Contract, do)
 	deploy.Instance, _ = util.PreProcess(deploy.Instance, do)
-	deploy.Libraries, _ = util.PreProcess(deploy.Libraries, do)
+	deploy.Libraries, _ = util.PreProcessLibs(deploy.Libraries, do)
 	deploy.Amount, _ = util.PreProcess(deploy.Amount, do)
 	deploy.Nonce, _ = util.PreProcess(deploy.Nonce, do)
 	deploy.Fee, _ = util.PreProcess(deploy.Fee, do)
@@ -97,7 +97,6 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 			log.Errorln("Error compiling contracts")
 			return "", fmt.Errorf(resp.Error)
 		}
-
 		// loop through objects returned from compiler
 		switch {
 		case len(resp.Objects) == 1:

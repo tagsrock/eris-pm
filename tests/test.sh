@@ -240,7 +240,7 @@ then
   if ! [ -z "$1" ]
   then
     echo "Running One Test..."
-    run_test "$1/"
+    run_test "$1*/"
   else
     echo "Running All Tests..."
     perform_tests
