@@ -22,8 +22,10 @@ In EPM a *job* is a single action which is performed (such as a transaction, a c
 ### For Developers
 
 1. [Install go](https://golang.org/doc/install)
-2. Ensure you have `gmp` installed (`sudo apt-get install libgmp3-dev || brew install gmp`)
-3. `go get github.com/eris-ltd/eris-pm/cmd/epm`
+2. [Install glide](https://github.com/Masterminds/glide)
+3. Ensure you have `gmp` installed (`sudo apt-get install libgmp3-dev || brew install gmp`)
+4. `go get github.com/eris-ltd/eris-pm/cmd/epm`
+5. from eris-pm dir run `glide install`
 
 ## Usage
 
