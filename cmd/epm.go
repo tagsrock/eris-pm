@@ -11,9 +11,8 @@ import (
 	"github.com/eris-ltd/eris-pm/util"
 	"github.com/eris-ltd/eris-pm/version"
 
-	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
-	. "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/common"
-	logger "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/common/go/log"
+	log "github.com/eris-ltd/eris-logger"
+	common "github.com/eris-ltd/common/go/common"
 	cfg "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/config"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
 )
@@ -37,8 +36,6 @@ Complete documentation is available at https://docs.erisindustries.com
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		// TODO: make this better.... need proper epm config
 		// need to be able to have variable writers (eventually)
-		log.SetFormatter(logger.ErisFormatter{})
-
 		log.SetLevel(log.WarnLevel)
 		if do.Verbose {
 			log.SetLevel(log.InfoLevel)
@@ -57,7 +54,7 @@ Complete documentation is available at https://docs.erisindustries.com
 		util.PrintPathPackage(do)
 
 		// Populates chainID from the chain (if its not passed)
-		IfExit(util.GetChainID(do))
+		common.IfExit(util.GetChainID(do))
 
 		// Populates the tendermint config object for proper websocket connection
 		config.Set("chain_id", do.ChainID)
@@ -106,7 +103,7 @@ func AddGlobalFlags() {
 
 //----------------------------------------------------
 func RunPackage(cmd *cobra.Command, args []string) {
-	IfExit(packages.RunPackage(do))
+	common.IfExit(packages.RunPackage(do))
 }
 
 // ---------------------------------------------------

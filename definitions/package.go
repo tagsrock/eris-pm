@@ -3,6 +3,7 @@ package definitions
 type Package struct {
 	Account string
 	Jobs    []*Jobs
+	Libraries map[string]string
 }
 
 type Jobs struct {

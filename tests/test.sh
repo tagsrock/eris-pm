@@ -147,6 +147,7 @@ run_test(){
   test_exit=$?
 
   rm -rf ./abi &>/dev/null
+  rm *.bin &>/dev/null
   rm ./epm.json &>/dev/null
   rm ./epm.csv &>/dev/null
 
@@ -182,7 +183,7 @@ test_teardown(){
       eris services stop -rx keys
     fi
     eris chains stop --force $chain_name 1>/dev/null
-    # eris chains logs $chain_name -t 500 # uncomment me to dump recent VM/Chain logs
+    # eris chains logs $chain_name -t 200 # uncomment me to dump recent VM/Chain logs
     # eris chains logs $chain_name -t all # uncomment me to dump all VM/Chain logs
     # eris chains logs $chain_name -t all | grep 'CALLDATALOAD\|Calling' # uncomment me to dump all VM/Chain logs and parse for Calls/Calldataload
     # eris chains logs $chain_name -t all | grep 'CALLDATALOAD\|Calling' > error.log # uncomment me to dump all VM/Chain logs and parse for Calls/Calldataload dump to a file
@@ -215,18 +216,21 @@ test_setup
 
 # ---------------------------------------------------------------------------
 # Get the things build and dependencies turned on
-echo
-echo "Building eris-pm in a docker container."
-set -e
-tests/build_tool.sh 1>/dev/null
-if [ $? -ne 0 ]
+if [ "$SKIP_BUILD" != "true" ]
 then
-  echo "Could not build eris-pm. Debug via by directly running [`pwd`/tests/build_tool.sh]"
-  exit 1
+  echo
+  echo "Building eris-pm in a docker container."
+  set -e
+  tests/build_tool.sh 1>/dev/null
+  if [ $? -ne 0 ]
+  then
+    echo "Could not build eris-pm. Debug via by directly running [`pwd`/tests/build_tool.sh]"
+    exit 1
+  fi
+  set +e
+  echo "Build complete."
+  echo ""
 fi
-set +e
-echo "Build complete."
-echo ""
 
 # ---------------------------------------------------------------------------
 # Go!
@@ -236,7 +240,7 @@ then
   if ! [ -z "$1" ]
   then
     echo "Running One Test..."
-    run_test "$1/"
+    run_test "$1*/"
   else
     echo "Running All Tests..."
     perform_tests

@@ -10,7 +10,7 @@ import (
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
-	log "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/Sirupsen/logrus"
+	log "github.com/eris-ltd/eris-logger"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/wire"
 )
 
@@ -74,7 +74,6 @@ func WriteJobResultJSON(results map[string]string) error {
 	if err != nil {
 		return err
 	}
-
 	if _, err = file.Write(res); err != nil {
 		return err
 	}
