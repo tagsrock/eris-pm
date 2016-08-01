@@ -158,11 +158,6 @@
 			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
 		},
 		{
-			"ImportPath": "github.com/ethereum/go-ethereum/crypto/sha3",
-			"Comment": "v1.3.3",
-			"Rev": "c541b38fb36587d23c60f5e2f2b9b3c8700ec489"
-		},
-		{
 			"ImportPath": "github.com/go-martini/martini",
 			"Comment": "v1.0-119-gc657c03",
 			"Rev": "c657c03d1add219e93d48ffa493052c9a79c11b2"

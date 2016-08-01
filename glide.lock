@@ -1,5 +1,5 @@
-hash: 0e38a9415963160a5364eb131883bec8fee005c636cca7c4df18a070557f1631
-updated: 2016-08-01T10:28:38.835686959-05:00
+hash: 7259a8261500da519d7c524ab47af3ffd1ab6735790394c9bf7098dafe15052c
+updated: 2016-08-01T11:05:59.988467285-05:00
 imports:
 - name: github.com/Azure/go-ansiterm
   version: fa152c58bc15761d0200cb75fe958b89a9d4888e
@@ -26,7 +26,7 @@ imports:
   subpackages:
   - go/common
 - name: github.com/eris-ltd/eris-abi
-  version: 6993e969fd1bc63d87a92d2be2300ab027f77ff8
+  version: 1b264afca26faacb6d43faa584f2b6b07a621657
   subpackages:
   - core
   - abi
@@ -37,6 +37,10 @@ imports:
   - util
 - name: github.com/eris-ltd/eris-logger
   version: ea48a395d6ecc0eccc67a26da9fc7a6106fabb84
+- name: github.com/ethereum/go-ethereum
+  version: 5f55d95aea433ef97c48ae927835d833772350de
+  subpackages:
+  - crypto/sha3
 - name: github.com/Sirupsen/logrus
   version: f3cfb454f4c209e6668c95216c4744b8fddb2356
 - name: golang.org/x/sys
