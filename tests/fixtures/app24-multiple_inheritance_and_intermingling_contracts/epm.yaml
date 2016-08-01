@@ -8,11 +8,11 @@ jobs:
        instance: one
        wait: true
 
- - name:  get1i
+ - name: get1i
    job:
      query-contract:
        destination: $deployOne
-       data: i
+       function: i
        abi: one
 
  - name: assert1One
@@ -34,7 +34,7 @@ jobs:
    job:
      query-contract:
        destination: $deployTwo
-       data: i
+       function: i
        abi: two
 
  - name: assert2One
@@ -48,7 +48,7 @@ jobs:
    job:
      query-contract:
        destination: $deployTwo
-       data: ii
+       function: ii
        abi: two
 
  - name: assert2Two
@@ -70,7 +70,7 @@ jobs:
    job:
      query-contract:
        destination: $deployThree
-       data: i
+       function: i
        abi: three
 
  - name: assert3One
@@ -84,7 +84,7 @@ jobs:
    job:
      query-contract:
        destination: $deployThree
-       data: ii
+       function: ii
        abi: three
 
  - name: assert3Two
@@ -98,7 +98,7 @@ jobs:
    job:
      query-contract:
        destination: $deployThree
-       data: iii
+       function: iii
        abi: three
        
  - name: assert3Three

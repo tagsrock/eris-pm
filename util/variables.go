@@ -27,10 +27,10 @@ func PreProcess(toProcess string, do *definitions.Do) (string, error) {
 			var innerVarName string
 			var wantsInnerValues bool = false
 			/*
-			log.WithFields(log.Fields{
-			 	"var": varName,
-			 	"job": jobName,
-			}).Debugf("Correcting match %d", i+1)
+				log.WithFields(log.Fields{
+				 	"var": varName,
+				 	"job": jobName,
+				}).Debugf("Correcting match %d", i+1)
 			*/
 			// first parse the reserved words.
 			if strings.Contains(jobName, "block") {
@@ -46,7 +46,7 @@ func PreProcess(toProcess string, do *definitions.Do) (string, error) {
 				processedString = strings.Replace(processedString, toProcess, block, 1)
 			}
 
-			if strings.Contains(jobName, ".") {	//for functions with multiple returns
+			if strings.Contains(jobName, ".") { //for functions with multiple returns
 				wantsInnerValues = true
 				var splitStr = strings.Split(jobName, ".")
 				jobName = splitStr[0]
@@ -56,14 +56,14 @@ func PreProcess(toProcess string, do *definitions.Do) (string, error) {
 			// second we loop through the jobNames to do a result replace
 			for _, job := range do.Package.Jobs {
 				if string(jobName) == job.JobName {
-					if (wantsInnerValues) { 
+					if wantsInnerValues {
 						for _, innerVal := range job.JobVars {
-							if (innerVal.Name == innerVarName) { //find the value we want from the bunch
+							if innerVal.Name == innerVarName { //find the value we want from the bunch
 								processedString = strings.Replace(processedString, varName, innerVal.Value, 1)
 								log.WithFields(log.Fields{
-									"job": string(jobName),
+									"job":     string(jobName),
 									"varName": innerVarName,
-									"result": innerVal.Value,
+									"result":  innerVal.Value,
 								}).Debug("Fixing Inner Vars =>")
 							}
 						}
@@ -74,7 +74,7 @@ func PreProcess(toProcess string, do *definitions.Do) (string, error) {
 						}).Debug("Fixing Variables =>")
 						processedString = strings.Replace(processedString, varName, job.JobResult, 1)
 					}
-					
+
 				}
 			}
 		}
@@ -153,7 +153,7 @@ func PreProcessLibs(libs string, do *definitions.Do) (string, error) {
 }
 
 func GetReturnValue(vars []*definitions.Variable) string {
-	var result []string;
+	var result []string
 	//log.WithField("=>", vars).Debug("GetReturnValue")
 	for _, value := range vars {
 		result = append(result, value.Value)

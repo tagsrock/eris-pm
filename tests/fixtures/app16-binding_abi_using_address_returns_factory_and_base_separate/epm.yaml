@@ -23,7 +23,7 @@ jobs:
   job:
     call:
       destination: $deployGSFactory
-      data: create
+      function: create
       abi: $deployGSFactory
       wait: true
 
@@ -32,7 +32,7 @@ jobs:
   job:
     query-contract:
       destination: $deployGSFactory
-      data: getLast
+      function: getLast
       abi: $deployGSFactory
 
 - name: assertAddr
@@ -47,7 +47,9 @@ jobs:
   job:
     call:
       destination: $createGSContract
-      data: set $setStorageBase
+      function: set 
+      data:
+        - $setStorageBase
       abi: $deployGSABIFactory
       wait: true
 
@@ -55,7 +57,7 @@ jobs:
   job:
     query-contract:
       destination: $createGSContract
-      data: get
+      function: get
       abi: $deployGSABIFactory
 
 - name: assertStorage

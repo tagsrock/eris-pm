@@ -16,7 +16,7 @@ jobs:
   job:
     call:
       destination: $deployGSFactory
-      data: create
+      function: create
       wait: true
 
 #Double check created address
@@ -24,7 +24,7 @@ jobs:
   job:
     query-contract:
       destination: $deployGSFactory
-      data: getLast
+      function: getLast
 
 - name: assertAddr
   job:
@@ -38,7 +38,9 @@ jobs:
   job:
     call:
       destination: $createGSContract
-      data: set $setStorageBase
+      function: set 
+      data:
+        - $setStorageBase
       abi: GSContract
       wait: true
 
@@ -46,7 +48,7 @@ jobs:
   job:
     query-contract:
       destination: $createGSContract
-      data: get
+      function: get
       abi: GSContract
 
 - name: assertStorage

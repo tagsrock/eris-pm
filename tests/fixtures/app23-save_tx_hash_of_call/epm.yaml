@@ -15,7 +15,9 @@ jobs:
   job:
     call:
       destination: $deployStorageK
-      data: set $setStorageBase
+      function: set
+      data:
+        - $setStorageBase
       save: tx
       wait: true
 
@@ -23,7 +25,8 @@ jobs:
   job:
     query-contract:
       destination: $deployStorageK
-      data: get
+      function: get
+
 
 - name: assertStorage
   job:

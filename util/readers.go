@@ -6,14 +6,15 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
+	//"reflect"
 	"strconv"
-	"strings"
+	//"strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
-	log "github.com/eris-ltd/eris-logger"
 	"github.com/eris-ltd/common/go/common"
 	ebi "github.com/eris-ltd/eris-abi/core"
+	log "github.com/eris-ltd/eris-logger"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
 )
 
@@ -54,36 +55,60 @@ func ReadTxSignAndBroadcast(result *core.TxResult, err error) error {
 	return nil
 }
 
-func ReadAbiFormulateCall(abiLocation, dataRaw string, do *definitions.Do) (string, error) {
+func ReadAbiFormulateCall(abiLocation, funcName string, dataRaw []string, do *definitions.Do) (string, error) {
 	abiSpecBytes, err := readAbi(do.ABIPath, abiLocation)
 	if err != nil {
 		return "", err
 	}
 	log.WithField("=>", string(abiSpecBytes)).Debug("ABI Specification (Formulate)")
-
-	// Process and Pack the Call
-	funcName, args := abiPreProcess(dataRaw, do)
-
-	log.WithFields(log.Fields{
-		"function name": funcName,
-		"arguments":     args,
-	}).Debug("Packing Call via ABI")
-	var totalArgs []string
+	totalArgs := make([]string, 0)
 	totalArgs = append(totalArgs, funcName)
-	totalArgs = append(totalArgs, args...)
+	// Process and Pack the Call
+	/*for _, data := range dataRaw {
+		var arg string
+		//see https://play.golang.org/p/W7ZnMgicc7
+		//might want to use this for interface assertions of arrays
+		if reflect.TypeOf(data).Kind() == reflect.Slice {
+			var args []string
+			for _, index := range data.([]interface{}) {
+				value := reflect.ValueOf(index)
+				var stringified string
+				switch value.Kind() {
+				case reflect.Int:
+					stringified = strconv.FormatInt(value.Int(), 10)
+				case reflect.String:
+					stringified = value.String()
+				}
+				index, _ = PreProcess(stringified, do)
+				args = append(args, stringified)
+			}
+			arg = "[" + strings.Join(args, ",") + "]"
+		} else {
+			if reflect.TypeOf(data).Kind() == reflect.Bool {
+				arg = strconv.FormatBool(reflect.ValueOf(data).Bool())
+			} else if reflect.TypeOf(data).Kind() == reflect.Int {
+				arg = strconv.FormatInt(reflect.ValueOf(data).Int(), 10)
+			} else {
+				arg = data.(string)
+			}
+			arg, _ = PreProcess(arg, do)
+		}
+		totalArgs = append(totalArgs, arg)
+	}*/
+	totalArgs = append(totalArgs, dataRaw...)
+	log.WithFields(log.Fields{
+		"arguments": totalArgs,
+	}).Debug("Packing Call via ABI")
 
 	return ebi.Packer(abiSpecBytes, totalArgs...)
 }
 
-func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *definitions.Do) ([]*definitions.Variable, error) {
+func ReadAndDecodeContractReturn(abiLocation string, funcName string, resultRaw string, do *definitions.Do) ([]*definitions.Variable, error) {
 	abiSpecBytes, err := readAbi(do.ABIPath, abiLocation)
 	if err != nil {
 		return nil, err
 	}
 	log.WithField("=>", string(abiSpecBytes)).Debug("ABI Specification (Decode)")
-
-	// Process and Pack the Call
-	funcName, _ := abiPreProcess(dataRaw, do)
 
 	// Unpack the result
 	res, err := ebi.UnPacker(abiSpecBytes, funcName, resultRaw, false)
@@ -114,24 +139,6 @@ func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *def
 	}
 
 	return result, nil
-}
-
-func abiPreProcess(dataRaw string, do *definitions.Do) (string, []string) {
-	var dataNew []string
-
-	data := strings.Split(dataRaw, " ")
-	log.WithField("=>", data).Debug("Data after splitting")
-	for _, d := range data {
-		d, _ = PreProcess(d, do)
-		dataNew = append(dataNew, d)
-	}
-
-	funcName := dataNew[0]
-	args := dataNew[1:]
-
-	log.WithField("=>", len(args)).Debug("Length of Args")
-
-	return funcName, args
 }
 
 func readAbi(root, contract string) ([]byte, error) {

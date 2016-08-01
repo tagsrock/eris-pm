@@ -42,7 +42,6 @@ func RunJobs(do *definitions.Do) error {
 		}
 
 		switch {
-
 		// Util jobs
 		case job.Job.Account != nil:
 			announce(job.JobName, "Account")

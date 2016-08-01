@@ -70,7 +70,7 @@ Hold with us while the marmots get those in control :)
 
 ## <a name="arrays"></a> Array Packing and Returns
 
-eris:pm can now handle packing and returning of arrays with some caveats. In order to pack an array value in, you must declare it inside square brackets, with each value separated by commas with `no spaces` in between. This is due to a splitting functionality which the marmots are hoping to refactor. For an example, see [app31](~/tests/fixtures/app31/epm.yaml). Until then, you can declare arrays for most static types such as: 
+eris:pm can now handle packing and returning of arrays with some caveats. In order to pack an array value in, you must declare it inside square brackets. For an example, see [app31](~/tests/fixtures/app31/epm.yaml). Until then, you can declare arrays for most static types such as: 
 
 *  `int` `uint` `bool` `bytes(1-32)`
 
