@@ -1,5 +1,5 @@
-hash: 7259a8261500da519d7c524ab47af3ffd1ab6735790394c9bf7098dafe15052c
-updated: 2016-06-29T01:18:52.238916629-05:00
+hash: 0e38a9415963160a5364eb131883bec8fee005c636cca7c4df18a070557f1631
+updated: 2016-08-01T10:28:38.835686959-05:00
 imports:
 - name: github.com/Azure/go-ansiterm
   version: fa152c58bc15761d0200cb75fe958b89a9d4888e
@@ -22,9 +22,14 @@ imports:
 - name: github.com/docker/go-units
   version: f2d77a61e3c169b43402a0a1e84f06daf29b8190
 - name: github.com/eris-ltd/common
-  version: 7060a2f920470e6bad335c36719c309ca7d6b198
+  version: eb041cd9a6dea7667b98db16fb5613eedaa62326
   subpackages:
   - go/common
+- name: github.com/eris-ltd/eris-abi
+  version: 6993e969fd1bc63d87a92d2be2300ab027f77ff8
+  subpackages:
+  - core
+  - abi
 - name: github.com/eris-ltd/eris-compilers
   version: 0ac7d524935fc9fda60d552d64410c0ca416aa36
   subpackages:
@@ -32,8 +37,6 @@ imports:
   - util
 - name: github.com/eris-ltd/eris-logger
   version: ea48a395d6ecc0eccc67a26da9fc7a6106fabb84
-- name: github.com/mitchellh/go-homedir
-  version: 756f7b183b7ab78acdbbee5c7f392838ed459dda
 - name: github.com/Sirupsen/logrus
   version: f3cfb454f4c209e6668c95216c4744b8fddb2356
 - name: golang.org/x/sys

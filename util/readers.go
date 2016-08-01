@@ -13,7 +13,7 @@ import (
 
 	log "github.com/eris-ltd/eris-logger"
 	"github.com/eris-ltd/common/go/common"
-	ebi "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-abi/core"
+	ebi "github.com/eris-ltd/eris-abi/core"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
 )
 

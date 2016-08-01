@@ -4,3 +4,4 @@ import:
 - package: github.com/eris-ltd/common
   subpackages:
   - go/common
+- package: github.com/eris-ltd/eris-abi/core
