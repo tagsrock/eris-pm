@@ -15,7 +15,7 @@ import (
 )
 
 const LogFileNameCSV = "epm.csv"
-const LogFileNameJSON = "epm.json"
+const LogFileNameJSON = "jobs_output.json"
 
 // ------------------------------------------------------------------------
 // Logging
