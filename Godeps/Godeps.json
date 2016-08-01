@@ -52,14 +52,6 @@
 			"Rev": "599e2b5057345680c99510c216d8feb0c98e2724"
 		},
 		{
-			"ImportPath": "github.com/eris-ltd/eris-abi/abi",
-			"Rev": "ba70b742d8959a0b4baa5a82c72974d50e4d7fc6"
-		},
-		{
-			"ImportPath": "github.com/eris-ltd/eris-abi/core",
-			"Rev": "ba70b742d8959a0b4baa5a82c72974d50e4d7fc6"
-		},
-		{
 			"ImportPath": "github.com/eris-ltd/eris-compilers",
 			"Rev": "2d7a4a8c4a07d366f2a7c16c2bc53b23d83d35f4"
 		},
@@ -164,11 +156,6 @@
 			"ImportPath": "github.com/eris-ltd/tendermint/wire",
 			"Comment": "0.1-66-g635ad92",
 			"Rev": "b0c1ee2c3ad851cf4e7b9dc95c2e65559e5d447d"
-		},
-		{
-			"ImportPath": "github.com/ethereum/go-ethereum/crypto/sha3",
-			"Comment": "v1.3.3",
-			"Rev": "c541b38fb36587d23c60f5e2f2b9b3c8700ec489"
 		},
 		{
 			"ImportPath": "github.com/go-martini/martini",
