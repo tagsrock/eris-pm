@@ -172,7 +172,7 @@ func postProcess(do *definitions.Do) error {
 			}
 		}
 	case "json":
-		log.Info("Writing [epm.json] to current directory")
+		log.Info("Writing [jobs_output.json] to current directory")
 		results := make(map[string]string)
 		for _, job := range do.Package.Jobs {
 			results[job.JobName] = job.JobResult

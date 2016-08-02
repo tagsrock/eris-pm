@@ -28,7 +28,7 @@ docs/eris-cli
 builds
 epm.csv
 epm.log
-epm.json
+jobs_output.json
 tests/fixtures/*/abi
 docs/eris-pm
 tests/fixtures/chaindata/genesis.json
