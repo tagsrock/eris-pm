@@ -12,10 +12,13 @@ COPY . $REPO
 # install glide; use glide; remove its traces
 WORKDIR $REPO
 RUN go get github.com/Masterminds/glide && \
-  glide install --strip-vcs --strip-vendor && \
-  rm -rf $GOPATH/pkg/* && \
-  rm -rf $GOPATH/bin/* && \
-  rm -rf $GOPATH/src/github.com/Masterminds
+	go get github.com/sgotti/glide-vc && \
+	glide install --strip-vcs --strip-vendor && \
+	glide vc && \
+  	rm -rf $GOPATH/pkg/* && \
+  	rm -rf $GOPATH/bin/* && \
+  	rm -rf $GOPATH/src/github.com/Masterminds && \
+ 	rm -rf $GOPATH/src/github.com/sgotti
 
 # install eris-pm
 WORKDIR $REPO/cmd/epm
