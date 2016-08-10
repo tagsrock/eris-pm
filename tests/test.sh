@@ -117,7 +117,7 @@ test_setup(){
   key2_pub=$(cat $chain_dir/accounts.csv | grep $name_part | cut -d ',' -f 1)
   echo -e "Default Key =>\t\t\t\t$key1_addr"
   echo -e "Backup Key =>\t\t\t\t$key2_addr"
-  eris chains new $chain_name --dir $chain_dir/$name_full 1>/dev/null
+  eris chains start $chain_name --init-dir $chain_dir/$name_full 1>/dev/null
   sleep 5 # boot time
   echo "Setup complete"
 }
