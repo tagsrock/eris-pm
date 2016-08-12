@@ -161,34 +161,19 @@ func deployContract(deploy *definitions.Deploy, do *definitions.Do, r response.R
 	// these are naively added to the end of the contract code using standard
 	// mint packing
 	
-	if (deploy.Data != nil) {
+	if deploy.Data != nil {
 		val := reflect.ValueOf(deploy.Data)
-		switch deploy.Data.(type){
-		case []int, []string, []bool:
-			log.Debug("Hit slice")
-			
-			for i := 0; i < val.Len(); i++ {
-				s := val.Index(i)
-				newString, err := util.PreProcess(s.Interface().(string), do)
-				if err != nil {
-					return "", err
-				}
-				addOns := common.LeftPadString(common.StripHex(common.Coerce2Hex(newString)), 64)
-				log.WithField("=>", contractCode).Debug("Contract Code")
-				log.WithField("=>", addOns).Debug("Additional Data")
-				contractCode = contractCode + addOns
-			}
-		default:
+		if reflect.TypeOf(deploy.Data).Kind() != reflect.Slice {
+			log.Warn("Your deploy job is currently using a soon to be deprecated way of declaring constructor values. Please remember to update your run file to use the new way of declaring constructor values.")
 			//todo: eventually deprecate this
 			var stringRepresentation string
-			log.Debug("Hit string")
-			log.Warn("Your deploy job is currently using a soon to be deprecated way of declaring constructor values. Please remember to update your run file to use the new way of declaring constructor values.")
+			
 			switch val.Kind() {
 			case reflect.Bool:
 				stringRepresentation = strconv.FormatBool(val.Bool())
 			case reflect.Int:
 				stringRepresentation = strconv.FormatInt(val.Int(), 10)
-			case reflect.String:
+			default:
 				stringRepresentation = val.String()
 			}
 			
@@ -201,6 +186,18 @@ func deployContract(deploy *definitions.Deploy, do *definitions.Do, r response.R
 					log.WithField("=>", addOns).Debug("Additional Data")
 					contractCode = contractCode + addOns
 				}
+			}
+		} else {	
+			for i := 0; i < val.Len(); i++ {
+				s := val.Index(i)
+				newString, err := util.PreProcess(s.Interface().(string), do)
+				if err != nil {
+					return "", err
+				}
+				addOns := common.LeftPadString(common.StripHex(common.Coerce2Hex(newString)), 64)
+				log.WithField("=>", contractCode).Debug("Contract Code")
+				log.WithField("=>", addOns).Debug("Additional Data")
+				contractCode = contractCode + addOns
 			}
 		}
 	}
@@ -289,34 +286,10 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 	call.Source, _ = util.PreProcess(call.Source, do)
 	call.Destination, _ = util.PreProcess(call.Destination, do)
 	//todo: find a way to call the fallback function here
-	if call.Function == "" {
-		if reflect.TypeOf(call.Data).Kind() == reflect.Slice {
-			return "", make([]*definitions.Variable, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
-		}
-		log.Warn("You called a job without a function. Please update your epm run file to utilize the function field instead of only using the data field as this functionality will soon be deprecated.")
-		call.Function = strings.Split(call.Data.(string), " ")[0]
-		callDataArray = strings.Split(call.Data.(string), " ")[1:]
-	} else if call.Data != nil {
-		if reflect.TypeOf(call.Data).Kind() != reflect.Slice {
-			return "", make([]*definitions.Variable, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
-		}
-		val := reflect.ValueOf(call.Data)
-		for i := 0; i < val.Len(); i++ {
-			s := val.Index(i)
-			var newString string
-			switch s.Kind() {
-			case reflect.Bool:
-				newString = strconv.FormatBool(s.Bool())
-			case reflect.Int:
-				newString = strconv.FormatInt(s.Int(), 10)
-			case reflect.String:
-				newString = s.Interface().(string)
-			}
-			newString, _ = util.PreProcess(newString, do)
-			callDataArray = append(callDataArray, newString)
-		}
+	call.Function, callDataArray, err = util.PreProcessInputData(call.Function, call.Data, do)
+	if err != nil {
+		return "", make([]*definitions.Variable, 0), err
 	}
-
 	call.Function, _ = util.PreProcess(call.Function, do)
 	call.Amount, _ = util.PreProcess(call.Amount, do)
 	call.Nonce, _ = util.PreProcess(call.Nonce, do)

@@ -4,8 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strconv"
-	"reflect"
-	"strings"
+
 
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
@@ -21,32 +20,10 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	query.ABI, _ = util.PreProcess(query.ABI, do)
 
 	var queryDataArray []string
-	if query.Function == "" {
-		if reflect.TypeOf(query.Data).Kind() == reflect.Slice {
-			return "", make([]*definitions.Variable, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
-		}
-		log.Warn("You called a job without a function. Please update your epm run file to utilize the function field instead of only using the data field as this functionality will soon be deprecated.")
-		query.Function = strings.Split(query.Data.(string), " ")[0]
-		queryDataArray = strings.Split(query.Data.(string), " ")[1:]
-	} else if query.Data != nil {
-		if reflect.TypeOf(query.Data).Kind() != reflect.Slice {
-			return "", make([]*definitions.Variable, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
-		}
-		val := reflect.ValueOf(query.Data)
-		for i := 0; i < val.Len(); i++ {
-			s := val.Index(i)
-			var newString string
-			switch s.Kind() {
-			case reflect.Bool:
-				newString = strconv.FormatBool(s.Bool())
-			case reflect.Int:
-				newString = strconv.FormatInt(s.Int(), 10)
-			case reflect.String:
-				newString = s.Interface().(string)
-			}
-			newString, _ = util.PreProcess(newString, do)
-			queryDataArray = append(queryDataArray, newString)
-		}
+	var err error
+	query.Function, queryDataArray, err = util.PreProcessInputData(query.Function, query.Data, do)
+	if err != nil {
+		return "", make([]*definitions.Variable, 0), err
 	}
 	// Set the from and the to
 	fromAddrBytes, err := hex.DecodeString(query.Source)

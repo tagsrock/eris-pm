@@ -6,9 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	//"reflect"
 	"strconv"
-	//"strings"
+
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
@@ -64,37 +63,6 @@ func ReadAbiFormulateCall(abiLocation, funcName string, dataRaw []string, do *de
 	totalArgs := make([]string, 0)
 	totalArgs = append(totalArgs, funcName)
 	// Process and Pack the Call
-	/*for _, data := range dataRaw {
-		var arg string
-		//see https://play.golang.org/p/W7ZnMgicc7
-		//might want to use this for interface assertions of arrays
-		if reflect.TypeOf(data).Kind() == reflect.Slice {
-			var args []string
-			for _, index := range data.([]interface{}) {
-				value := reflect.ValueOf(index)
-				var stringified string
-				switch value.Kind() {
-				case reflect.Int:
-					stringified = strconv.FormatInt(value.Int(), 10)
-				case reflect.String:
-					stringified = value.String()
-				}
-				index, _ = PreProcess(stringified, do)
-				args = append(args, stringified)
-			}
-			arg = "[" + strings.Join(args, ",") + "]"
-		} else {
-			if reflect.TypeOf(data).Kind() == reflect.Bool {
-				arg = strconv.FormatBool(reflect.ValueOf(data).Bool())
-			} else if reflect.TypeOf(data).Kind() == reflect.Int {
-				arg = strconv.FormatInt(reflect.ValueOf(data).Int(), 10)
-			} else {
-				arg = data.(string)
-			}
-			arg, _ = PreProcess(arg, do)
-		}
-		totalArgs = append(totalArgs, arg)
-	}*/
 	totalArgs = append(totalArgs, dataRaw...)
 	log.WithFields(log.Fields{
 		"arguments": totalArgs,
@@ -140,6 +108,8 @@ func ReadAndDecodeContractReturn(abiLocation string, funcName string, resultRaw 
 
 	return result, nil
 }
+
+
 
 func readAbi(root, contract string) ([]byte, error) {
 	p := path.Join(root, common.StripHex(contract))

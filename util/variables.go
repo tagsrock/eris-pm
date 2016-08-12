@@ -1,9 +1,11 @@
 package util
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
+	"reflect"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
@@ -135,6 +137,57 @@ func replaceBlockVariable(toReplace string, do *definitions.Do) (string, error) 
 
 	log.WithField("=>", toReplace).Debug("Replacement (unknown)")
 	return toReplace, nil
+}
+
+func PreProcessInputData(function string, data interface{}, do *definitions.Do) (string, []string, error) {
+	var callDataArray []string
+	if function == "" {
+		if reflect.TypeOf(data).Kind() == reflect.Slice {
+			return "", make([]string, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
+		}
+		log.Warn("You called a job without a function. Please update your epm run file to utilize the function field instead of only using the data field as this functionality will soon be deprecated.")
+		function = strings.Split(data.(string), " ")[0]
+		callDataArray = strings.Split(data.(string), " ")[1:]
+		for i, val := range callDataArray {
+			callDataArray[i], _ = PreProcess(val, do)
+		}
+	} else if data != nil {
+		if reflect.TypeOf(data).Kind() != reflect.Slice {
+			return "", make([]string, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
+		}
+		val := reflect.ValueOf(data)
+		for i := 0; i < val.Len(); i++ {
+			s := val.Index(i)
+			var newString string
+			switch s.Interface().(type) {
+			case bool:
+				newString = strconv.FormatBool(s.Interface().(bool))
+			case int, int32, int64:
+				newString = strconv.FormatInt(int64(s.Interface().(int)), 10) 
+			case []interface{}:
+				var args []string
+				for _, index := range s.Interface().([]interface{}) {		
+					value := reflect.ValueOf(index)
+					var stringified string
+					switch value.Kind() {
+					case reflect.Int:
+						stringified = strconv.FormatInt(value.Int(), 10)
+					case reflect.String:
+						stringified = value.String()
+					}
+					index, _ = PreProcess(stringified, do)
+					args = append(args, stringified)
+				}
+				newString = "[" + strings.Join(args, ",") + "]"
+				log.Debug(newString)
+			default:
+				newString = s.Interface().(string)
+			}
+			newString, _ = PreProcess(newString, do)
+			callDataArray = append(callDataArray, newString)
+		}
+	}
+	return function, callDataArray, nil
 }
 
 func PreProcessLibs(libs string, do *definitions.Do) (string, error) {
