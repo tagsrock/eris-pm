@@ -238,6 +238,7 @@ The deploy job will parse the following information:
 
 ```go
 // Contract compile and send to the chain functions
+
 type Deploy struct {
   // (Optional, if account job or global account set) address of the account from which to send (the
   // public key for the account must be available to eris-keys)
@@ -256,10 +257,10 @@ type Deploy struct {
   // the name of the file (or the last one deployed if there are no matching names; not the "last"
   // one deployed" strategy is non-deterministic and should not be used).
   Instance string `mapstructure:"instance" json:"instance" yaml:"instance" toml:"instance"`
-  // (Optional) list of Name:Address separated by commas of libraries (see app35)
+  // (Optional) list of Name:Address separated by commas of libraries (see app35 in test/fixtures)
   Libraries string `mapstructure:"libraries" json:"libraries" yaml:"libraries" toml:"libraries"`
   // (Optional) TODO: additional arguments to send along with the contract code
-  Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+  Data interface{} `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
   // (Optional) amount of tokens to send to the contract which will (after deployment) reside in the
   // contract's account
   Amount string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
@@ -292,9 +293,11 @@ type Call struct {
   Source string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
   // (Required) address of the contract which should be called
   Destination string `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
-  // (Required) data which should be called. will use the eris-abi tooling under the hood to formalize the
+  // (Required unless testing fallback function) function inside the contract to be called
+  Function string `mapstructure:"function" json:"function" yaml:"function" toml:"function"`
+  // (Optional) data which should be called. will use the eris-abi tooling under the hood to formalize the
   // transaction
-  Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+  Data interface{} `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
   // (Optional) amount of tokens to send to the contract
   Amount string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
   // (Optional) validators' fee
@@ -315,6 +318,8 @@ type Call struct {
   Save string `mapstructure:"save" json:"save" yaml:"save" toml:"save"`
   // (Optional) wait for the transaction to be confirmed in the blockchain before proceeding
   Wait bool `mapstructure:"wait" json:"wait" yaml:"wait" toml:"wait"`
+  // (Optional) the call job's returned variables
+  Variables []*Variable
 }
 ```
 ## <a name="testJobs"></a>Test Jobs
@@ -358,11 +363,16 @@ type QueryContract struct {
   Destination string `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
   // (Required) data which should be called. will use the eris-abi tooling under the hood to formalize the
   // transaction. QueryContract will usually be used with "accessor" functions in contracts
-  Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+  Function string `mapstructure:"function" json:"function" yaml:"function" toml:"function"`
+  // (Optional) data to be used in the function arguments. Will use the eris-abi tooling under the hood to formalize the
+  // transaction.
+  Data interface{} `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
   // (Optional) location of the abi file to use (can be relative path or in abi path)
   // deployed contracts save ABI artifacts in the abi folder as *both* the name of the contract
   // and the address where the contract was deployed to
   ABI string `mapstructure:"abi" json:"abi" yaml:"abi" toml:"abi"`
+
+  Variables []*Variable
 }
 ```
 

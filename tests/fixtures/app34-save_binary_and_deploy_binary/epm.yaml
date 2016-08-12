@@ -23,7 +23,9 @@ jobs:
     call:
       destination: $deployActualBinaryK
       abi: binary
-      data: set $setStorageBase
+      function: set
+      data:
+        - $setStorageBase
       wait: true
 
 - name: queryStorage
@@ -31,7 +33,8 @@ jobs:
     query-contract:
       destination: $deployActualBinaryK
       abi: binary
-      data: get
+      function: get
+
 
 - name: assertStorage
   job:

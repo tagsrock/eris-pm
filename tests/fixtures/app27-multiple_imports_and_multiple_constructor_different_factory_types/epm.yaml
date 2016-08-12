@@ -29,7 +29,9 @@ jobs:
   job:
     call:
       destination: $deployGSFactory
-      data: createSingle $setStorageBase1
+      function: createSingle
+      data:
+        - $setStorageBase1
       abi: $deployGSFactory
       wait: true
 
@@ -38,7 +40,7 @@ jobs:
   job:
     query-contract:
       destination: $deployGSFactory
-      data: getLastSingle
+      function: getLastSingle
       abi: $deployGSFactory
 
 - name: assertAddrSingle
@@ -53,7 +55,7 @@ jobs:
   job:
     query-contract:
       destination: $createGSContractSingle
-      data: get
+      function: get
       abi: $deployGSABIFactorySingle
 
 - name: assertStorageSingle
@@ -68,7 +70,9 @@ jobs:
   job:
     call:
       destination: $createGSContractSingle
-      data: set $setStorageBase2
+      function: set 
+      data:
+        - $setStorageBase2
       abi: $deployGSABIFactorySingle
       wait: true
 
@@ -76,7 +80,7 @@ jobs:
   job:
     query-contract:
       destination: $createGSContractSingle
-      data: get
+      function: get
       abi: $deployGSABIFactorySingle
 
 - name: assertStorageSingleNew
@@ -98,7 +102,10 @@ jobs:
   job:
     call:
       destination: $deployGSFactory
-      data: createMulti $setStorageBase1 $setStorageBase2
+      function: createMulti
+      data:
+        - $setStorageBase1
+        - $setStorageBase2
       abi: $deployGSFactory
       wait: true
 
@@ -107,7 +114,7 @@ jobs:
   job:
     query-contract:
       destination: $deployGSFactory
-      data: getLastMulti
+      function: getLastMulti
       abi: $deployGSFactory
 
 - name: assertAddrMulti
@@ -122,7 +129,7 @@ jobs:
   job:
     query-contract:
       destination: $createGSContractMulti
-      data: getFirst
+      function: getFirst
       abi: $deployGSABIFactoryMulti
 
 - name: assertStorageMultiFirst
@@ -136,7 +143,7 @@ jobs:
   job:
     query-contract:
       destination: $createGSContractMulti
-      data: getSecond
+      function: getSecond
       abi: $deployGSABIFactoryMulti
 
 - name: assertStorageMultiSecond
@@ -151,7 +158,10 @@ jobs:
   job:
     call:
       destination: $createGSContractMulti
-      data: set $setStorageBase2 $setStorageBase1
+      function: set
+      data: 
+        - $setStorageBase2 
+        - $setStorageBase1
       abi: $deployGSABIFactoryMulti
       wait: true
 
@@ -159,7 +169,7 @@ jobs:
   job:
     query-contract:
       destination: $createGSContractMulti
-      data: getFirst
+      function: getFirst
       abi: $deployGSABIFactoryMulti
 
 - name: assertStorageMultiNewFirst
@@ -173,7 +183,7 @@ jobs:
   job:
     query-contract:
       destination: $createGSContractMulti
-      data: getSecond
+      function: getSecond
       abi: $deployGSABIFactoryMulti
 
 - name: assertStorageMultiNewSecond

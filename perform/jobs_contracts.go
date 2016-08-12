@@ -6,6 +6,8 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"strconv"
+	"reflect"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
@@ -20,6 +22,7 @@ import (
 
 func PackageDeployJob(pkgDeploy *definitions.PackageDeploy, do *definitions.Do) (string, error) {
 	// todo
+	// note: we should have this talking to a new client package...add that to the todo
 	var result string
 
 	return result, nil
@@ -157,16 +160,48 @@ func deployContract(deploy *definitions.Deploy, do *definitions.Do, r response.R
 	// additional data may be sent along with the contract
 	// these are naively added to the end of the contract code using standard
 	// mint packing
-	if deploy.Data != "" {
-		splitout := strings.Split(deploy.Data, " ")
-		for _, s := range splitout {
-			s, _ = util.PreProcess(s, do)
-			addOns := common.LeftPadString(common.StripHex(common.Coerce2Hex(s)), 64)
-			log.WithField("=>", contractCode).Debug("Contract Code")
-			log.WithField("=>", addOns).Debug("Additional Data")
-			contractCode = contractCode + addOns
+	
+	if deploy.Data != nil {
+		val := reflect.ValueOf(deploy.Data)
+		if reflect.TypeOf(deploy.Data).Kind() != reflect.Slice {
+			log.Warn("Your deploy job is currently using a soon to be deprecated way of declaring constructor values. Please remember to update your run file to use the new way of declaring constructor values.")
+			//todo: eventually deprecate this
+			var stringRepresentation string
+			
+			switch val.Kind() {
+			case reflect.Bool:
+				stringRepresentation = strconv.FormatBool(val.Bool())
+			case reflect.Int:
+				stringRepresentation = strconv.FormatInt(val.Int(), 10)
+			default:
+				stringRepresentation = val.String()
+			}
+			
+			if stringRepresentation != "" {
+				splitout := strings.Split(stringRepresentation, " ")
+				for _, s := range splitout {
+					s, _ = util.PreProcess(s, do)
+					addOns := common.LeftPadString(common.StripHex(common.Coerce2Hex(s)), 64)
+					log.WithField("=>", contractCode).Debug("Contract Code")
+					log.WithField("=>", addOns).Debug("Additional Data")
+					contractCode = contractCode + addOns
+				}
+			}
+		} else {	
+			for i := 0; i < val.Len(); i++ {
+				s := val.Index(i)
+				newString, err := util.PreProcess(s.Interface().(string), do)
+				if err != nil {
+					return "", err
+				}
+				addOns := common.LeftPadString(common.StripHex(common.Coerce2Hex(newString)), 64)
+				log.WithField("=>", contractCode).Debug("Contract Code")
+				log.WithField("=>", addOns).Debug("Additional Data")
+				contractCode = contractCode + addOns
+			}
 		}
 	}
+
 	// Save ABI
 	if _, err := os.Stat(do.ABIPath); os.IsNotExist(err) {
 		if err := os.Mkdir(do.ABIPath, 0775); err != nil {
@@ -244,9 +279,18 @@ func deployRaw(do *definitions.Do, deploy *definitions.Deploy, contractName, con
 }
 
 func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions.Variable, error) {
+	var err error
+	var callData string
+	var callDataArray []string
 	// Preprocess variables
 	call.Source, _ = util.PreProcess(call.Source, do)
 	call.Destination, _ = util.PreProcess(call.Destination, do)
+	//todo: find a way to call the fallback function here
+	call.Function, callDataArray, err = util.PreProcessInputData(call.Function, call.Data, do)
+	if err != nil {
+		return "", make([]*definitions.Variable, 0), err
+	}
+	call.Function, _ = util.PreProcess(call.Function, do)
 	call.Amount, _ = util.PreProcess(call.Amount, do)
 	call.Nonce, _ = util.PreProcess(call.Nonce, do)
 	call.Fee, _ = util.PreProcess(call.Fee, do)
@@ -259,15 +303,12 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 	call.Fee = useDefault(call.Fee, do.DefaultFee)
 	call.Gas = useDefault(call.Gas, do.DefaultGas)
 
-	var err error
-	// save for later
-	originalData := call.Data
 
 	// formulte call
 	if call.ABI == "" {
-		call.Data, err = util.ReadAbiFormulateCall(call.Destination, call.Data, do)
+		callData, err = util.ReadAbiFormulateCall(call.Destination, call.Function, callDataArray, do)
 	} else {
-		call.Data, err = util.ReadAbiFormulateCall(call.ABI, call.Data, do)
+		callData, err = util.ReadAbiFormulateCall(call.ABI, call.Function, callDataArray, do)
 	}
 	if err != nil {
 		var str, err = util.ABIErrorHandler(do, err, call, nil)
@@ -283,10 +324,11 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 
 	log.WithFields(log.Fields{
 		"destination": call.Destination,
-		"data":        call.Data,
+		"function":    call.Function,
+		"data":        callData,
 	}).Info("Calling")
 
-	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, call.Source, call.Destination, call.Amount, call.Nonce, call.Gas, call.Fee, call.Data)
+	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, call.Source, call.Destination, call.Amount, call.Nonce, call.Gas, call.Fee, callData)
 	if err != nil {
 		return "", make([]*definitions.Variable, 0), err
 	}
@@ -310,9 +352,9 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 	if result != "" {
 		log.WithField("=>", result).Debug("Decoding Raw Result")
 		if call.ABI == "" {
-			call.Variables, err = util.ReadAndDecodeContractReturn(call.Destination, originalData, result, do)
+			call.Variables, err = util.ReadAndDecodeContractReturn(call.Destination, call.Function, result, do)
 		} else {
-			call.Variables, err = util.ReadAndDecodeContractReturn(call.ABI, originalData, result, do)
+			call.Variables, err = util.ReadAndDecodeContractReturn(call.ABI, call.Function, result, do)
 		}
 		if err != nil {
 			return "", make([]*definitions.Variable, 0), err

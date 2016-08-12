@@ -148,7 +148,7 @@ type Deploy struct {
 	// (Optional) list of Name:Address separated by commas of libraries (see solc --help)
 	Libraries string `mapstructure:"libraries" json:"libraries" yaml:"libraries" toml:"libraries"`
 	// (Optional) TODO: additional arguments to send along with the contract code
-	Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+	Data interface{} `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
 	// (Optional) amount of tokens to send to the contract which will (after deployment) reside in the
 	// contract's account
 	Amount string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
@@ -174,9 +174,11 @@ type Call struct {
 	Source string `mapstructure:"source" json:"source" yaml:"source" toml:"source"`
 	// (Required) address of the contract which should be called
 	Destination string `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
-	// (Required) data which should be called. will use the eris-abi tooling under the hood to formalize the
+	// (Required unless testing fallback function) function inside the contract to be called
+	Function string `mapstructure:"function" json:"function" yaml:"function" toml:"function"`
+	// (Optional) data which should be called. will use the eris-abi tooling under the hood to formalize the
 	// transaction
-	Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+	Data interface{} `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
 	// (Optional) amount of tokens to send to the contract
 	Amount string `mapstructure:"amount" json:"amount" yaml:"amount" toml:"amount"`
 	// (Optional) validators' fee
@@ -233,7 +235,10 @@ type QueryContract struct {
 	Destination string `mapstructure:"destination" json:"destination" yaml:"destination" toml:"destination"`
 	// (Required) data which should be called. will use the eris-abi tooling under the hood to formalize the
 	// transaction. QueryContract will usually be used with "accessor" functions in contracts
-	Data string `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
+	Function string `mapstructure:"function" json:"function" yaml:"function" toml:"function"`
+	// (Optional) data to be used in the function arguments. Will use the eris-abi tooling under the hood to formalize the
+	// transaction.
+	Data interface{} `mapstructure:"data" json:"data" yaml:"data" toml:"data"`
 	// (Optional) location of the abi file to use (can be relative path or in abi path)
 	// deployed contracts save ABI artifacts in the abi folder as *both* the name of the contract
 	// and the address where the contract was deployed to

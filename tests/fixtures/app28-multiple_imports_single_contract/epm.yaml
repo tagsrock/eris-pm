@@ -20,14 +20,17 @@ jobs:
   job:
     call:
       destination: $deployStorageK
-      data: setString $setStorageBaseString1 $setStorageBaseString2
+      function: setString
+      data:
+        - $setStorageBaseString1
+        - $setStorageBaseString2
       wait: true
 
 - name: queryStorageString1
   job:
     query-contract:
       destination: $deployStorageK
-      data: getString1
+      function: getString1
 
 - name: assertStorageString1
   job:
@@ -40,7 +43,7 @@ jobs:
   job:
     query-contract:
       destination: $deployStorageK
-      data: getString2
+      function: getString2
 
 - name: assertStorageString2
   job:

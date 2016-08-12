@@ -11,8 +11,8 @@ import (
 	"github.com/eris-ltd/eris-pm/util"
 	"github.com/eris-ltd/eris-pm/version"
 
-	log "github.com/eris-ltd/eris-logger"
 	common "github.com/eris-ltd/common/go/common"
+	log "github.com/eris-ltd/eris-logger"
 	cfg "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/config"
 	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
 )

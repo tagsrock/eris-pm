@@ -10,7 +10,9 @@ jobs:
   job:
     call:
       destination: $deployC
-      data: intCallWithArray [1,2,3,4]
+      function: intCallWithArray 
+      data: 
+        - [1,2,3,4]
       wait: true
 
 - name: assertIntCall
@@ -24,7 +26,9 @@ jobs:
   job:
     call:
       destination: $deployC
-      data: bytesCallWithArray [Hello,World,Of,Marmots]
+      function: bytesCallWithArray
+      data:
+        - [Hello,World,Of,Marmots]
       wait: true
 
 - name: assertBytesCall
@@ -38,7 +42,9 @@ jobs:
   job:
     call:
       destination: $deployC
-      data: boolCallWithArray [true,false,true,false]
+      function: boolCallWithArray 
+      data:
+        - [true,false,true,false]
       wait: true
 
 - name: assertBoolsCall
@@ -52,7 +58,9 @@ jobs:
   job:
     call:
       destination: $deployC
-      data: addressCallWithArray [B806DC304416CA32B5951E3391490813C9F6FF7A,B806DC304416CA32B5951E3391490813C9F6FF7C,B806DC304416CA32B5951E3391490813C9F6FF7D]
+      function: addressCallWithArray 
+      data:
+        - [B806DC304416CA32B5951E3391490813C9F6FF7A,B806DC304416CA32B5951E3391490813C9F6FF7C,B806DC304416CA32B5951E3391490813C9F6FF7D]
       wait: true
 
 - name: assertAddressCall
@@ -66,7 +74,7 @@ jobs:
   job:
     query-contract:
       destination: $deployC
-      data: intMemoryArray
+      function: intMemoryArray
 
 - name: assertIntMemoryArray
   job:
@@ -79,7 +87,7 @@ jobs:
   job:
     query-contract:
       destination: $deployC
-      data: bytesMemoryArray
+      function: bytesMemoryArray
 
 - name: assertBytesMemoryArray
   job:

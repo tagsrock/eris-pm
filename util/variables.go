@@ -1,9 +1,11 @@
 package util
 
 import (
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
+	"reflect"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
@@ -27,10 +29,10 @@ func PreProcess(toProcess string, do *definitions.Do) (string, error) {
 			var innerVarName string
 			var wantsInnerValues bool = false
 			/*
-			log.WithFields(log.Fields{
-			 	"var": varName,
-			 	"job": jobName,
-			}).Debugf("Correcting match %d", i+1)
+				log.WithFields(log.Fields{
+				 	"var": varName,
+				 	"job": jobName,
+				}).Debugf("Correcting match %d", i+1)
 			*/
 			// first parse the reserved words.
 			if strings.Contains(jobName, "block") {
@@ -46,7 +48,7 @@ func PreProcess(toProcess string, do *definitions.Do) (string, error) {
 				processedString = strings.Replace(processedString, toProcess, block, 1)
 			}
 
-			if strings.Contains(jobName, ".") {	//for functions with multiple returns
+			if strings.Contains(jobName, ".") { //for functions with multiple returns
 				wantsInnerValues = true
 				var splitStr = strings.Split(jobName, ".")
 				jobName = splitStr[0]
@@ -56,14 +58,14 @@ func PreProcess(toProcess string, do *definitions.Do) (string, error) {
 			// second we loop through the jobNames to do a result replace
 			for _, job := range do.Package.Jobs {
 				if string(jobName) == job.JobName {
-					if (wantsInnerValues) { 
+					if wantsInnerValues {
 						for _, innerVal := range job.JobVars {
-							if (innerVal.Name == innerVarName) { //find the value we want from the bunch
+							if innerVal.Name == innerVarName { //find the value we want from the bunch
 								processedString = strings.Replace(processedString, varName, innerVal.Value, 1)
 								log.WithFields(log.Fields{
-									"job": string(jobName),
+									"job":     string(jobName),
 									"varName": innerVarName,
-									"result": innerVal.Value,
+									"result":  innerVal.Value,
 								}).Debug("Fixing Inner Vars =>")
 							}
 						}
@@ -74,7 +76,7 @@ func PreProcess(toProcess string, do *definitions.Do) (string, error) {
 						}).Debug("Fixing Variables =>")
 						processedString = strings.Replace(processedString, varName, job.JobResult, 1)
 					}
-					
+
 				}
 			}
 		}
@@ -137,6 +139,57 @@ func replaceBlockVariable(toReplace string, do *definitions.Do) (string, error) 
 	return toReplace, nil
 }
 
+func PreProcessInputData(function string, data interface{}, do *definitions.Do) (string, []string, error) {
+	var callDataArray []string
+	if function == "" {
+		if reflect.TypeOf(data).Kind() == reflect.Slice {
+			return "", make([]string, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
+		}
+		log.Warn("You called a job without a function. Please update your epm run file to utilize the function field instead of only using the data field as this functionality will soon be deprecated.")
+		function = strings.Split(data.(string), " ")[0]
+		callDataArray = strings.Split(data.(string), " ")[1:]
+		for i, val := range callDataArray {
+			callDataArray[i], _ = PreProcess(val, do)
+		}
+	} else if data != nil {
+		if reflect.TypeOf(data).Kind() != reflect.Slice {
+			return "", make([]string, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
+		}
+		val := reflect.ValueOf(data)
+		for i := 0; i < val.Len(); i++ {
+			s := val.Index(i)
+			var newString string
+			switch s.Interface().(type) {
+			case bool:
+				newString = strconv.FormatBool(s.Interface().(bool))
+			case int, int32, int64:
+				newString = strconv.FormatInt(int64(s.Interface().(int)), 10) 
+			case []interface{}:
+				var args []string
+				for _, index := range s.Interface().([]interface{}) {		
+					value := reflect.ValueOf(index)
+					var stringified string
+					switch value.Kind() {
+					case reflect.Int:
+						stringified = strconv.FormatInt(value.Int(), 10)
+					case reflect.String:
+						stringified = value.String()
+					}
+					index, _ = PreProcess(stringified, do)
+					args = append(args, stringified)
+				}
+				newString = "[" + strings.Join(args, ",") + "]"
+				log.Debug(newString)
+			default:
+				newString = s.Interface().(string)
+			}
+			newString, _ = PreProcess(newString, do)
+			callDataArray = append(callDataArray, newString)
+		}
+	}
+	return function, callDataArray, nil
+}
+
 func PreProcessLibs(libs string, do *definitions.Do) (string, error) {
 	libraries, _ := PreProcess(libs, do)
 	if libraries != "" {
@@ -153,7 +206,7 @@ func PreProcessLibs(libs string, do *definitions.Do) (string, error) {
 }
 
 func GetReturnValue(vars []*definitions.Variable) string {
-	var result []string;
+	var result []string
 	//log.WithField("=>", vars).Debug("GetReturnValue")
 	for _, value := range vars {
 		result = append(result, value.Value)

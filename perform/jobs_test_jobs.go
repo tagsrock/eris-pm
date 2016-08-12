@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 
+
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
 
@@ -18,6 +19,12 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	query.Destination, _ = util.PreProcess(query.Destination, do)
 	query.ABI, _ = util.PreProcess(query.ABI, do)
 
+	var queryDataArray []string
+	var err error
+	query.Function, queryDataArray, err = util.PreProcessInputData(query.Function, query.Data, do)
+	if err != nil {
+		return "", make([]*definitions.Variable, 0), err
+	}
 	// Set the from and the to
 	fromAddrBytes, err := hex.DecodeString(query.Source)
 	if err != nil {
@@ -31,9 +38,9 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	// Get the packed data from the ABI functions
 	var data string
 	if query.ABI == "" {
-		data, err = util.ReadAbiFormulateCall(query.Destination, query.Data, do)
+		data, err = util.ReadAbiFormulateCall(query.Destination, query.Function, queryDataArray, do)
 	} else {
-		data, err = util.ReadAbiFormulateCall(query.ABI, query.Data, do)
+		data, err = util.ReadAbiFormulateCall(query.ABI, query.Function, queryDataArray, do)
 	}
 	if err != nil {
 		var str, err = util.ABIErrorHandler(do, err, nil, query)
@@ -65,10 +72,10 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	log.WithField("res", result).Debug("Decoding Raw Result")
 	if query.ABI == "" {
 		log.WithField("abi", query.Destination).Debug()
-		query.Variables, err = util.ReadAndDecodeContractReturn(query.Destination, query.Data, result, do)
+		query.Variables, err = util.ReadAndDecodeContractReturn(query.Destination, query.Function, result, do)
 	} else {
 		log.WithField("abi", query.ABI).Debug()
-		query.Variables, err = util.ReadAndDecodeContractReturn(query.ABI, query.Data, result, do)
+		query.Variables, err = util.ReadAndDecodeContractReturn(query.ABI, query.Function, result, do)
 	}
 	if err != nil {
 		return "", make([]*definitions.Variable, 0), err
