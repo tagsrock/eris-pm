@@ -14,15 +14,13 @@ WORKDIR $REPO
 RUN go get github.com/Masterminds/glide && \
 	go get github.com/sgotti/glide-vc && \
 	glide install --strip-vcs --strip-vendor && \
-	glide vc && \
-  	rm -rf $GOPATH/pkg/* && \
-  	rm -rf $GOPATH/bin/* && \
-  	rm -rf $GOPATH/src/github.com/Masterminds && \
- 	rm -rf $GOPATH/src/github.com/sgotti
+	glide vc
 
 # install eris-pm
-RUN go install ./cmd/epm
+WORKDIR $REPO/cmd/epm
+RUN go build -o $INSTALL_BASE/epm
 RUN chown --recursive $USER:$USER $REPO
+RUN rm -rf $GOPATH
 
 #-----------------------------------------------------------------------------
 # root dir
