@@ -9,18 +9,17 @@ MAINTAINER Eris Industries <support@erisindustries.com>
 ENV REPO $GOPATH/src/github.com/eris-ltd/eris-pm
 COPY . $REPO
 
-# install glide; use glide; remove its traces
+# use glide; remove its traces
 WORKDIR $REPO
-RUN go get github.com/Masterminds/glide && \
-	go get github.com/sgotti/glide-vc && \
-	glide install --strip-vcs --strip-vendor && \
+RUN glide install --strip-vcs --strip-vendor && \
 	glide vc
 
 # install eris-pm
 WORKDIR $REPO/cmd/epm
 RUN go build -o $INSTALL_BASE/epm
 RUN chown --recursive $USER:$USER $REPO
-RUN rm -rf $GOPATH
+# should be able to remove /usr/lib/go as well.
+RUN glide cc && rm -rf $GOPATH && apk del --no-cache --purge go git gmp-dev gcc musl-dev 
 
 #-----------------------------------------------------------------------------
 # root dir
