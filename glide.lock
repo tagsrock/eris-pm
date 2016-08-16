@@ -1,5 +1,5 @@
 hash: 7259a8261500da519d7c524ab47af3ffd1ab6735790394c9bf7098dafe15052c
-updated: 2016-08-01T11:05:59.988467285-05:00
+updated: 2016-08-15T17:12:17.920167098-05:00
 imports:
 - name: github.com/Azure/go-ansiterm
   version: fa152c58bc15761d0200cb75fe958b89a9d4888e
@@ -31,7 +31,7 @@ imports:
   - core
   - abi
 - name: github.com/eris-ltd/eris-compilers
-  version: 0ac7d524935fc9fda60d552d64410c0ca416aa36
+  version: e4962fd23106031467ea0df42bac81c35478c6f1
   subpackages:
   - network
   - util

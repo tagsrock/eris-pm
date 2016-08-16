@@ -98,7 +98,7 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 			return "", err
 		} else if resp.Error != "" {
 			log.Errorln("Error compiling contracts")
-			return "", fmt.Errorf(resp.Error)
+			return "", fmt.Errorf("%v", resp.Error)
 		}
 		// loop through objects returned from compiler
 		switch {
