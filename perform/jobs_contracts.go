@@ -94,10 +94,10 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 		resp, err := compilers.BeginCompile(do.Compiler, p, false, deploy.Libraries)
 
 		if err != nil {
-			log.Errorln("Error compiling contracts")
+			log.Errorln("Error compiling contracts: Compilers error:")
 			return "", err
 		} else if resp.Error != "" {
-			log.Errorln("Error compiling contracts")
+			log.Errorln("Error compiling contracts: Language error:")
 			return "", fmt.Errorf("%v", resp.Error)
 		}
 		// loop through objects returned from compiler
