@@ -304,15 +304,19 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 	call.Gas = useDefault(call.Gas, do.DefaultGas)
 
 
-	// formulte call
+	// formulate call
 	if call.ABI == "" {
 		callData, err = util.ReadAbiFormulateCall(call.Destination, call.Function, callDataArray, do)
 	} else {
 		callData, err = util.ReadAbiFormulateCall(call.ABI, call.Function, callDataArray, do)
 	}
 	if err != nil {
-		var str, err = util.ABIErrorHandler(do, err, call, nil)
-		return str, make([]*definitions.Variable, 0), err
+		if call.Function == "()" {
+			log.Warn("Calling the fallback function")
+		} else {
+			var str, err = util.ABIErrorHandler(do, err, call, nil)
+			return str, make([]*definitions.Variable, 0), err
+		}
 	}
 
 	// Don't use pubKey if account override

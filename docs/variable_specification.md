@@ -9,6 +9,7 @@ Variables come in the following types:
 * [job result variables](#jobResultVars)
 * [set variables](#setVars)
 * [reserved variables](#reservedVars)
+* [fallback function](#fallBack)
 * [tuple returns](#tupleReturns)
 * [array packing and returns](#arrays)
 
@@ -43,6 +44,10 @@ The following are reserved variables:
 * `$block`: will return a string version of the current block height
 * `$block+X`: where `X` can be any digit; will return a string version of the current block height `+X` blocks
 * `$block-X`: where `X` can be any digit; will return a string version of the current block heigh `-X` blocks
+
+## <a name="fallBack"></a>Fallback Function
+
+In order to test your fallback function in your contract using the call job, simply put the name of your function as "()" and the fallback function will be called. See app37.
 
 ## <a name="tupleReturns"></a>Tuples and Returns
 
