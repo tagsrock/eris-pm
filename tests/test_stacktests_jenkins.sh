@@ -91,7 +91,7 @@ tests_setup() {
 
 tests_teardown() {
   eris chains stop --force $chain_name 1>/dev/null
-  eris chains rm --file --data $chain_name 1>/dev/null
+  eris chains rm --data $chain_name 1>/dev/null
   rm -rf $chain_dir
   echo
   echo "Tests Teardown complete"
