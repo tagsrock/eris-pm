@@ -18,7 +18,7 @@ RUN go get github.com/Masterminds/glide && \
 
 # install eris-pm
 WORKDIR $REPO/cmd/epm
-RUN go build --ldflags '-extldflags "-static" -o $INSTALL_BASE/epm
+RUN go build --ldflags '-extldflags "-static"' -o $INSTALL_BASE/epm
 RUN chown --recursive $USER:$USER $REPO
 RUN rm -rf $GOPATH
 
