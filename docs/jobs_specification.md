@@ -254,7 +254,7 @@ type Deploy struct {
   // When none is provided, the system will choose the contract with the same name as that file.
   // use "all" to override and deploy all contracts in order. if "all" is selected the result
   // of the job will default to the address of the contract which was deployed that matches
-  // the name of the file (or the last one deployed if there are no matching names; not the "last"
+  // the name of the file (or the last one deployed if there are no matching names; note the "last
   // one deployed" strategy is non-deterministic and should not be used).
   Instance string `mapstructure:"instance" json:"instance" yaml:"instance" toml:"instance"`
   // (Optional) list of Name:Address separated by commas of libraries (see app35 in test/fixtures)
