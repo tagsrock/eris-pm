@@ -1,6 +1,6 @@
 # Variables Specification
 
-Variables can be used for nearly every epm [jobs](../jobs_specification) field (largely with the exception of nonce and wait).
+Variables can be used for nearly every epm [jobs](jobs_specification) field (largely with the exception of nonce and wait).
 
 eris:pm variables will always begin with a dollar sign `$`. This is what will trigger the variable expansion.
 
@@ -75,7 +75,7 @@ Hold with us while the marmots get those in control :)
 
 ## <a name="arrays"></a> Array Packing and Returns
 
-eris:pm can now handle packing and returning of arrays with some caveats. In order to pack an array value in, you must declare it inside square brackets. For an example, see [app31](~/tests/fixtures/app31/epm.yaml). Until then, you can declare arrays for most static types such as: 
+eris:pm can now handle packing and returning of arrays with some caveats. In order to pack an array value in, you must declare it inside square brackets. For an example, see [app31](https://github.com/eris-ltd/eris-pm/tree/master/tests/fixtures/app31/epm.yaml). Until then, you can declare arrays for most static types such as: 
 
 *  `int` `uint` `bool` `bytes(1-32)`
 
