@@ -10,7 +10,7 @@ Action definition files may be formatted in any of the following formats:
 
 Examples of epm definition files are available in the [`tests/fixtures` directory](https://github.com/eris-ltd/eris-pm/tree/master/tests/fixtures).
 
-Each job will perform its required action and then it will save the result of its job in a variable which can be utilized by jobs later in the sequence using eris:pm's [variable specification](../variable_specification).
+Each job will perform its required action and then it will save the result of its job in a variable which can be utilized by jobs later in the sequence using eris:pm's [variable specification](variable_specification).
 
 # Jobs
 
