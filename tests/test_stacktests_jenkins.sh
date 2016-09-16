@@ -83,7 +83,7 @@ tests_setup() {
   echo -e "Backup Key =>\t\t\t\t$key2_addr"
 
   # boot the chain
-  eris chains new $chain_name --dir $chain_dir/$name_full 1>/dev/null
+  eris chains start $chain_name --init-dir $chain_dir/$name_full 1>/dev/null
   if [ $? -ne 0 ]; then return 1; fi
   sleep 5 # boot time
   echo "Tests Setup complete"
