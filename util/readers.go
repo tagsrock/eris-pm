@@ -14,7 +14,7 @@ import (
 	"github.com/eris-ltd/common/go/common"
 	ebi "github.com/eris-ltd/eris-abi/core"
 	log "github.com/eris-ltd/eris-logger"
-	"github.com/eris-ltd/mint-client/mintx/core"
+	"github.com/eris-ltd/eris-db/client/core"
 )
 
 // This is a closer function which is called by most of the tx_run functions
