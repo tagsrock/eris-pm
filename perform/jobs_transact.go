@@ -6,6 +6,14 @@ import (
 	"io"
 	"os"
 
+	log "github.com/eris-ltd/eris-logger"
+
+	"github.com/eris-ltd/eris-db/account"
+	"github.com/eris-ltd/eris-db/client"
+	"github.com/eris-ltd/eris-db/client/core"
+	"github.com/eris-ltd/eris-db/keys"
+	"github.com/eris-ltd/eris-db/txs"
+
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
 
@@ -38,7 +46,9 @@ func SendJob(send *definitions.Send, do *definitions.Do) (string, error) {
 		"amount":      send.Amount,
 	}).Info("Sending Transaction")
 
-	tx, err := core.Send(do.Chain, do.Signer, do.PublicKey, send.Source, send.Destination, send.Amount, send.Nonce)
+	erisNodeClient := client.NewErisNodeClient(do.Node)
+	erisKeyClient := keys.NewErisKeyClient(do.Signer)
+	tx, err := core.Send(erisNodeClient, erisKeyClient, do.PublicKey, send.Source, send.Destination, send.Amount, send.Nonce)
 	if err != nil {
 		return util.MintChainErrorHandler(do, err)
 	}
@@ -154,7 +164,9 @@ func registerNameTx(name *definitions.RegisterName, do *definitions.Do) (string,
 		"amount": name.Amount,
 	}).Info("NameReg Transaction")
 
-	tx, err := core.Name(do.Chain, do.Signer, do.PublicKey, name.Source, name.Amount, name.Nonce, name.Fee, name.Name, name.Data)
+	erisNodeClient := client.NewErisNodeClient(do.Node)
+	erisKeyClient := keys.NewErisKeyClient(do.Signer)
+	tx, err := core.Name(erisNodeClient, erisKeyClient, do.PublicKey, name.Source, name.Amount, name.Nonce, name.Fee, name.Name, name.Data)
 	if err != nil {
 		return util.MintChainErrorHandler(do, err)
 	}
@@ -204,7 +216,9 @@ func PermissionJob(perm *definitions.Permission, do *definitions.Do) (string, er
 	arg := fmt.Sprintf("%s:%s", args[0], args[1])
 	log.WithField(perm.Action, arg).Info("Setting Permissions")
 
-	tx, err := core.Permissions(do.Chain, do.Signer, do.PublicKey, perm.Source, perm.Nonce, perm.Action, args)
+	erisNodeClient := client.NewErisNodeClient(do.Node)
+	erisKeyClient := keys.NewErisKeyClient(do.Signer)
+	tx, err := core.Permissions(erisNodeClient, erisKeyClient, do.PublicKey, perm.Source, perm.Nonce, perm.Action, args)
 	if err != nil {
 		return util.MintChainErrorHandler(do, err)
 	}
@@ -234,7 +248,9 @@ func BondJob(bond *definitions.Bond, do *definitions.Do) (string, error) {
 		"amount":     bond.Amount,
 	}).Infof("Bond Transaction")
 
-	tx, err := core.Bond(do.Chain, do.Signer, do.PublicKey, bond.Account, bond.Amount, bond.Nonce)
+	erisNodeClient := client.NewErisNodeClient(do.Node)
+	erisKeyClient := keys.NewErisKeyClient(do.Signer)
+	tx, err := core.Bond(erisNodeClient, erisKeyClient, do.PublicKey, bond.Account, bond.Amount, bond.Nonce)
 	if err != nil {
 		return util.MintChainErrorHandler(do, err)
 	}
@@ -324,7 +340,9 @@ func RebondJob(rebond *definitions.Rebond, do *definitions.Do) (string, error) {
 func txFinalize(do *definitions.Do, tx interface{}, wait bool) (string, error) {
 	var result string
 
-	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx.(types.Tx), true, true, wait)
+	erisNodeClient := client.NewErisNodeClient(do.Node)
+	erisKeyClient := keys.NewErisKeyClient(do.Signer)
+	res, err := core.SignAndBroadcast(do.ChainID, erisNodeClient, erisKeyClient, tx.(txs.Tx), true, true, wait)
 	if err != nil {
 		return util.MintChainErrorHandler(do, err)
 	}

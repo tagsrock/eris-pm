@@ -16,8 +16,11 @@ import (
 	compilers "github.com/eris-ltd/eris-compilers/network"
 	response "github.com/eris-ltd/eris-compilers/util"
 	log "github.com/eris-ltd/eris-logger"
-	"github.com/eris-ltd/mint-client/mintx/core"
-	"github.com/eris-ltd/tendermint/types"
+
+	"github.com/eris-ltd/eris-db/client"
+	"github.com/eris-ltd/eris-db/client/core"
+	"github.com/eris-ltd/eris-db/keys"
+	"github.com/eris-ltd/eris-db/txs"
 )
 
 func PackageDeployJob(pkgDeploy *definitions.PackageDeploy, do *definitions.Do) (string, error) {
@@ -270,7 +273,9 @@ func deployRaw(do *definitions.Do, deploy *definitions.Deploy, contractName, con
 		"code":   contractCode,
 	}).Info()
 
-	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, deploy.Source, "", deploy.Amount, deploy.Nonce, deploy.Gas, deploy.Fee, contractCode)
+	erisNodeClient := client.NewErisNodeClient(do.Node)
+	erisKeyClient := keys.NewErisKeyClient(do.Signer)
+	tx, err := core.Call(erisNodeClient, erisKeyClient, do.PublicKey, deploy.Source, "", deploy.Amount, deploy.Nonce, deploy.Gas, deploy.Fee, contractCode)
 	if err != nil {
 		return &types.CallTx{}, fmt.Errorf("Error deploying contract %s: %v", contractName, err)
 	}
@@ -344,6 +349,8 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 
 	// Sign, broadcast, display
 	var result string
+
+
 
 	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, call.Wait)
 	if err != nil {
