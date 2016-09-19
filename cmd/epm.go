@@ -55,11 +55,6 @@ Complete documentation is available at https://monax.io/docs/documentation
 
 		// Populates chainID from the chain (if its not passed)
 		common.IfExit(util.GetChainID(do))
-
-		// Populates the tendermint config object for proper websocket connection
-		config.Set("chain_id", do.ChainID)
-		config.Set("log_level", "error")
-		cfg.ApplyConfig(config)
 	},
 
 	Run: RunPackage,
