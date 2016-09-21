@@ -1,6 +1,8 @@
 package: github.com/eris-ltd/eris-pm
 import:
+  # version locked to version of develop - unlock when rc3 is ready for unstable-release
 - package: github.com/eris-ltd/eris-db
+  version: a7086aa175ebeaefd68dec7dccd3c72e3e9e880e
 - package: github.com/eris-ltd/eris-abi
   version: 1b264afca26faacb6d43faa584f2b6b07a621657
   subpackages:
@@ -14,9 +16,7 @@ import:
 - package: github.com/eris-ltd/common
   subpackages:
   - go/common
-<<<<<<< HEAD
   - go/docs
-=======
 - packages: github.com/eris-ltd/eris-logger
   version: ea48a395d6ecc0eccc67a26da9fc7a6106fabb84
 - package: github.com/ethereum/go-ethereum
@@ -28,11 +28,9 @@ import:
   version: 62bee037599929a6e9146f29d10dd5208c43507d
   subpackages:
   - unix
-# github.com/eris-ltd/tendermint needs to be deprecated
-- package: github.com/eris-ltd/tendermint
 - package: github.com/spf13/cobra
-# MARMOT
-# - package: github.com/tendermint/go-wire
+# MARMOT: remove go-wire dependency (/util/writers.go)
+- package: github.com/tendermint/go-wire
 - package: github.com/Azure/go-ansiterm
   version: fa152c58bc15761d0200cb75fe958b89a9d4888e
   subpackages:
@@ -53,4 +51,3 @@ import:
   - pkg/term/windows
 - package: github.com/docker/go-units
   version: f2d77a61e3c169b43402a0a1e84f06daf29b8190
->>>>>>> 9e53507... dependencies: remove godep vendored
