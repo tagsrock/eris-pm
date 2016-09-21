@@ -13,7 +13,7 @@ import (
 
 	common "github.com/eris-ltd/common/go/common"
 	log "github.com/eris-ltd/eris-logger"
-	cfg "github.com/eris-ltd/tendermint/config"
+
 	"github.com/spf13/cobra"
 )
 

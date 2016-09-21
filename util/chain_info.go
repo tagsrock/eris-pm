@@ -10,8 +10,8 @@ import (
 	"github.com/eris-ltd/eris-pm/definitions"
 
 	log "github.com/eris-ltd/eris-logger"
-	// MARMOT
-	cclient "eris-ltd/tendermint/rpc/core_client"
+
+	"github.com/eris-ltd/eris-db/client"
 )
 
 func ChainStatus(field string, do *definitions.Do) (string, error) {
@@ -55,14 +55,13 @@ func GetChainID(do *definitions.Do) error {
 }
 
 func AccountsInfo(account, field string, do *definitions.Do) (string, error) {
-	client := cclient.NewClient(do.Chain, "HTTP")
 
 	addrBytes, err := hex.DecodeString(account)
 	if err != nil {
 		return "", fmt.Errorf("Account Addr %s is improper hex: %v", account, err)
 	}
-
-	r, err := client.GetAccount(addrBytes)
+	nodeClient := client.NewErisNodeClient(do.Chain)
+	r, err := nodeClient.GetAccount(addrBytes)
 	if err != nil {
 		return "", err
 	}

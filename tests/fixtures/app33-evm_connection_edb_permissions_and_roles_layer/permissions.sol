@@ -9,7 +9,7 @@ contract Permissions {
 }
 
 contract permSNative {
-  // https://github.com/eris-ltd/tendermint/blob/eris-db-0.11.3/vm/snative.go#L17
+  // github.com/eris-ltd/eris-db/manager/eris-mint/evm/snative.go#L17
   Permissions perm = Permissions(address(bytes20("permissions_contract")));
 
   function has_base(address addr, int permFlag) constant returns (bool value) {

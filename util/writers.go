@@ -11,8 +11,8 @@ import (
 	"github.com/eris-ltd/eris-pm/definitions"
 
 	log "github.com/eris-ltd/eris-logger"
-	// MARMOT
-	"github.com/eris-ltd/tendermint/wire"
+	// MARMOT: dependency on go-wire needs to be removed.
+	"github.com/tendermint/go-wire"
 )
 
 const LogFileNameCSV = "epm.csv"
