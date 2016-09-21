@@ -10,7 +10,8 @@ import (
 	"github.com/eris-ltd/eris-pm/definitions"
 
 	log "github.com/eris-ltd/eris-logger"
-	cclient "github.com/eris-ltd/tendermint/rpc/core_client"
+	// MARMOT
+	cclient "eris-ltd/tendermint/rpc/core_client"
 )
 
 func ChainStatus(field string, do *definitions.Do) (string, error) {

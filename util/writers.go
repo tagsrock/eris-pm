@@ -11,6 +11,7 @@ import (
 	"github.com/eris-ltd/eris-pm/definitions"
 
 	log "github.com/eris-ltd/eris-logger"
+	// MARMOT
 	"github.com/eris-ltd/tendermint/wire"
 )
 
