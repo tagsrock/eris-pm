@@ -39,7 +39,7 @@ func LoadPackage(fileName string) (*definitions.Package, error) {
 	}
 
 	// marshall file
-	if err := epmJobs.Marshal(pkg); err != nil {
+	if err := epmJobs.Unmarshal(pkg); err != nil {
 		return nil, fmt.Errorf("Sorry, the marmots could not figure that eris-pm jobs file out.\nPlease check your epm.yaml is properly formatted.\n")
 	}
 
