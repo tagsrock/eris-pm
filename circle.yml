@@ -25,20 +25,23 @@ dependencies:
 
 test:
   override:
-    - "cd ${GOPATH%%:*}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME} && glide install -s -v && GO15VENDOREXPERIMENT=1 go install ./cmd/epm"
-    - glide install -s -v
+    - cd $REPO && glide install 
+    - cd $REPO && go install ./cmd/epm
+    - tests/build_outside_tool.sh
     - "tests/circle_test.sh | tee $CIRCLE_ARTIFACTS/output.log; test ${PIPESTATUS[0]} -eq 0"
 
 deployment:
   master:
     branch: master
     commands:
-      - tests/build_tool.sh
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS quay.io
+      - tests/build_outside_tool.sh
       - docker push quay.io/eris/epm
       - docs/build.sh master
   develop:
     branch: develop
     commands:
-      - tests/build_tool.sh
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS quay.io
+      - tests/build_outside_tool.sh
       - docker push quay.io/eris/epm
       - docs/build.sh
