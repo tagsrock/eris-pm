@@ -4,12 +4,10 @@ import:
 - package: github.com/eris-ltd/eris-db
   version: a3f39a29773bf3b12e451d6c95d71f988ef74824
 - package: github.com/eris-ltd/eris-abi
-  version: 1b264afca26faacb6d43faa584f2b6b07a621657
   subpackages:
   - core
   - abi
 - package: github.com/eris-ltd/eris-compilers
-  version: e4962fd23106031467ea0df42bac81c35478c6f1
   subpackages:
   - network
   - util
