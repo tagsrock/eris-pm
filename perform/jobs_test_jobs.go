@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"strconv"
 
-
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
 

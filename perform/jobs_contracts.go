@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strings"
-	"strconv"
 	"reflect"
+	"strconv"
+	"strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
@@ -163,14 +163,14 @@ func deployContract(deploy *definitions.Deploy, do *definitions.Do, r response.R
 	// additional data may be sent along with the contract
 	// these are naively added to the end of the contract code using standard
 	// mint packing
-	
+
 	if deploy.Data != nil {
 		val := reflect.ValueOf(deploy.Data)
 		if reflect.TypeOf(deploy.Data).Kind() != reflect.Slice {
 			log.Warn("Your deploy job is currently using a soon to be deprecated way of declaring constructor values. Please remember to update your run file to use the new way of declaring constructor values.")
 			//todo: eventually deprecate this
 			var stringRepresentation string
-			
+
 			switch val.Kind() {
 			case reflect.Bool:
 				stringRepresentation = strconv.FormatBool(val.Bool())
@@ -179,7 +179,7 @@ func deployContract(deploy *definitions.Deploy, do *definitions.Do, r response.R
 			default:
 				stringRepresentation = val.String()
 			}
-			
+
 			if stringRepresentation != "" {
 				splitout := strings.Split(stringRepresentation, " ")
 				for _, s := range splitout {
@@ -190,7 +190,7 @@ func deployContract(deploy *definitions.Deploy, do *definitions.Do, r response.R
 					contractCode = contractCode + addOns
 				}
 			}
-		} else {	
+		} else {
 			for i := 0; i < val.Len(); i++ {
 				s := val.Index(i)
 				newString, err := util.PreProcess(s.Interface().(string), do)
@@ -307,7 +307,6 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 	call.Amount = useDefault(call.Amount, do.DefaultAmount)
 	call.Fee = useDefault(call.Fee, do.DefaultFee)
 	call.Gas = useDefault(call.Gas, do.DefaultGas)
-
 
 	// formulate call
 	if call.ABI == "" {

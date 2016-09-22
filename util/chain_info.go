@@ -28,8 +28,6 @@ func ChainStatus(do *definitions.Do) (chainId string, latestBlockHeight int, err
 	return
 }
 
-
-
 func GetChainID(do *definitions.Do) error {
 	if do.ChainID == "" {
 		chainId, _, err := ChainStatus(do)
