@@ -14,40 +14,30 @@ import (
 	"github.com/eris-ltd/eris-db/client"
 )
 
-func ChainStatus(field string, do *definitions.Do) (string, error) {
-	client := cclient.NewClient(do.Chain, "HTTP")
-
-	r, err := client.Status()
+func ChainStatus(do *definitions.Do) (chainId string, latestBlockHeight int, err error) {
+	nodeClient := client.NewErisNodeClient(do.Chain)
+	// NOTE: ChainId should be bytes, convert it here to string
+	// NodeInfo is no longer exposed through Status();
+	// other values are currentlu not used by e-pm
+	chainIdBytes, _, _, latestBlockHeight, _, err := nodeClient.Status()
 	if err != nil {
-		return "", err
+		return "", 0, err
 	}
-
-	s, err := FormatOutput([]string{field}, 0, r)
-	if err != nil {
-		return "", err
-	}
-
-	return s, nil
+	// set return values
+	chainId = string(chainIdBytes)
+	return
 }
+
+
 
 func GetChainID(do *definitions.Do) error {
 	if do.ChainID == "" {
-		status, err := ChainStatus("node_info", do)
+		chainId, _, err := ChainStatus(do)
 		if err != nil {
 			return err
 		}
 
-		// Wrangle these returns
-		type NodeInfo struct {
-			ChainID string `mapstructure:"chain_id" json:"chain_id"`
-		}
-		var ret NodeInfo
-		err = json.Unmarshal([]byte(status), &ret)
-		if err != nil {
-			return err
-		}
-
-		do.ChainID = ret.ChainID
+		do.ChainID = chainId
 		log.WithField("=>", do.ChainID).Info("Using ChainID from Node")
 	}
 
@@ -69,11 +59,6 @@ func AccountsInfo(account, field string, do *definitions.Do) (string, error) {
 		return "", fmt.Errorf("Account %s does not exist", account)
 	}
 
-	r2 := r.Account
-	if r2 == nil {
-		return "", fmt.Errorf("Account %s does not exist", account)
-	}
-
 	var s string
 	if strings.Contains(field, "permissions") {
 
@@ -89,7 +74,7 @@ func AccountsInfo(account, field string, do *definitions.Do) (string, error) {
 
 		fields := strings.Split(field, ".")
 
-		s, err = FormatOutput([]string{"permissions"}, 0, r2)
+		s, err = FormatOutput([]string{"permissions"}, 0, r)
 
 		var deconstructed AccountPermission
 		err := json.Unmarshal([]byte(s), &deconstructed)
@@ -108,7 +93,7 @@ func AccountsInfo(account, field string, do *definitions.Do) (string, error) {
 			}
 		}
 	} else {
-		s, err = FormatOutput([]string{field}, 0, r2)
+		s, err = FormatOutput([]string{field}, 0, r)
 	}
 
 	if err != nil {
@@ -118,29 +103,28 @@ func AccountsInfo(account, field string, do *definitions.Do) (string, error) {
 	return s, nil
 }
 
-func NamesInfo(account, field string, do *definitions.Do) (string, error) {
-	client := cclient.NewClient(do.Chain, "HTTP")
-
-	r, err := client.GetName(account)
+func NamesInfo(name, field string, do *definitions.Do) (string, error) {
+	nodeClient := client.NewErisNodeClient(do.Chain)
+	owner, data, expirationBlock, err := nodeClient.GetName(name)
 	if err != nil {
 		return "", err
 	}
 	if r == nil {
-		return "", fmt.Errorf("Account %s does not exist", account)
+		return "", fmt.Errorf("Name %s does not exist", name)
 	}
 
-	r2 := r.Entry
-	s, err := FormatOutput([]string{field}, 0, r2)
-	if err != nil {
-		return "", err
+	switch field {
+	case "name":
+		return name, nil
+	case "owner":
+		return string(owner), nil
+	case "data":
+		return data, nil
+	case "expires":
+		return strvonv.Itoa(expirationBlock), nil
+	default:
+		return "", fmt.Errorf("Field %s not recognized", field)
 	}
-
-	s, err = strconv.Unquote(s)
-	if err != nil {
-		return "", err
-	}
-
-	return s, nil
 }
 
 func ValidatorsInfo(field string, do *definitions.Do) (string, error) {

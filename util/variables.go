@@ -92,7 +92,8 @@ func replaceBlockVariable(toReplace string, do *definitions.Do) (string, error) 
 		"chain": do.Chain,
 		"var":   toReplace,
 	}).Debug("Correcting $block variable")
-	block, err := ChainStatus("latest_block_height", do)
+	_, blockInt, err := ChainStatus(do)
+	block := strconv.Itoa(blockInt)
 	log.WithField("=>", block).Debug("Current height is")
 	if err != nil {
 		return "", err
