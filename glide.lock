@@ -1,6 +1,10 @@
-hash: 66c2b8d8b3e9584dcf6d94ee523057d8a64cb9f70fe8bd871bebd564219f91ea
-updated: 2016-09-21T17:05:38.007319287+02:00
+hash: 0e0b6bc9aaa655f606ecf1c13ef9cd213b493d6d3707260dd4c45cc2b3d63818
+updated: 2016-09-22T15:55:45.955279709+02:00
 imports:
+- name: github.com/agl/ed25519
+  version: d2b94fd789ea21d12fac1a4443dd3a3f79cda72c
+  subpackages:
+  - edwards25519
 - name: github.com/Azure/go-ansiterm
   version: fa152c58bc15761d0200cb75fe958b89a9d4888e
   subpackages:
@@ -44,20 +48,20 @@ imports:
   - network
   - util
 - name: github.com/eris-ltd/eris-db
-  version: a7086aa175ebeaefd68dec7dccd3c72e3e9e880e
+  version: a3f39a29773bf3b12e451d6c95d71f988ef74824
   subpackages:
-  - account
   - client
   - client/core
   - keys
   - txs
-  - permission/types
+  - account
+  - consensus/types
   - core/types
   - rpc/tendermint/client
   - rpc/tendermint/core/types
-  - consensus/types
-  - manager/eris-mint/state/types
+  - permission/types
   - event
+  - manager/eris-mint/state/types
 - name: github.com/eris-ltd/eris-keys
   version: 114ebc77443db9a153692233294e48bc7e184215
   subpackages:
@@ -136,8 +140,6 @@ imports:
   version: 1f49d83d9aa00e6ce4fc8258c71cc7786aec968a
   subpackages:
   - proto
-- name: github.com/golang/snappy
-  version: 799c780093d646c1b79d30894e22512c319fa137
 - name: github.com/gorilla/websocket
   version: 2d1e4548da234d9cb742cc3628556fef86aafbac
 - name: github.com/hashicorp/hcl
@@ -158,9 +160,9 @@ imports:
 - name: github.com/magiconair/properties
   version: 0723e352fa358f9322c938cc2dadda874e9151a9
 - name: github.com/mattn/go-colorable
-  version: ed8eb9e318d7a84ce5915b495b7d35e0cfe7b5a8
+  version: d67e0b7d1797975196499f79bcc322c08b9f218b
 - name: github.com/mattn/go-isatty
-  version: 56b76bdf51f7708750eac80fa38b952bb9f32639
+  version: fdbe02a1b44e75977b2690062b83cf507d70c013
 - name: github.com/mitchellh/mapstructure
   version: ca63d7c062ee3c9f34db231e352b60012b4fd0c1
 - name: github.com/pelletier/go-buffruneio
@@ -174,7 +176,7 @@ imports:
 - name: github.com/russross/blackfriday
   version: 35eb537633d9950afc8ae7bdf0edb6134584e9fc
 - name: github.com/Sirupsen/logrus
-  version: 3ec0642a7fb6488f65b06f9040adc67e3990296a
+  version: 57cce1ed6103dce7791881d3e69e55f90d986aa5
 - name: github.com/spf13/afero
   version: 52e4a6cfac46163658bd4f123c49b6ee7dc75f78
   subpackages:
@@ -191,7 +193,7 @@ imports:
 - name: github.com/spf13/viper
   version: a78f70b5b977efe08e313a9e2341c3f5457abdaf
 - name: github.com/syndtr/goleveldb
-  version: 917f41c560270110ceb73c5b38be2a9127387071
+  version: 63c9e642efad852f49e20a6f90194cae112fd2ac
   subpackages:
   - leveldb
   - leveldb/cache
@@ -205,10 +207,13 @@ imports:
   - leveldb/storage
   - leveldb/table
   - leveldb/util
-- name: github.com/tendermint/ed25519
-  version: 1f52c6f8b8a5c7908aff4497c186af344b428925
+- name: github.com/syndtr/gosnappy
+  version: 156a073208e131d7d2e212cb749feae7c339e846
   subpackages:
-  - edwards25519
+  - snappy
+- name: github.com/tendermint/ed25519
+  version: 533fb6548e2071076888eda3c38749d707ba49bc
+  subpackages:
   - extra25519
 - name: github.com/tendermint/flowcontrol
   version: 84d9671090430e8ec80e35b339907e0579b999eb
@@ -240,7 +245,7 @@ imports:
 - name: github.com/tendermint/go-wire
   version: 3b0adbc86ed8425eaed98516165b6788d9f4de7a
 - name: github.com/tendermint/log15
-  version: 9545b249b3aacafa97f79e0838b02b274adc6f5f
+  version: ""
   subpackages:
   - term
 - name: github.com/tendermint/tendermint
@@ -265,14 +270,14 @@ imports:
   - ripemd160
   - nacl/secretbox
   - openpgp/armor
+  - ssh
+  - nacl/box
   - poly1305
   - salsa20/salsa
   - openpgp/errors
-  - nacl/box
-  - ssh
   - curve25519
 - name: golang.org/x/net
-  version: f4fe4abe3c785295ddf81c7f1823bcd3bad391b6
+  version: 6d3beaea10370160dea67f5c9327ed791afd5389
   subpackages:
   - http2
   - context
