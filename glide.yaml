@@ -4,7 +4,7 @@ import:
 - package: github.com/eris-ltd/eris-db
   version: a3f39a29773bf3b12e451d6c95d71f988ef74824
 - package: github.com/eris-ltd/eris-abi
-  version: 6993e969fd1bc63d87a92d2be2300ab027f77ff8
+  # version: 6993e969fd1bc63d87a92d2be2300ab027f77ff8
   subpackages:
   - core
   - abi
@@ -19,7 +19,6 @@ import:
 - packages: github.com/eris-ltd/eris-logger
   version: ea48a395d6ecc0eccc67a26da9fc7a6106fabb84
 - package: github.com/ethereum/go-ethereum
-  version: 5f55d95aea433ef97c48ae927835d833772350de
   subpackages:
   - crypto/sha3
 - package: github.com/russross/blackfriday
@@ -51,3 +50,6 @@ import:
   - pkg/term/windows
 - package: github.com/docker/go-units
   version: f2d77a61e3c169b43402a0a1e84f06daf29b8190
+- package: golang.org/x/crypto
+  subpackages:
+  - ed25519

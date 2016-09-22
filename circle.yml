@@ -26,7 +26,6 @@ test:
   override:
     - cd $REPO && glide install 
     - cd $REPO && go install ./cmd/epm
-    - tests/build_outside_tool.sh
     - "tests/circle_test.sh | tee $CIRCLE_ARTIFACTS/output.log; test ${PIPESTATUS[0]} -eq 0"
 
 deployment:
