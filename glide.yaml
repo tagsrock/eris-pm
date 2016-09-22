@@ -2,7 +2,7 @@ package: github.com/eris-ltd/eris-pm
 import:
   # version locked to version of develop - unlock when rc3 is ready for unstable-release
 - package: github.com/eris-ltd/eris-db
-  version: a7086aa175ebeaefd68dec7dccd3c72e3e9e880e
+  version: a3f39a29773bf3b12e451d6c95d71f988ef74824
 - package: github.com/eris-ltd/eris-abi
   version: 1b264afca26faacb6d43faa584f2b6b07a621657
   subpackages:
@@ -29,6 +29,7 @@ import:
   subpackages:
   - unix
 - package: github.com/spf13/cobra
+- package: github.com/spf13/viper
 # MARMOT: remove go-wire dependency (/util/writers.go)
 - package: github.com/tendermint/go-wire
 - package: github.com/Azure/go-ansiterm

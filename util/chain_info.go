@@ -109,11 +109,8 @@ func NamesInfo(name, field string, do *definitions.Do) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	if r == nil {
-		return "", fmt.Errorf("Name %s does not exist", name)
-	}
 
-	switch field {
+	switch strings.ToLower(field) {
 	case "name":
 		return name, nil
 	case "owner":
@@ -121,39 +118,33 @@ func NamesInfo(name, field string, do *definitions.Do) (string, error) {
 	case "data":
 		return data, nil
 	case "expires":
-		return strvonv.Itoa(expirationBlock), nil
+		return strconv.Itoa(expirationBlock), nil
 	default:
 		return "", fmt.Errorf("Field %s not recognized", field)
 	}
 }
 
 func ValidatorsInfo(field string, do *definitions.Do) (string, error) {
-	client := cclient.NewClient(do.Chain, "HTTP")
-
-	r, err := client.ListValidators()
-	if err != nil {
-		return "", err
-	}
-
-	s, err := FormatOutput([]string{field}, 0, r)
-	if err != nil {
-		return "", err
-	}
-
-	type Account struct {
-		Address string `mapstructure:"address" json:"address"`
-	}
-
-	var deconstructed []Account
-	err = json.Unmarshal([]byte(s), &deconstructed)
+	nodeClient := client.NewErisNodeClient(do.Chain)
+	_, bondedValidators, unbondingValidators, err := nodeClient.ListValidators()
 	if err != nil {
 		return "", err
 	}
 
 	vals := []string{}
-	for _, v := range deconstructed {
-		vals = append(vals, v.Address)
+	switch strings.ToLower(field) {
+	case "bondedvalidators":
+		for _, v := range bondedValidators {
+			vals = append(vals, string(v.Address()))
+		}
+	case "unbondingvalidators":
+		for _, v := range unbondingValidators {
+			vals = append(vals, string(v.Address()))
+		}
+	default:
+		return "", fmt.Errorf("Field %s not recognized", field)
 	}
+	var s string
 	s = strings.Join(vals, ",")
 
 	return s, nil
