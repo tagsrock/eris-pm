@@ -10,8 +10,8 @@ import (
 	"github.com/eris-ltd/eris-pm/util"
 
 	log "github.com/eris-ltd/eris-logger"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/types"
+	"github.com/eris-ltd/mint-client/mintx/core"
+	"github.com/eris-ltd/tendermint/types"
 )
 
 func SendJob(send *definitions.Send, do *definitions.Do) (string, error) {

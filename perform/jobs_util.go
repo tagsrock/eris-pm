@@ -5,7 +5,7 @@ import (
 	"github.com/eris-ltd/eris-pm/util"
 
 	log "github.com/eris-ltd/eris-logger"
-	keys "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-keys/eris-keys"
+	keys "github.com/eris-ltd/eris-keys/eris-keys"
 )
 
 func SetAccountJob(account *definitions.Account, do *definitions.Do) (string, error) {

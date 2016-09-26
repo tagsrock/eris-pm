@@ -10,7 +10,7 @@ import (
 	"github.com/eris-ltd/eris-pm/util"
 
 	log "github.com/eris-ltd/eris-logger"
-	cclient "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/rpc/core_client"
+	cclient "github.com/eris-ltd/tendermint/rpc/core_client"
 )
 
 func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (string, []*definitions.Variable, error) {

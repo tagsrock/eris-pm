@@ -16,8 +16,8 @@ import (
 	compilers "github.com/eris-ltd/eris-compilers/network"
 	response "github.com/eris-ltd/eris-compilers/util"
 	log "github.com/eris-ltd/eris-logger"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/types"
+	"github.com/eris-ltd/mint-client/mintx/core"
+	"github.com/eris-ltd/tendermint/types"
 )
 
 func PackageDeployJob(pkgDeploy *definitions.PackageDeploy, do *definitions.Do) (string, error) {

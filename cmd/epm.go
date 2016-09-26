@@ -13,8 +13,8 @@ import (
 
 	common "github.com/eris-ltd/common/go/common"
 	log "github.com/eris-ltd/eris-logger"
-	cfg "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/config"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
+	cfg "github.com/eris-ltd/tendermint/config"
+	"github.com/spf13/cobra"
 )
 
 const VERSION = version.VERSION

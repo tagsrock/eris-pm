@@ -1,9 +1,9 @@
 package commands
 
 import (
-	cfg "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/config"
+	cfg "github.com/eris-ltd/tendermint/config"
 
-	_ "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/utils" // calls ApplyConfig
+	_ "github.com/eris-ltd/mint-client/utils" // calls ApplyConfig
 )
 
 var config cfg.Config = nil

@@ -11,7 +11,7 @@ import (
 	"github.com/eris-ltd/eris-pm/definitions"
 
 	log "github.com/eris-ltd/eris-logger"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/wire"
+	"github.com/eris-ltd/tendermint/wire"
 )
 
 const LogFileNameCSV = "epm.csv"
