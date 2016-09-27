@@ -76,7 +76,6 @@ func PreProcess(toProcess string, do *definitions.Do) (string, error) {
 						}).Debug("Fixing Variables =>")
 						processedString = strings.Replace(processedString, varName, job.JobResult, 1)
 					}
-
 				}
 			}
 		}
@@ -92,8 +91,8 @@ func replaceBlockVariable(toReplace string, do *definitions.Do) (string, error) 
 		"chain": do.Chain,
 		"var":   toReplace,
 	}).Debug("Correcting $block variable")
-	_, blockInt, err := ChainStatus(do)
-	block := strconv.Itoa(blockInt)
+	blockHeight, err := GetBlockHeight(do)
+	block := strconv.Itoa(blockHeight)
 	log.WithField("=>", block).Debug("Current height is")
 	if err != nil {
 		return "", err
