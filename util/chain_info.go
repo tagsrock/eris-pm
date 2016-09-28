@@ -130,11 +130,11 @@ func ValidatorsInfo(field string, do *definitions.Do) (string, error) {
 
 	vals := []string{}
 	switch strings.ToLower(field) {
-	case "bondedvalidators":
+	case "bonded_validators":
 		for _, v := range bondedValidators {
 			vals = append(vals, string(v.Address()))
 		}
-	case "unbondingvalidators":
+	case "unbonding_validators":
 		for _, v := range unbondingValidators {
 			vals = append(vals, string(v.Address()))
 		}
