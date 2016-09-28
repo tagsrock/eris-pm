@@ -30,6 +30,7 @@ epm.csv
 epm.log
 jobs_output.json
 tests/fixtures/*/abi
-docs/eris-pm
+docs/documentation
 tests/fixtures/chaindata/genesis.json
 tests/fixtures/error*.log
+vendor

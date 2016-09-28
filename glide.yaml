@@ -4,3 +4,4 @@ import:
 - package: github.com/eris-ltd/common
   subpackages:
   - go/common
+  - go/docs

@@ -1,5 +1,5 @@
-hash: 7259a8261500da519d7c524ab47af3ffd1ab6735790394c9bf7098dafe15052c
-updated: 2016-08-15T17:12:17.920167098-05:00
+hash: 1d5dd415188f7568967979d8a76ebfd2fb8d4ec22b5c7ffac19d6a2341221046
+updated: 2016-09-26T20:18:52.19633671+01:00
 imports:
 - name: github.com/Azure/go-ansiterm
   version: fa152c58bc15761d0200cb75fe958b89a9d4888e
@@ -16,20 +16,21 @@ imports:
 - name: github.com/docker/docker
   version: 91fd0df9c0775dc48446c924c4789c81b4f5f47e
   subpackages:
-  - pkg/term
   - pkg/system
+  - pkg/term
   - pkg/term/windows
 - name: github.com/docker/go-units
   version: f2d77a61e3c169b43402a0a1e84f06daf29b8190
 - name: github.com/eris-ltd/common
-  version: eb041cd9a6dea7667b98db16fb5613eedaa62326
+  version: efab819d45728e77515ef323dd97fede3116ae1a
   subpackages:
   - go/common
+  - go/docs
 - name: github.com/eris-ltd/eris-abi
   version: 1b264afca26faacb6d43faa584f2b6b07a621657
   subpackages:
-  - core
   - abi
+  - core
 - name: github.com/eris-ltd/eris-compilers
   version: e4962fd23106031467ea0df42bac81c35478c6f1
   subpackages:
@@ -47,4 +48,4 @@ imports:
   version: 62bee037599929a6e9146f29d10dd5208c43507d
   subpackages:
   - unix
-devImports: []
+testImports: []
