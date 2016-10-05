@@ -86,7 +86,7 @@ That's it! Your contract is all ready to go. You should see the output in `epm.j
 
 # Working With a Local Compiler
 
-Where are the contracts compiling? By default they are compiled using a microservice which we run at https://compilers.eris.industries. However, it is just as easy to run the compilers service locally and use that to compile contracts. To work with the local compilers service just add the `--local-compilers` flag do your `eris pkgs do` command.
+Where are the contracts compiling? By default they are compiled using a microservice which we run at https://compilers.monax.io. However, it is just as easy to run the compilers service locally and use that to compile contracts. To work with the local compilers service just add the `--local-compilers` flag do your `eris pkgs do` command.
 
 # Clean Up
 
