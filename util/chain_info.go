@@ -2,7 +2,6 @@ package util
 
 import (
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
@@ -58,39 +57,23 @@ func AccountsInfo(account, field string, do *definitions.Do) (string, error) {
 
 	var s string
 	if strings.Contains(field, "permissions") {
+		// TODO: [ben] resolve conflict between explicit types and json better
 
-		type BasePermission struct {
-			PermissionValue int `mapstructure:"perms" json:"perms"`
-			SetBitValue     int `mapstructure:"set" json:"set"`
-		}
 
-		type AccountPermission struct {
-			Base  *BasePermission `mapstructure:"base" json:"base"`
-			Roles []string        `mapstructure:"roles" json:"roles"`
-		}
 
 		fields := strings.Split(field, ".")
 
-		s, err = FormatOutput([]string{"permissions"}, 0, r)
-
-		var deconstructed AccountPermission
-		err := json.Unmarshal([]byte(s), &deconstructed)
-		if err != nil {
-			return "", err
-		}
 
 		if len(fields) > 1 {
 			switch fields[1] {
 			case "roles":
-				s = strings.Join(deconstructed.Roles, ",")
+				s = strings.Join(r.Permissions.Roles, ",")
 			case "base", "perms":
-				s = strconv.Itoa(deconstructed.Base.PermissionValue)
+				s = strconv.Itoa(int(r.Permissions.Base.Perms))
 			case "set":
-				s = strconv.Itoa(deconstructed.Base.SetBitValue)
+				s = strconv.Itoa(int(r.Permissions.Base.SetBit))
 			}
 		}
-	} else {
-		s, err = FormatOutput([]string{field}, 0, r)
 	}
 
 	if err != nil {

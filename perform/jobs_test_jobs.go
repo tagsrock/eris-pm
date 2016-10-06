@@ -53,42 +53,33 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 
 	// Call the client
 	nodeClient := client.NewErisNodeClient(do.Chain)
-	retrn, _, err := nodeClient.QueryContract(fromAddrBytes, toAddrBytes, dataBytes)
+	result, _, err := nodeClient.QueryContract(fromAddrBytes, toAddrBytes, dataBytes)
 	if err != nil {
 		return "", make([]*definitions.Variable, 0), err
 	}
 
-	// Preprocess return
-	result, err := util.FormatOutput([]string{"return"}, 0, retrn)
-	if err != nil {
-		return "", make([]*definitions.Variable, 0), err
-	}
-	result, err = strconv.Unquote(result)
-	if err != nil {
-		return "", make([]*definitions.Variable, 0), err
-	}
 
 	// Formally process the return
 	log.WithField("res", result).Debug("Decoding Raw Result")
 	if query.ABI == "" {
 		log.WithField("abi", query.Destination).Debug()
-		query.Variables, err = util.ReadAndDecodeContractReturn(query.Destination, query.Function, result, do)
+		query.Variables, err = util.ReadAndDecodeContractReturn(query.Destination, query.Function, fmt.Sprintf("%X", result), do)
 	} else {
 		log.WithField("abi", query.ABI).Debug()
-		query.Variables, err = util.ReadAndDecodeContractReturn(query.ABI, query.Function, result, do)
+		query.Variables, err = util.ReadAndDecodeContractReturn(query.ABI, query.Function, fmt.Sprintf("%X", result), do)
 	}
 	if err != nil {
 		return "", make([]*definitions.Variable, 0), err
 	}
 
-	result = util.GetReturnValue(query.Variables)
+	result2 := util.GetReturnValue(query.Variables)
 	// Finalize
-	if result != "" {
+	if result2 != "" {
 		log.WithField("=>", result).Warn("Return Value")
 	} else {
 		log.Debug("No return.")
 	}
-	return result, query.Variables, nil
+	return result2, query.Variables, nil
 }
 
 func QueryAccountJob(query *definitions.QueryAccount, do *definitions.Do) (string, error) {
