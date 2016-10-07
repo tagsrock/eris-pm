@@ -12,9 +12,7 @@ COPY . $REPO
 # install glide; use glide; remove its traces
 WORKDIR $REPO
 RUN go get github.com/Masterminds/glide && \
-	go get github.com/sgotti/glide-vc && \
-	glide install --strip-vendor && \
-	glide vc
+	glide install
 
 # install eris-pm
 WORKDIR $REPO/cmd/epm
