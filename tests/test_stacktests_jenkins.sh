@@ -135,7 +135,7 @@ early_exit(){
     return 0
   fi
 
-  echo "There was an error duing setup. Exiting."
+  echo "There was an error during setup. Exiting."
   if [ "$was_running" -eq 0 ]
   then
     eris services stop -r keys

@@ -89,7 +89,7 @@ early_exit(){
     return 0
   fi
 
-  echo "There was an error duing setup; keys were not properly imported. Exiting."
+  echo "There was an error during setup; keys were not properly imported. Exiting."
   if [ "$was_running" -eq 0 ]
   then
     if [ "$ci" = true ]
