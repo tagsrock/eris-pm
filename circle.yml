@@ -5,6 +5,9 @@ machine:
     DOCKER_VERSION: 1.9.1
     DOCKER_MACHINE_VERSION: 0.7.0
     ERIS_CLI_BRANCH: develop
+    # ERIS_PM_LEAN is an intermediary measure to build eris-pm outside of the docker container
+    # and then move only the executable into the container to counteract bloating the image
+    # ERIS_PM_LEAN: true
   post:
     - git config --global user.email "billings@monax.io"
     - git config --global user.name "Billings the Bot"
@@ -27,19 +30,18 @@ test:
     - cd $REPO && glide install 
     - cd $REPO && go install ./cmd/epm
     - "tests/circle_test.sh | tee $CIRCLE_ARTIFACTS/output.log; test ${PIPESTATUS[0]} -eq 0"
-
 deployment:
   master:
     branch: master
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS quay.io
-      - tests/build_tool.sh
+      - ERIS_PM_LEAN=true tests/build_tool.sh
       - docker push quay.io/eris/epm
       - docs/build.sh master
   develop:
     branch: develop
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS quay.io
-      - tests/build_tool.sh
+      - ERIS_PM_LEAN=true tests/build_tool.sh
       - docker push quay.io/eris/epm
       - docs/build.sh

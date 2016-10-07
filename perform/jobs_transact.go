@@ -6,19 +6,14 @@ import (
 	"io"
 	"os"
 
-	log "github.com/eris-ltd/eris-logger"
-
-	"github.com/eris-ltd/eris-db/client"
-	"github.com/eris-ltd/eris-db/client/core"
-	"github.com/eris-ltd/eris-db/keys"
-	"github.com/eris-ltd/eris-db/txs"
-
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
 
 	log "github.com/eris-ltd/eris-logger"
-	"github.com/eris-ltd/mint-client/mintx/core"
-	"github.com/eris-ltd/tendermint/types"
+	"github.com/eris-ltd/eris-db/client"
+	"github.com/eris-ltd/eris-db/client/core"
+	"github.com/eris-ltd/eris-db/keys"
+	"github.com/eris-ltd/eris-db/txs"
 )
 
 func SendJob(send *definitions.Send, do *definitions.Do) (string, error) {

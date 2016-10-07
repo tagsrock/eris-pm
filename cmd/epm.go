@@ -50,7 +50,7 @@ Complete documentation is available at https://monax.io/docs/documentation
 		log.Info("Hello! I'm EPM.")
 
 		// Fixes path issues and controls for mint-client / eris-keys assumptions
-		util.BundleHttpPathCorrect(do)
+		// util.BundleHttpPathCorrect(do)
 		util.PrintPathPackage(do)
 
 		// Populates chainID from the chain (if its not passed)

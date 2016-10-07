@@ -111,6 +111,7 @@ test_setup(){
   ensure_running keys
 
   # make a chain
+  eris clean -y
   eris chains make --account-types=Full:1,Participant:1 $chain_name #1>/dev/null
   key1_addr=$(cat $chain_dir/addresses.csv | grep $name_full | cut -d ',' -f 1)
   key2_addr=$(cat $chain_dir/addresses.csv | grep $name_part | cut -d ',' -f 1)
@@ -225,7 +226,7 @@ then
   echo
   echo "Building eris-pm in a docker container."
   set -e
-  tests/build_outside_tool.sh 1>/dev/null
+  tests/build_tool.sh 1>/dev/null
   if [ $? -ne 0 ]
   then
     echo "Could not build eris-pm. Debug via by directly running [`pwd`/tests/build_outside_tool.sh]"
