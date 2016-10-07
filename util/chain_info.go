@@ -74,6 +74,8 @@ func AccountsInfo(account, field string, do *definitions.Do) (string, error) {
 				s = strconv.Itoa(int(r.Permissions.Base.SetBit))
 			}
 		}
+	} else if field == "balance" {
+		s = strconv.Itoa(int(r.Balance))
 	}
 
 	if err != nil {
