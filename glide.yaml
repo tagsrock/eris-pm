@@ -2,7 +2,7 @@ package: github.com/eris-ltd/eris-pm
 import:
   # version locked to version of develop - unlock when rc3 is ready for unstable-release
 - package: github.com/eris-ltd/eris-db
-  version: a3f39a29773bf3b12e451d6c95d71f988ef74824
+  version: 6cd9f1eed2613f43d4dcca21afb76cfa84c70a4d
 - package: github.com/eris-ltd/eris-abi
   # version: 6993e969fd1bc63d87a92d2be2300ab027f77ff8
   subpackages:

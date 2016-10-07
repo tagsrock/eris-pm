@@ -1,5 +1,5 @@
-hash: 16465929cc8a2dd7f2960e329b0d4fa40718147f705af36963af08d0af178cce
-updated: 2016-09-22T18:00:51.348019109+02:00
+hash: 491fa7101bbf91137260a2f7266503ac34afbe8293bd6b4e5f8e80feb6ca8b9d
+updated: 2016-10-07T21:07:52.762036573+02:00
 imports:
 - name: github.com/Azure/go-ansiterm
   version: fa152c58bc15761d0200cb75fe958b89a9d4888e
@@ -30,7 +30,7 @@ imports:
 - name: github.com/docker/go-units
   version: f2d77a61e3c169b43402a0a1e84f06daf29b8190
 - name: github.com/eris-ltd/common
-  version: 0b8693d97cfb9257d2055e96cee960e503711fb4
+  version: 244a29bda27f25b00dd0cdc64a5e0b8e0bfcd369
   subpackages:
   - go/common
 - name: github.com/eris-ltd/eris-abi
@@ -44,7 +44,7 @@ imports:
   - network
   - util
 - name: github.com/eris-ltd/eris-db
-  version: a3f39a29773bf3b12e451d6c95d71f988ef74824
+  version: 6cd9f1eed2613f43d4dcca21afb76cfa84c70a4d
   subpackages:
   - client
   - client/core
@@ -62,6 +62,11 @@ imports:
   version: 114ebc77443db9a153692233294e48bc7e184215
   subpackages:
   - eris-keys
+  - crypto
+  - crypto/ed25519
+  - crypto/randentropy
+  - crypto/secp256k1
+  - crypto/sha3
 - name: github.com/eris-ltd/eris-logger
   version: ea48a395d6ecc0eccc67a26da9fc7a6106fabb84
 - name: github.com/ethereum/go-ethereum
