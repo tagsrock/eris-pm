@@ -19,7 +19,7 @@ The Eris Package Manager is a utility for deploying and testing smart contract p
 
 ## Background
 
-`epm` is a high level tool which provides easy access to most of the `eris-db` tooling. `epm` is used to deploy and test suites of smart contracts. In general it wrap the `mint-client` tooling, along with `eris-keys` and `eris-compilers` to provide a harmonized interface to the modular components of the [eris](https://docs.erisindustries.com) open source platform.
+`epm` is a high level tool which provides easy access to most of the `eris-db` tooling. `epm` is used to deploy and test suites of smart contracts. In general it wrap the `mint-client` tooling, along with `eris-keys` and `eris-compilers` to provide a harmonized interface to the modular components of the [eris](https://monax.io/docs/documentation/) open source platform.
 
 `epm` is closer to an ansible or chef like tool than it is `npm` in that it is a deployment sequence and testing tool. `epm` uses an **epm definition file** to tell the package manager what jobs should be ran and in what order.
 
@@ -42,9 +42,9 @@ In EPM a *job* is a single action which is performed (such as a transaction, a c
 ```
 The Eris Package Manager Deploys and Tests Smart Contract Systems
 
-Made with <3 by Eris Industries.
+Made with <3 by Monax Industries.
 
-Complete documentation is available at https://docs.erisindustries.com
+Complete documentation is available at https://monax.io/docs/documentation/
 
 Version:
   0.12.0
@@ -57,7 +57,7 @@ Flags:
   -r, --address="": default address to use; operates the same way as the [account] job, only before the epm file is ran; default respects $EPM_ADDRESS
   -u, --amount="9999": default amount to use; default respects $EPM_AMOUNT
   -c, --chain="localhost:46657": <ip:port> of chain which EPM should use; default respects $EPM_CHAIN_ADDR
-  -m, --compiler="https://compilers.eris.industries:10114": <ip:port> of compiler which EPM should use; default respects $EPM_COMPILER_ADDR
+  -m, --compiler="https://compilers.monax.io:10114": <ip:port> of compiler which EPM should use; default respects $EPM_COMPILER_ADDR
   -p, --contracts-path="./contracts": path to the contracts EPM should use; default respects $EPM_CONTRACTS_PATH
   -d, --debug=false: debug level output; the most output available for epm; if it is too chatty use verbose flag; default respects $EPM_DEBUG
   -n, --fee="1234": default fee to use; default respects $EPM_FEE
@@ -157,11 +157,11 @@ jobs:
       wait: true
 ```
 
-For more about the jobs epm is capable of performing please see the [Jobs Specification](https://docs.erisindustries.com/documentation/eris-pm/latest/jobs_specification/).
+For more about the jobs epm is capable of performing please see the [Jobs Specification](https://monax.io/docs/documentation/pm/latest/specifications/jobs_specification/).
 
 ### Variable Handling
 
-`epm` will also handle variables; for more information please see the [Variables Specification](https://docs.erisindustries.com/documentation/eris-pm/latest/variable_specification/).
+`epm` will also handle variables; for more information please see the [Variables Specification](https://monax.io/docs/documentation/pm/latest/specifications/variable_specification/).
 
 `epm` will save an `epm.log` file with the variables used and results of the jobs in the `pwd` unless another location is specified.
 
