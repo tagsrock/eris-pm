@@ -9,7 +9,7 @@ jobs:
 - name: setStorageBaseBool
   job:
     set:
-      val: true
+      val: "true"
 
 - name: setStorageBool
   job:
@@ -54,7 +54,7 @@ jobs:
     assert:
       key: $queryStorageBool2
       relation: eq
-      val: true
+      val: "true"
 
 - name: setStorageBaseInt
   job:

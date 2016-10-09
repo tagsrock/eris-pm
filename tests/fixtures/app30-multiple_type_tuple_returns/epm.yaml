@@ -34,14 +34,14 @@ jobs:
     assert:
       key: $queryBools.0
       relation: eq
-      val: true
+      val: "true"
 
 - name: assertBools
   job:
     assert:
       key: $queryBools.1
       relation: eq
-      val: false
+      val: "false"
 
 - name: queryBytes
   job:

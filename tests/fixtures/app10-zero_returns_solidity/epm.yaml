@@ -69,4 +69,4 @@ jobs:
     assert:
       key: $queryBool
       relation: eq
-      val: false
+      val: "false"

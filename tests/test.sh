@@ -104,10 +104,10 @@ early_exit(){
 
 test_setup(){
   echo "Getting Setup"
-  if [ "$ci" = true ]
-  then
-    eris init --yes --pull-images=true --testing=true 1>/dev/null
-  fi
+  #if [ "$ci" = true ]
+  #then
+    #eris init --yes --pull-images=true --testing=true 1>/dev/null
+  #fi
   ensure_running keys
 
   # make a chain

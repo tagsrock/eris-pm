@@ -1,13 +1,7 @@
 package: github.com/eris-ltd/eris-pm
 import:
-  # version locked to version of develop - unlock when rc3 is ready for unstable-release
 - package: github.com/eris-ltd/eris-db
   version: f61579a5547ce5271b878b32e2ede050a497cffa
-- package: github.com/eris-ltd/eris-abi
-  # version: 6993e969fd1bc63d87a92d2be2300ab027f77ff8
-  subpackages:
-  - core
-  - abi
 - package: github.com/eris-ltd/eris-compilers
   subpackages:
   - network
@@ -18,9 +12,6 @@ import:
   - go/docs
 - packages: github.com/eris-ltd/eris-logger
   version: ea48a395d6ecc0eccc67a26da9fc7a6106fabb84
-- package: github.com/ethereum/go-ethereum
-  subpackages:
-  - crypto/sha3
 - package: github.com/russross/blackfriday
 - package: golang.org/x/sys/unix
   version: 62bee037599929a6e9146f29d10dd5208c43507d
@@ -28,7 +19,6 @@ import:
   - unix
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
-# MARMOT: remove go-wire dependency (/util/writers.go)
 - package: github.com/tendermint/go-wire
 - package: github.com/Azure/go-ansiterm
   version: fa152c58bc15761d0200cb75fe958b89a9d4888e

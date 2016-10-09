@@ -36,7 +36,7 @@ func RunJobs(do *definitions.Do) error {
 		} else if do.Overwrite == false && dup == true {
 			overwriteWarning := "You are about to overwrite a previous job name, continue?"
 
-			if common.QueryYesOrNo(overwriteWarning) == common.No {
+			if common.QueryYesOrNo(overwriteWarning, []int{}...) == common.No {
 				continue
 			}
 		}

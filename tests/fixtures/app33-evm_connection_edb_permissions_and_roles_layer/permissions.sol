@@ -1,15 +1,15 @@
 contract Permissions {
-  function has_base(address addr, int permFlag) constant returns (bool value) {}
-  function set_base(address addr, int permFlag, bool value) constant returns (bool val) {}
-  function unset_base(address addr, int permFlag) constant returns (int pf) {}
-  function set_global(address addr, int permFlag, bool value) constant returns (int pf) {}
-  function has_role(address addr, bytes32 role) constant returns (bool val) {}
-  function add_role(address addr, bytes32 role) constant returns (bool added) {}
-  function rm_role(address addr, bytes32 role) constant returns (bool removed) {}
+  function has_base(address addr, int permFlag) constant returns (bool value);
+  function set_base(address addr, int permFlag, bool value) constant returns (bool val);
+  function unset_base(address addr, int permFlag) constant returns (int pf);
+  function set_global(address addr, int permFlag, bool value) constant returns (int pf);
+  function has_role(address addr, bytes32 role) constant returns (bool val);
+  function add_role(address addr, bytes32 role) constant returns (bool added);
+  function rm_role(address addr, bytes32 role) constant returns (bool removed);
 }
 
 contract permSNative {
-  // github.com/eris-ltd/eris-db/manager/eris-mint/evm/snative.go#L17
+  // github.com/eris-ltd/eris-db/permission/types/snatives.go#L17
   Permissions perm = Permissions(address(bytes20("permissions_contract")));
 
   function has_base(address addr, int permFlag) constant returns (bool value) {
@@ -41,4 +41,3 @@ contract permSNative {
     return perm.rm_role(addr, role);
   }
 }
-

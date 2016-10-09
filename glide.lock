@@ -34,11 +34,6 @@ imports:
   subpackages:
   - go/common
   - go/docs
-- name: github.com/eris-ltd/eris-abi
-  version: 61d1c08b5be1b46519835503c51338bbd451f065
-  subpackages:
-  - core
-  - abi
 - name: github.com/eris-ltd/eris-compilers
   version: b56060c5cbd4c0858d7aa741aff4442829a0580a
   subpackages:
@@ -70,10 +65,6 @@ imports:
   - crypto/sha3
 - name: github.com/eris-ltd/eris-logger
   version: ea48a395d6ecc0eccc67a26da9fc7a6106fabb84
-- name: github.com/ethereum/go-ethereum
-  version: 421df866cd4468d62b09295199b7228d0ae2b714
-  subpackages:
-  - crypto/sha3
 - name: github.com/fsnotify/fsnotify
   version: f12c6236fe7b5cf6bcf30e5935d08cb079d78334
 - name: github.com/go-stack/stack
