@@ -1,24 +1,19 @@
 # Pull base image.
 FROM quay.io/eris/build
-MAINTAINER Monax Industries <support@monax.io>
+MAINTAINER Eris Industries <support@erisindustries.com>
 
 #-----------------------------------------------------------------------------
 # install epm
 
 # set the repo and copy in files
 ENV REPO $GOPATH/src/github.com/eris-ltd/eris-pm
-COPY . $REPO
-
-# install glide; use glide; remove its traces
-WORKDIR $REPO
-RUN go get github.com/Masterminds/glide && \
-	glide install
+COPY ./fixtures $REPO/epm_artifact
 
 # install eris-pm
-WORKDIR $REPO/cmd/epm
-RUN go build --ldflags '-extldflags "-static"' -o $INSTALL_BASE/epm
-RUN chown --recursive $USER:$USER $REPO
-RUN rm -rf $GOPATH
+RUN chmod +x $REPO/fixtures
+RUN chown $USER:$USER $REPO/fixtures
+RUN cp $REPO/fixtures $INSTALL_BASE/epm
+RUN rm $REPO/fixtures
 
 #-----------------------------------------------------------------------------
 # root dir
