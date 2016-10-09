@@ -13,8 +13,8 @@ import (
 
 	common "github.com/eris-ltd/common/go/common"
 	log "github.com/eris-ltd/eris-logger"
-	cfg "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/config"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
+
+	"github.com/spf13/cobra"
 )
 
 const VERSION = version.VERSION
@@ -50,16 +50,11 @@ Complete documentation is available at https://monax.io/docs/documentation
 		log.Info("Hello! I'm EPM.")
 
 		// Fixes path issues and controls for mint-client / eris-keys assumptions
-		util.BundleHttpPathCorrect(do)
+		// util.BundleHttpPathCorrect(do)
 		util.PrintPathPackage(do)
 
 		// Populates chainID from the chain (if its not passed)
 		common.IfExit(util.GetChainID(do))
-
-		// Populates the tendermint config object for proper websocket connection
-		config.Set("chain_id", do.ChainID)
-		config.Set("log_level", "error")
-		cfg.ApplyConfig(config)
 	},
 
 	Run: RunPackage,

@@ -2,10 +2,10 @@ package util
 
 import (
 	"fmt"
+	"reflect"
 	"regexp"
 	"strconv"
 	"strings"
-	"reflect"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
@@ -76,7 +76,6 @@ func PreProcess(toProcess string, do *definitions.Do) (string, error) {
 						}).Debug("Fixing Variables =>")
 						processedString = strings.Replace(processedString, varName, job.JobResult, 1)
 					}
-
 				}
 			}
 		}
@@ -92,7 +91,8 @@ func replaceBlockVariable(toReplace string, do *definitions.Do) (string, error) 
 		"chain": do.Chain,
 		"var":   toReplace,
 	}).Debug("Correcting $block variable")
-	block, err := ChainStatus("latest_block_height", do)
+	blockHeight, err := GetBlockHeight(do)
+	block := strconv.Itoa(blockHeight)
 	log.WithField("=>", block).Debug("Current height is")
 	if err != nil {
 		return "", err
@@ -163,10 +163,10 @@ func PreProcessInputData(function string, data interface{}, do *definitions.Do) 
 			case bool:
 				newString = strconv.FormatBool(s.Interface().(bool))
 			case int, int32, int64:
-				newString = strconv.FormatInt(int64(s.Interface().(int)), 10) 
+				newString = strconv.FormatInt(int64(s.Interface().(int)), 10)
 			case []interface{}:
 				var args []string
-				for _, index := range s.Interface().([]interface{}) {		
+				for _, index := range s.Interface().([]interface{}) {
 					value := reflect.ValueOf(index)
 					var stringified string
 					switch value.Kind() {

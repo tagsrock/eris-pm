@@ -10,7 +10,7 @@ import (
 	"github.com/eris-ltd/eris-pm/version"
 	"github.com/eris-ltd/common/go/docs"
 
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/spf13/cobra"
+	"github.com/spf13/cobra"
 )
 
 // repos should customize the next two lines

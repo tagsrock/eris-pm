@@ -6,7 +6,7 @@
 | Develop | [![Circle CI](https://circleci.com/gh/eris-ltd/eris-pm/tree/develop.svg?style=svg)](https://circleci.com/gh/eris-ltd/eris-pm/tree/develop) |
 
 
-The Eris Package Manager is a utility for deploying and testing smart contract packages. It is most commonly used by `eris pkgs do`, a command exposed through [eris-cli](https://github.com/eris-ltd/eris-cli), the entry point for the Eris Platform.
+The Eris Package Manager is a utility for deploying and testing smart contract packages. It is most commonly used by `eris pkgs do`, a command exposed through [eris-cli](https://monax.io/docs/documentation/cli), the entry point for the Eris Platform.
 
 ## Table of Contents
 
@@ -19,7 +19,7 @@ The Eris Package Manager is a utility for deploying and testing smart contract p
 
 ## Background
 
-`epm` is a high level tool which provides easy access to most of the `eris-db` tooling. `epm` is used to deploy and test suites of smart contracts. In general it wrap the `mint-client` tooling, along with `eris-keys` and `eris-compilers` to provide a harmonized interface to the modular components of the [eris](https://monax.io/docs/documentation/) open source platform.
+`epm` is a high level tool which provides easy access to most of the `eris-db` tooling. `epm` is used to deploy and test suites of smart contracts. In general it wraps the `eris-client` tooling, along with `eris-keys` and `eris-compilers` to provide a harmonized interface to the modular components of the [eris](https://monax.io/docs/documentation/) open source platform.
 
 `epm` is closer to an ansible or chef like tool than it is `npm` in that it is a deployment sequence and testing tool. `epm` uses an **epm definition file** to tell the package manager what jobs should be ran and in what order.
 

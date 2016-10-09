@@ -1,24 +1,25 @@
 package util
 
 import (
+	"fmt"
 	"regexp"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 )
 
 func BundleHttpPathCorrect(do *definitions.Do) {
-	do.Chain = HttpPathCorrect(do.Chain, true)
-	do.Signer = HttpPathCorrect(do.Signer, false)
-	do.Compiler = HttpPathCorrect(do.Compiler, false)
+	do.Chain = HttpPathCorrect(do.Chain, "tcp", true)
+	do.Signer = HttpPathCorrect(do.Signer, "http", false)
+	do.Compiler = HttpPathCorrect(do.Compiler, "http", false)
 }
 
-func HttpPathCorrect(oldPath string, trailingSlash bool) string {
+func HttpPathCorrect(oldPath, requiredPrefix string, trailingSlash bool) string {
 	var newPath string
-	protoReg := regexp.MustCompile("https*://.*")
+	protoReg := regexp.MustCompile(fmt.Sprintf("%ss*://.*", requiredPrefix))
 	trailer := regexp.MustCompile("/$")
 
 	if !protoReg.MatchString(oldPath) {
-		newPath = "http://" + oldPath
+		newPath = requiredPrefix + "://" + oldPath
 	} else {
 		newPath = oldPath
 	}
