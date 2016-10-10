@@ -36,6 +36,7 @@ deployment:
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS quay.io
       - tests/build_tool.sh
+      - "docker rmi quay.io/eris/pm:latest && docker tag quay.io/eris/pm:build throw:build && docker rmi quay.io/eris/pm:build"
       - docker push quay.io/eris/pm
       - docs/build.sh master
   develop:
@@ -43,5 +44,6 @@ deployment:
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS quay.io
       - tests/build_tool.sh
+      - "docker tag quay.io/eris/pm:build throw:build && docker rmi quay.io/eris/pm:build"
       - docker push quay.io/eris/pm
       - docs/build.sh
