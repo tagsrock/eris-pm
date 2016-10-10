@@ -1,31 +1,17 @@
-# Pull base image.
 FROM quay.io/eris/build
-MAINTAINER Monax Industries <support@monax.io>
+MAINTAINER Monax <support@monax.io>
 
-#-----------------------------------------------------------------------------
-# install epm
+# Install eris-pm, a go app that manages packages
+ENV NAME eris-pm
+ENV REPO $GOPATH/src/github.com/eris-ltd/$NAME
 
-# set the repo and copy in files
-ENV REPO $GOPATH/src/github.com/eris-ltd/eris-pm
-COPY . $REPO
-
-# install glide; use glide; remove its traces
+COPY ./glide.yaml $REPO/glide.yaml
+COPY ./glide.lock $REPO/glide.lock
 WORKDIR $REPO
-RUN go get github.com/Masterminds/glide && \
-	glide install
+RUN glide install
 
-# install eris-pm
-WORKDIR $REPO/cmd/epm
-RUN go build --ldflags '-extldflags "-static"' -o $INSTALL_BASE/epm
-RUN chown --recursive $USER:$USER $REPO
-RUN rm -rf $GOPATH
-
-#-----------------------------------------------------------------------------
-# root dir
-
-# persist data, set user
-RUN chown --recursive $USER:$USER /home/$USER
-VOLUME /home/$USER/.eris
-WORKDIR /home/$USER/.eris
-USER $USER
-CMD ["epm", "--chain", "chain:46657", "--sign", "keys:4767" ]
+COPY . $REPO/.
+RUN cd $REPO/cmd/$NAME && \
+  go build --ldflags '-extldflags "-static"' -o $INSTALL_BASE/$NAME && \
+  unset NAME && \
+  unset REPO

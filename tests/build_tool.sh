@@ -2,9 +2,9 @@
 # ----------------------------------------------------------
 # PURPOSE
 
-# This is the build script for epm. It will build the tool
-# into docker containers in a reliable and predicatable
-# manner.
+# This is the build script for the eris stack. It will
+# build the tool into docker containers in a reliable and
+# predicatable manner.
 
 # ----------------------------------------------------------
 # REQUIREMENTS
@@ -17,55 +17,43 @@
 # build_tool.sh
 
 # ----------------------------------------------------------
-# Set defaults
-#INSTALL_BASE="/usr/local/bin"
-set -e
-if [ "$CIRCLE_BRANCH" ]
-then
-  repo=`pwd`
-else
-  repo=$GOPATH/src/github.com/eris-ltd/eris-pm
-fi
-branch=${CIRCLE_BRANCH:=master}
-branch=${branch/-/_}
-testimage=${testimage:="quay.io/eris/epm"}
 
-release_min=$(cat $repo/version/version.go | tail -n 1 | cut -d \  -f 4 | tr -d '"')
+NAME=eris-pm
+IMAGE=quay.io/eris/pm
+
+set -e
+
+if [ "$JENKINS_URL" ] || [ "$CIRCLE_BRANCH" ]
+then
+  REPO=`pwd`
+  CI="true"
+else
+  REPO=$GOPATH/src/github.com/eris-ltd/$NAME
+fi
+
+release_min=$(cat $REPO/version/version.go | tail -n 1 | cut -d \  -f 4 | tr -d '"')
 release_maj=$(echo $release_min | cut -d . -f 1-2)
 
-# ---------------------------------------------------------------------------
-# Go!
+# Build
+docker build -t $IMAGE:build $REPO
+docker run --rm --entrypoint cat $IMAGE:build /usr/local/bin/$NAME > $REPO/$NAME
+docker build -t $IMAGE:$release_min -f Dockerfile.deploy $REPO
 
-# build the static binary in a clean build environment
-# echo "Building static binary in a clean build environment"
-# docker build -t $testimage:build $repo
-
-# if [ "$ERIS_PM_LEAN" = true ]
-# then
-  # copy out the built executable to local host
-#   echo "Recovering artifact to local host"
-#  docker run --rm --entrypoint cat $testimage:build $INSTALL_BASE/epm > $repo/epm_artifact
-  # move the built artefact into a clean docker image
-  # echo "Creating fresh deployment image with built artifact"
-#   docker build -f $repo/ -t $testimage:deploy $repo
-# else
-  # rename build image as deployment; skipping repackaging step
-#  docker tag $testimage:build $testimage:deploy
-# fi
-
-if [[ "$branch" = "master" ]]
+# Cleanup
+rm $REPO/$NAME
+if [ "$CI" ]
 then
-  # retag original deploy image as latest image
-  #docker tag $testimage:deploy $testimage:latest
-  docker build -t $testimage:latest $repo
-  docker tag $testimage:latest $testimage:$release_maj
-  docker tag $testimage:latest $testimage:$release_min
-else
-  # retag original deploy image as minor release image
-  #docker tag $testimage:deploy $testimage:$release_min
-  docker build -t $testimage:$release_min $repo
+  docker rmi $IMAGE:build
 fi
 
-# clean up
-# docker rmi $testimage:build
-# docker rmi $testimage:deploy
+# Extra Tags
+if [[ "$branch" = "master" ]]
+then
+  docker tag -f $IMAGE:$release_min $IMAGE:$release_maj
+  docker tag -f $IMAGE:$release_min $IMAGE:latest
+fi
+
+if [ "$CIRCLE_BRANCH" ]
+then
+  docker tag -f $IMAGE:$release_min $IMAGE:latest
+fi
