@@ -24,7 +24,7 @@ var do *definitions.Do
 
 // Defining the root command
 var EPMCmd = &cobra.Command{
-	Use:   "epm",
+	Use:   "eris-pm",
 	Short: "The Eris Package Manager Deploys and Tests Smart Contract Systems",
 	Long: `The Eris Package Manager Deploys and Tests Smart Contract Systems
 
