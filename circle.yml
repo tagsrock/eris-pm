@@ -27,7 +27,7 @@ dependencies:
 
 test:
   override:
-    - cd $REPO && glide install 
+    - cd $REPO && glide install
     - cd $REPO && go install ./cmd/eris-pm
     - "tests/circle_test.sh | tee $CIRCLE_ARTIFACTS/output.log; test ${PIPESTATUS[0]} -eq 0"
 deployment:
@@ -35,13 +35,13 @@ deployment:
     branch: master
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS quay.io
-      - ERIS_PM_LEAN=true tests/build_tool.sh
+      - tests/build_tool.sh
       - docker push quay.io/eris/pm
       - docs/build.sh master
   develop:
     branch: develop
     commands:
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS quay.io
-      - ERIS_PM_LEAN=true tests/build_tool.sh
+      - tests/build_tool.sh
       - docker push quay.io/eris/pm
       - docs/build.sh
