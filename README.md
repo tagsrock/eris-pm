@@ -14,28 +14,30 @@ The Eris Package Manager is a utility for deploying and testing smart contract p
 - [Installation](#installation)
 - [Usage](#usage)
   - [EPM Definition Files](#epm-definition-files)
+  - [Variable Handling](#variable-handling)
 - [Contribute](#contribute)
 - [License](#license)
 
 ## Background
 
-`epm` is a high level tool which provides easy access to most of the `eris-db` tooling. `epm` is used to deploy and test suites of smart contracts. In general it wraps the `eris-client` tooling, along with `eris-keys` and `eris-compilers` to provide a harmonized interface to the modular components of the [eris](https://monax.io/docs/documentation/) open source platform.
+`eris-pm` is a high level tool which provides easy access to most of the `eris-db` tooling. `eris-pm` is used to deploy and test suites of smart contracts. In general it wraps the `eris-client` tooling, along with clients to the `eris-keys` and `eris-compilers` daemons to provide a harmonized interface to the modular components of the [eris](https://monax.io/docs/documentation/) open source platform.
 
-`epm` is closer to an ansible or chef like tool than it is `npm` in that it is a deployment sequence and testing tool. `epm` uses an **epm definition file** to tell the package manager what jobs should be ran and in what order.
+`eris-pm` is closer to an ansible or chef like tool than it is `npm` in that it is a deployment sequence and testing tool. `eris-pm` uses an **epm definition file** to tell the package manager what jobs should be ran and in what order.
 
 In EPM a *job* is a single action which is performed (such as a transaction, a contract deployment, a call to a smart contract, or a query of information). The results of these jobs are then kept in variables and may be used in later jobs.
 
 ## Installation
 
-`epm` is intended to be used by the `eris pkgs do` command vi [eris-cli](https://github.com/eris-ltd/eris-cli), which runs a temporary docker container to expose its functionality.
+`eris-pm` is intended to be used by the `eris pkgs do` command via [eris-cli](https://github.com/eris-ltd/eris-cli), which runs a temporary docker container to expose its functionality.
 
 ### For Developers
 
 1. [Install go](https://golang.org/doc/install)
 2. [Install glide](https://github.com/Masterminds/glide)
 3. Ensure you have `gmp` installed (`sudo apt-get install libgmp3-dev || brew install gmp`)
-4. `go get github.com/eris-ltd/eris-pm/cmd/epm`
+4. `git clone https://github.com/eris-ltd/eris-pm/cmd/eris-pm $GOPATH/src/github.com/eris-ltd/eris-pm/cmd/eris-pm`
 5. `glide install -s -v`
+6. `go install $GOPATH/src/github.com/eris-ltd/eris-pm/cmd/eris-pm`
 
 ## Usage
 
@@ -50,7 +52,7 @@ Version:
   0.12.0
 
 Usage:
-  epm [flags]
+  eris-pm [flags]
 
 Flags:
   -a, --abi-path="./abi": path to the abi directory EPM should use when saving ABIs after the compile process; default respects $EPM_ABI_PATH
@@ -71,11 +73,11 @@ Flags:
   -v, --verbose=false: verbose output; more output than no output flags; less output than debug level; default respects $EPM_VERBOSE
 ```
 
-`epm` is a simple tool from the command line perspective in that it does not have subcommands. `epm` is the only command it will run. This command will execute the instructions of the epm definition file in the current directory (unless a different file is given via the `--file` flag or `$EPM_FILE` environment variable).
+`eris-pm` is a simple tool from the command line perspective in that it does not have subcommands. `eris-pm` is the only command it will run. This command will execute the instructions of the epm definition file in the current directory (unless a different file is given via the `--file` flag or `$EPM_FILE` environment variable).
 
 ### EPM Definition Files
 
-A sample EPM definition file, typically saved as `epm.yaml`, looks like: 
+A sample EPM definition file, typically saved as `epm.yaml`, looks like:
 
 ```yaml
 jobs:
@@ -157,13 +159,13 @@ jobs:
       wait: true
 ```
 
-For more about the jobs epm is capable of performing please see the [Jobs Specification](https://monax.io/docs/documentation/pm/latest/specifications/jobs_specification/).
+For more about the jobs eris-pm is capable of performing please see the [Jobs Specification](https://monax.io/docs/documentation/pm/latest/specifications/jobs_specification/).
 
 ### Variable Handling
 
-`epm` will also handle variables; for more information please see the [Variables Specification](https://monax.io/docs/documentation/pm/latest/specifications/variable_specification/).
+`eris-pm` will also handle variables; for more information please see the [Variables Specification](https://monax.io/docs/documentation/pm/latest/specifications/variable_specification/).
 
-`epm` will save an `epm.log` file with the variables used and results of the jobs in the `pwd` unless another location is specified.
+`eris-pm` will save an `jobs_output.json` file with the variables used and results of the jobs in the `pwd` unless another location is specified.
 
 ## Contribute
 
