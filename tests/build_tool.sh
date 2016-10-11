@@ -18,7 +18,7 @@
 
 # ----------------------------------------------------------
 
-NAME=eris-pm
+TARGET=eris-pm
 IMAGE=quay.io/eris/pm
 
 set -e
@@ -28,7 +28,7 @@ then
   REPO=`pwd`
   CI="true"
 else
-  REPO=$GOPATH/src/github.com/eris-ltd/$NAME
+  REPO=$GOPATH/src/github.com/eris-ltd/$TARGET
 fi
 
 release_min=$(cat $REPO/version/version.go | tail -n 1 | cut -d \  -f 4 | tr -d '"')
@@ -36,11 +36,11 @@ release_maj=$(echo $release_min | cut -d . -f 1-2)
 
 # Build
 docker build -t $IMAGE:build $REPO
-docker run --rm --entrypoint cat $IMAGE:build /usr/local/bin/$NAME > $REPO/$NAME
+docker run --rm --entrypoint cat $IMAGE:build /usr/local/bin/$TARGET > $REPO/"$TARGET"_build_artifact
 docker build -t $IMAGE:$release_min -f Dockerfile.deploy $REPO
 
 # Cleanup
-rm $REPO/$NAME
+rm $REPO/"$TARGET"_build_artifact
 
 # Extra Tags
 if [[ "$branch" = "master" ]]
