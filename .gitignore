@@ -4,6 +4,7 @@
 *.so
 
 # Folders
+vendor
 _obj
 _test
 
@@ -28,8 +29,9 @@ docs/eris-cli
 builds
 epm.csv
 epm.log
-epm.json
+jobs_output.json
 tests/fixtures/*/abi
-docs/eris-pm
+docs/documentation
 tests/fixtures/chaindata/genesis.json
 tests/fixtures/error*.log
+vendor

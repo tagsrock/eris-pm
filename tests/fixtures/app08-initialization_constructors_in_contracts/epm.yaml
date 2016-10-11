@@ -9,14 +9,15 @@ jobs:
   job:
     deploy:
       contract: ./storage.sol
-      data: $setStorage
+      data: 
+        - $setStorage
       wait: true
 
 - name: queryStorage
   job:
     query-contract:
       destination: $deployStorageK
-      data: get
+      function: get
 
 - name: assertStorage
   job:

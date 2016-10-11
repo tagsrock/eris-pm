@@ -5,6 +5,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"reflect"
+	"strconv"
 	"strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
@@ -14,12 +16,16 @@ import (
 	compilers "github.com/eris-ltd/eris-compilers/network"
 	response "github.com/eris-ltd/eris-compilers/util"
 	log "github.com/eris-ltd/eris-logger"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/tendermint/types"
+
+	"github.com/eris-ltd/eris-db/client"
+	"github.com/eris-ltd/eris-db/client/core"
+	"github.com/eris-ltd/eris-db/keys"
+	"github.com/eris-ltd/eris-db/txs"
 )
 
 func PackageDeployJob(pkgDeploy *definitions.PackageDeploy, do *definitions.Do) (string, error) {
 	// todo
+	// note: we should have this talking to a new client package...add that to the todo
 	var result string
 
 	return result, nil
@@ -91,11 +97,11 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 		resp, err := compilers.BeginCompile(do.Compiler, p, false, deploy.Libraries)
 
 		if err != nil {
-			log.Errorln("Error compiling contracts")
+			log.Errorln("Error compiling contracts: Compilers error:")
 			return "", err
 		} else if resp.Error != "" {
-			log.Errorln("Error compiling contracts")
-			return "", fmt.Errorf(resp.Error)
+			log.Errorln("Error compiling contracts: Language error:")
+			return "", fmt.Errorf("%v", resp.Error)
 		}
 		// loop through objects returned from compiler
 		switch {
@@ -157,16 +163,48 @@ func deployContract(deploy *definitions.Deploy, do *definitions.Do, r response.R
 	// additional data may be sent along with the contract
 	// these are naively added to the end of the contract code using standard
 	// mint packing
-	if deploy.Data != "" {
-		splitout := strings.Split(deploy.Data, " ")
-		for _, s := range splitout {
-			s, _ = util.PreProcess(s, do)
-			addOns := common.LeftPadString(common.StripHex(common.Coerce2Hex(s)), 64)
-			log.WithField("=>", contractCode).Debug("Contract Code")
-			log.WithField("=>", addOns).Debug("Additional Data")
-			contractCode = contractCode + addOns
+
+	if deploy.Data != nil {
+		val := reflect.ValueOf(deploy.Data)
+		if reflect.TypeOf(deploy.Data).Kind() != reflect.Slice {
+			log.Warn("Your deploy job is currently using a soon to be deprecated way of declaring constructor values. Please remember to update your run file to use the new way of declaring constructor values.")
+			//todo: eventually deprecate this
+			var stringRepresentation string
+
+			switch val.Kind() {
+			case reflect.Bool:
+				stringRepresentation = strconv.FormatBool(val.Bool())
+			case reflect.Int:
+				stringRepresentation = strconv.FormatInt(val.Int(), 10)
+			default:
+				stringRepresentation = val.String()
+			}
+
+			if stringRepresentation != "" {
+				splitout := strings.Split(stringRepresentation, " ")
+				for _, s := range splitout {
+					s, _ = util.PreProcess(s, do)
+					addOns := common.LeftPadString(common.StripHex(common.Coerce2Hex(s)), 64)
+					log.WithField("=>", contractCode).Debug("Contract Code")
+					log.WithField("=>", addOns).Debug("Additional Data")
+					contractCode = contractCode + addOns
+				}
+			}
+		} else {
+			for i := 0; i < val.Len(); i++ {
+				s := val.Index(i)
+				newString, err := util.PreProcess(s.Interface().(string), do)
+				if err != nil {
+					return "", err
+				}
+				addOns := common.LeftPadString(common.StripHex(common.Coerce2Hex(newString)), 64)
+				log.WithField("=>", contractCode).Debug("Contract Code")
+				log.WithField("=>", addOns).Debug("Additional Data")
+				contractCode = contractCode + addOns
+			}
 		}
 	}
+
 	// Save ABI
 	if _, err := os.Stat(do.ABIPath); os.IsNotExist(err) {
 		if err := os.Mkdir(do.ABIPath, 0775); err != nil {
@@ -223,7 +261,7 @@ func deployContract(deploy *definitions.Deploy, do *definitions.Do, r response.R
 	return result, err
 }
 
-func deployRaw(do *definitions.Do, deploy *definitions.Deploy, contractName, contractCode string) (*types.CallTx, error) {
+func deployRaw(do *definitions.Do, deploy *definitions.Deploy, contractName, contractCode string) (*txs.CallTx, error) {
 
 	// Deploy contract
 	log.WithFields(log.Fields{
@@ -235,18 +273,29 @@ func deployRaw(do *definitions.Do, deploy *definitions.Deploy, contractName, con
 		"code":   contractCode,
 	}).Info()
 
-	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, deploy.Source, "", deploy.Amount, deploy.Nonce, deploy.Gas, deploy.Fee, contractCode)
+	erisNodeClient := client.NewErisNodeClient(do.Chain)
+	erisKeyClient := keys.NewErisKeyClient(do.Signer)
+	tx, err := core.Call(erisNodeClient, erisKeyClient, do.PublicKey, deploy.Source, "", deploy.Amount, deploy.Nonce, deploy.Gas, deploy.Fee, contractCode)
 	if err != nil {
-		return &types.CallTx{}, fmt.Errorf("Error deploying contract %s: %v", contractName, err)
+		return &txs.CallTx{}, fmt.Errorf("Error deploying contract %s: %v", contractName, err)
 	}
 
 	return tx, err
 }
 
 func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions.Variable, error) {
+	var err error
+	var callData string
+	var callDataArray []string
 	// Preprocess variables
 	call.Source, _ = util.PreProcess(call.Source, do)
 	call.Destination, _ = util.PreProcess(call.Destination, do)
+	//todo: find a way to call the fallback function here
+	call.Function, callDataArray, err = util.PreProcessInputData(call.Function, call.Data, do)
+	if err != nil {
+		return "", make([]*definitions.Variable, 0), err
+	}
+	call.Function, _ = util.PreProcess(call.Function, do)
 	call.Amount, _ = util.PreProcess(call.Amount, do)
 	call.Nonce, _ = util.PreProcess(call.Nonce, do)
 	call.Fee, _ = util.PreProcess(call.Fee, do)
@@ -259,19 +308,19 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 	call.Fee = useDefault(call.Fee, do.DefaultFee)
 	call.Gas = useDefault(call.Gas, do.DefaultGas)
 
-	var err error
-	// save for later
-	originalData := call.Data
-
-	// formulte call
+	// formulate call
 	if call.ABI == "" {
-		call.Data, err = util.ReadAbiFormulateCall(call.Destination, call.Data, do)
+		callData, err = util.ReadAbiFormulateCall(call.Destination, call.Function, callDataArray, do)
 	} else {
-		call.Data, err = util.ReadAbiFormulateCall(call.ABI, call.Data, do)
+		callData, err = util.ReadAbiFormulateCall(call.ABI, call.Function, callDataArray, do)
 	}
 	if err != nil {
-		var str, err = util.ABIErrorHandler(do, err, call, nil)
-		return str, make([]*definitions.Variable, 0), err
+		if call.Function == "()" {
+			log.Warn("Calling the fallback function")
+		} else {
+			var str, err = util.ABIErrorHandler(do, err, call, nil)
+			return str, make([]*definitions.Variable, 0), err
+		}
 	}
 
 	// Don't use pubKey if account override
@@ -283,10 +332,13 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 
 	log.WithFields(log.Fields{
 		"destination": call.Destination,
-		"data":        call.Data,
+		"function":    call.Function,
+		"data":        callData,
 	}).Info("Calling")
 
-	tx, err := core.Call(do.Chain, do.Signer, do.PublicKey, call.Source, call.Destination, call.Amount, call.Nonce, call.Gas, call.Fee, call.Data)
+	erisNodeClient := client.NewErisNodeClient(do.Chain)
+	erisKeyClient := keys.NewErisKeyClient(do.Signer)
+	tx, err := core.Call(erisNodeClient, erisKeyClient, do.PublicKey, call.Source, call.Destination, call.Amount, call.Nonce, call.Gas, call.Fee, callData)
 	if err != nil {
 		return "", make([]*definitions.Variable, 0), err
 	}
@@ -299,7 +351,7 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 	// Sign, broadcast, display
 	var result string
 
-	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx, true, true, call.Wait)
+	res, err := core.SignAndBroadcast(do.ChainID, erisNodeClient, erisKeyClient, tx, true, true, call.Wait)
 	if err != nil {
 		var str, err = util.MintChainErrorHandler(do, err)
 		return str, make([]*definitions.Variable, 0), err
@@ -310,9 +362,9 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 	if result != "" {
 		log.WithField("=>", result).Debug("Decoding Raw Result")
 		if call.ABI == "" {
-			call.Variables, err = util.ReadAndDecodeContractReturn(call.Destination, originalData, result, do)
+			call.Variables, err = util.ReadAndDecodeContractReturn(call.Destination, call.Function, result, do)
 		} else {
-			call.Variables, err = util.ReadAndDecodeContractReturn(call.ABI, originalData, result, do)
+			call.Variables, err = util.ReadAndDecodeContractReturn(call.ABI, call.Function, result, do)
 		}
 		if err != nil {
 			return "", make([]*definitions.Variable, 0), err
@@ -339,7 +391,9 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 func deployFinalize(do *definitions.Do, tx interface{}, wait bool) (string, error) {
 	var result string
 
-	res, err := core.SignAndBroadcast(do.ChainID, do.Chain, do.Signer, tx.(types.Tx), true, true, wait)
+	erisNodeClient := client.NewErisNodeClient(do.Chain)
+	erisKeyClient := keys.NewErisKeyClient(do.Signer)
+	res, err := core.SignAndBroadcast(do.ChainID, erisNodeClient, erisKeyClient, tx.(txs.Tx), true, true, wait)
 	if err != nil {
 		return util.MintChainErrorHandler(do, err)
 	}

@@ -23,7 +23,7 @@ jobs:
   job:
     call:
       destination: $deployGSFactory
-      data: create
+      function: create
       abi: GSFactory
       wait: true
 
@@ -31,7 +31,7 @@ jobs:
   job:
     call:
       destination: $deployGSFactory
-      data: create
+      function: create
       abi: GSFactory
       wait: true
 
@@ -39,7 +39,7 @@ jobs:
   job:
     call:
       destination: $deployGSFactory
-      data: create
+      function: create
       abi: GSFactory
       wait: true
 
@@ -47,7 +47,7 @@ jobs:
   job:
     query-contract:
       destination: $deployGSFactory
-      data: last
+      function: last
       abi: GSFactory
 
 - name: assertAddrSingle
@@ -66,7 +66,9 @@ jobs:
   job:
     call:
       destination: $createGSContract1
-      data: set $setStorageBase
+      function: set 
+      data:
+        - $setStorageBase
       abi: $deployGSABIFactory
       wait: true
 
@@ -74,7 +76,7 @@ jobs:
   job:
     query-contract:
       destination: $createGSContract1
-      data: get
+      function: get
       abi: $deployGSABIFactory
 
 - name: assertStorage1
@@ -88,7 +90,9 @@ jobs:
   job:
     call:
       destination: $createGSContract2
-      data: set $setStorageBase
+      function: set 
+      data:
+        - $setStorageBase
       abi: $deployGSABIFactory
       wait: true
 
@@ -96,7 +100,7 @@ jobs:
   job:
     query-contract:
       destination: $createGSContract2
-      data: get
+      function: get
       abi: $deployGSABIFactory
 
 - name: assertStorage2
@@ -110,7 +114,9 @@ jobs:
   job:
     call:
       destination: $createGSContract3
-      data: set $setStorageBase
+      function: set 
+      data:
+        - $setStorageBase
       abi: $deployGSABIFactory
       wait: true
 
@@ -118,7 +124,7 @@ jobs:
   job:
     query-contract:
       destination: $createGSContract3
-      data: get
+      function: get
       abi: $deployGSABIFactory
 
 - name: assertStorage3
@@ -133,7 +139,7 @@ jobs:
   job:
     call:
       destination: $deployGSFactory
-      data: create
+      function: create
       abi: GSFactory
       wait: true
 
@@ -141,7 +147,7 @@ jobs:
   job:
     query-contract:
       destination: $deployGSFactory
-      data: last
+      function: last
       abi: GSFactory
 
 - name: assertAddrSingle

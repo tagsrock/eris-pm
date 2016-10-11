@@ -1,6 +1,5 @@
 jobs:
 
-# Configuration 0
 - name: deployK0
   job:
     deploy:
@@ -12,7 +11,12 @@ jobs:
   job:
     call:
       destination: $deployK0
-      data: addThing test test test test
+      function: addThing
+      data:
+        - test
+        - test
+        - test
+        - test
       wait: true
 
 - name: assertTen0
@@ -26,7 +30,7 @@ jobs:
   job:
     query-contract:
       destination: $deployK0
-      data: getDesc
+      function: getDesc
 
 - name: assertDesc0
   job:
@@ -39,7 +43,7 @@ jobs:
   job:
     query-contract:
       destination: $deployK0
-      data: getUrl
+      function: getUrl
 
 - name: assertUrl0
   job:
@@ -52,7 +56,7 @@ jobs:
   job:
     query-contract:
       destination: $deployK0
-      data: getHash
+      function: getHash
 
 - name: assertHash0
   job:
@@ -65,7 +69,7 @@ jobs:
   job:
     query-contract:
       destination: $deployK0
-      data: getName
+      function: getName
 
 - name: assertName0
   job:
@@ -86,7 +90,12 @@ jobs:
   job:
     call:
       destination: $deployK1
-      data: addThing test test test test
+      function: addThing
+      data: 
+        - test
+        - test
+        - test
+        - test
       wait: true
 
 - name: assertTen1
@@ -108,7 +117,12 @@ jobs:
   job:
     call:
       destination: $deployK2
-      data: addThing test test test test
+      function: addThing 
+      data: 
+        - test
+        - test
+        - test
+        - test
       wait: true
 
 - name: assertTen2
@@ -130,7 +144,12 @@ jobs:
   job:
     call:
       destination: $deployK3
-      data: addThing test test test test
+      function: addThing
+      data: 
+        - test
+        - test
+        - test
+        - test
       wait: true
 
 - name: assertTen3
@@ -152,7 +171,12 @@ jobs:
   job:
     call:
       destination: $deployK4
-      data: addThing test test test test
+      function: addThing 
+      data: 
+        - test
+        - test
+        - test
+        - test
       wait: true
 
 - name: assertTen4
@@ -174,7 +198,12 @@ jobs:
   job:
     call:
       destination: $deployK5
-      data: addThing test test test test
+      function: addThing 
+      data: 
+        - test
+        - test
+        - test
+        - test
       wait: true
 
 - name: assertTen5
@@ -196,7 +225,12 @@ jobs:
   job:
     call:
       destination: $deployK6
-      data: addThing test test test test
+      function: addThing 
+      data: 
+        - test
+        - test
+        - test
+        - test
       wait: true
 
 - name: assertTen6
@@ -218,7 +252,12 @@ jobs:
   job:
     call:
       destination: $deployK7
-      data: addThing test test test test
+      function: addThing
+      data: 
+        - test
+        - test
+        - test
+        - test
       wait: true
 
 - name: assertTen7
@@ -240,7 +279,12 @@ jobs:
   job:
     call:
       destination: $deployK8
-      data: addThing test test test test
+      function: addThing
+      data: 
+        - test
+        - test
+        - test
+        - test
       wait: true
 
 - name: assertTen8
@@ -262,7 +306,12 @@ jobs:
   job:
     call:
       destination: $deployK9
-      data: addThing test test test test
+      function: addThing 
+      data: 
+        - test
+        - test
+        - test
+        - test
       wait: true
 
 - name: assertTen9
@@ -284,7 +333,12 @@ jobs:
   job:
     call:
       destination: $deployK10
-      data: addThing test test test test
+      function: addThing 
+      data: 
+        - test
+        - test
+        - test
+        - test
       wait: true
 
 - name: assertTen10
@@ -306,7 +360,12 @@ jobs:
   job:
     call:
       destination: $deployK11
-      data: addThing test test test test
+      function: addThing
+      data: 
+        - test
+        - test
+        - test
+        - test
       wait: true
 
 - name: assertTen11

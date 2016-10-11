@@ -7,14 +7,13 @@ import (
 	"os"
 	"path"
 	"strconv"
-	"strings"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
-	log "github.com/eris-ltd/eris-logger"
 	"github.com/eris-ltd/common/go/common"
-	ebi "github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/eris-abi/core"
-	"github.com/eris-ltd/eris-pm/Godeps/_workspace/src/github.com/eris-ltd/mint-client/mintx/core"
+	ebi "github.com/eris-ltd/eris-abi/core"
+	"github.com/eris-ltd/eris-db/client/core"
+	log "github.com/eris-ltd/eris-logger"
 )
 
 // This is a closer function which is called by most of the tx_run functions
@@ -54,36 +53,29 @@ func ReadTxSignAndBroadcast(result *core.TxResult, err error) error {
 	return nil
 }
 
-func ReadAbiFormulateCall(abiLocation, dataRaw string, do *definitions.Do) (string, error) {
+func ReadAbiFormulateCall(abiLocation, funcName string, dataRaw []string, do *definitions.Do) (string, error) {
 	abiSpecBytes, err := readAbi(do.ABIPath, abiLocation)
 	if err != nil {
 		return "", err
 	}
 	log.WithField("=>", string(abiSpecBytes)).Debug("ABI Specification (Formulate)")
-
-	// Process and Pack the Call
-	funcName, args := abiPreProcess(dataRaw, do)
-
-	log.WithFields(log.Fields{
-		"function name": funcName,
-		"arguments":     args,
-	}).Debug("Packing Call via ABI")
-	var totalArgs []string
+	totalArgs := make([]string, 0)
 	totalArgs = append(totalArgs, funcName)
-	totalArgs = append(totalArgs, args...)
+	// Process and Pack the Call
+	totalArgs = append(totalArgs, dataRaw...)
+	log.WithFields(log.Fields{
+		"arguments": totalArgs,
+	}).Debug("Packing Call via ABI")
 
 	return ebi.Packer(abiSpecBytes, totalArgs...)
 }
 
-func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *definitions.Do) ([]*definitions.Variable, error) {
+func ReadAndDecodeContractReturn(abiLocation string, funcName string, resultRaw string, do *definitions.Do) ([]*definitions.Variable, error) {
 	abiSpecBytes, err := readAbi(do.ABIPath, abiLocation)
 	if err != nil {
 		return nil, err
 	}
 	log.WithField("=>", string(abiSpecBytes)).Debug("ABI Specification (Decode)")
-
-	// Process and Pack the Call
-	funcName, _ := abiPreProcess(dataRaw, do)
 
 	// Unpack the result
 	res, err := ebi.UnPacker(abiSpecBytes, funcName, resultRaw, false)
@@ -114,24 +106,6 @@ func ReadAndDecodeContractReturn(abiLocation, dataRaw, resultRaw string, do *def
 	}
 
 	return result, nil
-}
-
-func abiPreProcess(dataRaw string, do *definitions.Do) (string, []string) {
-	var dataNew []string
-
-	data := strings.Split(dataRaw, " ")
-	log.WithField("=>", data).Debug("Data after splitting")
-	for _, d := range data {
-		d, _ = PreProcess(d, do)
-		dataNew = append(dataNew, d)
-	}
-
-	funcName := dataNew[0]
-	args := dataNew[1:]
-
-	log.WithField("=>", len(args)).Debug("Length of Args")
-
-	return funcName, args
 }
 
 func readAbi(root, contract string) ([]byte, error) {

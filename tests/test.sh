@@ -89,7 +89,7 @@ early_exit(){
     return 0
   fi
 
-  echo "There was an error duing setup; keys were not properly imported. Exiting."
+  echo "There was an error during setup; keys were not properly imported. Exiting."
   if [ "$was_running" -eq 0 ]
   then
     if [ "$ci" = true ]
@@ -111,14 +111,19 @@ test_setup(){
   ensure_running keys
 
   # make a chain
+  eris clean -y
   eris chains make --account-types=Full:1,Participant:1 $chain_name #1>/dev/null
   key1_addr=$(cat $chain_dir/addresses.csv | grep $name_full | cut -d ',' -f 1)
   key2_addr=$(cat $chain_dir/addresses.csv | grep $name_part | cut -d ',' -f 1)
   key2_pub=$(cat $chain_dir/accounts.csv | grep $name_part | cut -d ',' -f 1)
   echo -e "Default Key =>\t\t\t\t$key1_addr"
   echo -e "Backup Key =>\t\t\t\t$key2_addr"
-  eris chains new $chain_name --dir $chain_dir/$name_full 1>/dev/null
+  eris chains start $chain_name --init-dir $chain_dir/$name_full 1>/dev/null
   sleep 5 # boot time
+  chain_ip=$(eris chains inspect $chain_name NetworkSettings.IPAddress)
+  keys_ip=$(eris services inspect keys NetworkSettings.IPAddress)
+  echo -e "Chain at =>\t\t\t\t$chain_ip"
+  echo -e "Keys at =>\t\t\t\t$keys_ip"
   echo "Setup complete"
 }
 
@@ -137,7 +142,7 @@ run_test(){
     echo
     cat readme.md
     echo
-    eris pkgs do --chain "$chain_name" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub" #--debug
+    eris pkgs do --chain "$chain_name" --address "$key1_addr" --set "addr1=$key1_addr" --set "addr2=$key2_addr" --set "addr2_pub=$key2_pub" --local-compiler #--debug
   else
     echo
     cat readme.md
@@ -148,7 +153,7 @@ run_test(){
 
   rm -rf ./abi &>/dev/null
   rm *.bin &>/dev/null
-  rm ./epm.json &>/dev/null
+  rm ./jobs_output.json &>/dev/null
   rm ./epm.csv &>/dev/null
 
   # Reset for next run
@@ -187,7 +192,7 @@ test_teardown(){
     # eris chains logs $chain_name -t all # uncomment me to dump all VM/Chain logs
     # eris chains logs $chain_name -t all | grep 'CALLDATALOAD\|Calling' # uncomment me to dump all VM/Chain logs and parse for Calls/Calldataload
     # eris chains logs $chain_name -t all | grep 'CALLDATALOAD\|Calling' > error.log # uncomment me to dump all VM/Chain logs and parse for Calls/Calldataload dump to a file
-    eris chains rm --file --data $chain_name 1>/dev/null
+    eris chains rm --data $chain_name 1>/dev/null
     rm -rf $HOME/.eris/scratch/data/$name_base-*
     rm -rf $chain_dir
   else
@@ -221,10 +226,10 @@ then
   echo
   echo "Building eris-pm in a docker container."
   set -e
-  tests/build_tool.sh 1>/dev/null
+  # tests/build_tool.sh 1>/dev/null
   if [ $? -ne 0 ]
   then
-    echo "Could not build eris-pm. Debug via by directly running [`pwd`/tests/build_tool.sh]"
+    echo "Could not build eris-pm. Debug via by directly running [`pwd`/tests/build_outside_tool.sh]"
     exit 1
   fi
   set +e

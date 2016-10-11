@@ -71,7 +71,10 @@ jobs:
   job:
     call:
       destination: $deployPermK
-      data: has_role $addr2 marmots_deny
+      function: has_role
+      data:
+        - $addr2
+        - marmots_deny
       wait: true
 
 - name: assertRole1
@@ -85,14 +88,20 @@ jobs:
   job:
     call:
       destination: $deployPermK
-      data: add_role $addr2 $role
+      function: add_role 
+      data: 
+        - $addr2
+        - $role
       wait: true
 
 - name: checkRole2
   job:
     call:
       destination: $deployPermK
-      data: has_role $addr2 $role
+      function: has_role
+      data:
+        - $addr2
+        - $role
       wait: true
 
 - name: assertRole2
@@ -106,14 +115,20 @@ jobs:
   job:
     call:
       destination: $deployPermK
-      data: rm_role $addr2 $role
+      function: rm_role
+      data:
+        - $addr2
+        - $role
       wait: true
 
 - name: checkRole3
   job:
     query-contract:
       destination: $deployPermK
-      data: has_role $addr2 $role
+      function: has_role
+      data:
+        - $addr2
+        - $role
 
 - name: assertRole3
   job:
@@ -127,7 +142,10 @@ jobs:
   job:
     call:
       destination: $deployPermK
-      data: has_base $addr2 2118
+      function: has_base
+      data:
+        - $addr2
+        - 2118
       wait: true
 
 - name: assertBase1
@@ -141,7 +159,10 @@ jobs:
   job:
     call:
       destination: $deployPermK
-      data: has_base $addr2 14846
+      function: has_base
+      data: 
+        - $addr2
+        - 14846
       wait: true
 
 - name: assertBase
@@ -155,14 +176,21 @@ jobs:
   job:
     call:
       destination: $deployPermK
-      data: set_base $addr2 2119 true
+      function: set_base 
+      data:
+        - $addr2
+        - 2119
+        - true
       wait: true
 
 - name: checkBase3
   job:
     call:
       destination: $deployPermK
-      data: has_base $addr2 2119
+      function: has_base
+      data:
+        - $addr2
+        - 2119
       wait: true
 
 - name: assertBase
@@ -176,14 +204,20 @@ jobs:
   job:
     call:
       destination: $deployPermK
-      data: unset_base $addr2 2119
+      function: unset_base
+      data:
+        - $addr2
+        - 2119
       wait: true
 
 - name: checkBase4
   job:
     call:
       destination: $deployPermK
-      data: has_base $addr2 2119
+      function: has_base
+      data:
+        - $addr2
+        - 2119
       wait: true
 
 - name: assertBase

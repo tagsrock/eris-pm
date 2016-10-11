@@ -1,53 +1,65 @@
+# Eris Package Manager
+
 |[![GoDoc](https://godoc.org/github.com/eris-pm?status.png)](https://godoc.org/github.com/eris-ltd/eris-pm) | Linux |
 |---|-------|
 | Master | [![Circle CI](https://circleci.com/gh/eris-ltd/eris-pm/tree/master.svg?style=svg)](https://circleci.com/gh/eris-ltd/eris-pm/tree/master) |
 | Develop | [![Circle CI](https://circleci.com/gh/eris-ltd/eris-pm/tree/develop.svg?style=svg)](https://circleci.com/gh/eris-ltd/eris-pm/tree/develop) |
 
-# Eris Package Manager: The Smart Contract Package Manager
 
-```
-The Eris Package Manager Deploys and Tests Smart Contract Systems
-```
+The Eris Package Manager is a utility for deploying and testing smart contract packages. It is most commonly used by `eris pkgs do`, a command exposed through [eris-cli](https://monax.io/docs/documentation/cli), the entry point for the Eris Platform.
 
-EPM is a high level tool which provides easy access to most of the eris:db tooling. EPM is used to deploy and test suites of smart contracts. In general it will wrap the mint-client tooling, along with eris-keys and eris-compilers to provide a harmonized interface to the modular components of the [eris](https://docs.erisindustries.com) open source platform.
+## Table of Contents
 
-EPM is closer to an ansible or chef like tool than it is NPM in that it is a deployment sequence and testing tool. EPM uses an **epm definition file** to tell the package manager what jobs should be ran and in what order.
+- [Background](#background)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [EPM Definition Files](#epm-definition-files)
+  - [Variable Handling](#variable-handling)
+- [Contribute](#contribute)
+- [License](#license)
+
+## Background
+
+`eris-pm` is a high level tool which provides easy access to most of the `eris-db` tooling. `eris-pm` is used to deploy and test suites of smart contracts. In general it wraps the `eris-client` tooling, along with clients to the `eris-keys` and `eris-compilers` daemons to provide a harmonized interface to the modular components of the [eris](https://monax.io/docs/documentation/) open source platform.
+
+`eris-pm` is closer to an ansible or chef like tool than it is `npm` in that it is a deployment sequence and testing tool. `eris-pm` uses an **epm definition file** to tell the package manager what jobs should be ran and in what order.
 
 In EPM a *job* is a single action which is performed (such as a transaction, a contract deployment, a call to a smart contract, or a query of information). The results of these jobs are then kept in variables and may be used in later jobs.
 
-## Install
+## Installation
 
-`epm` is intended to be used by [eris-cli](https://github.com/eris-ltd/eris-cli), e.g., by running `eris pkgs do`.
+`eris-pm` is intended to be used by the `eris pkgs do` command via [eris-cli](https://github.com/eris-ltd/eris-cli), which runs a temporary docker container to expose its functionality.
 
 ### For Developers
 
 1. [Install go](https://golang.org/doc/install)
 2. [Install glide](https://github.com/Masterminds/glide)
 3. Ensure you have `gmp` installed (`sudo apt-get install libgmp3-dev || brew install gmp`)
-4. `go get github.com/eris-ltd/eris-pm/cmd/epm`
-5. from eris-pm dir run `glide install`
+4. `git clone https://github.com/eris-ltd/eris-pm/cmd/eris-pm $GOPATH/src/github.com/eris-ltd/eris-pm/cmd/eris-pm`
+5. `glide install -s -v`
+6. `go install $GOPATH/src/github.com/eris-ltd/eris-pm/cmd/eris-pm`
 
 ## Usage
 
 ```
 The Eris Package Manager Deploys and Tests Smart Contract Systems
 
-Made with <3 by Eris Industries.
+Made with <3 by Monax Industries.
 
-Complete documentation is available at https://docs.erisindustries.com
+Complete documentation is available at https://monax.io/docs/documentation/
 
 Version:
   0.12.0
 
 Usage:
-  epm [flags]
+  eris-pm [flags]
 
 Flags:
   -a, --abi-path="./abi": path to the abi directory EPM should use when saving ABIs after the compile process; default respects $EPM_ABI_PATH
   -r, --address="": default address to use; operates the same way as the [account] job, only before the epm file is ran; default respects $EPM_ADDRESS
   -u, --amount="9999": default amount to use; default respects $EPM_AMOUNT
   -c, --chain="localhost:46657": <ip:port> of chain which EPM should use; default respects $EPM_CHAIN_ADDR
-  -m, --compiler="https://compilers.eris.industries:10114": <ip:port> of compiler which EPM should use; default respects $EPM_COMPILER_ADDR
+  -m, --compiler="https://compilers.monax.io:10114": <ip:port> of compiler which EPM should use; default respects $EPM_COMPILER_ADDR
   -p, --contracts-path="./contracts": path to the contracts EPM should use; default respects $EPM_CONTRACTS_PATH
   -d, --debug=false: debug level output; the most output available for epm; if it is too chatty use verbose flag; default respects $EPM_DEBUG
   -n, --fee="1234": default fee to use; default respects $EPM_FEE
@@ -61,11 +73,11 @@ Flags:
   -v, --verbose=false: verbose output; more output than no output flags; less output than debug level; default respects $EPM_VERBOSE
 ```
 
-EPM is a simple tool from the command line perspective in that it does not have subcommands. `epm` is the only command it will run. This command will execute the instructions of the epm definition file in the current directory (unless a different file is given via the `--file` flag or `$EPM_FILE` environment variable).
+`eris-pm` is a simple tool from the command line perspective in that it does not have subcommands. `eris-pm` is the only command it will run. This command will execute the instructions of the epm definition file in the current directory (unless a different file is given via the `--file` flag or `$EPM_FILE` environment variable).
 
-## EPM Definition Files
+### EPM Definition Files
 
-Sample EPM definition file, typically saved as a `epm.yaml` file.
+A sample EPM definition file, typically saved as `epm.yaml`, looks like:
 
 ```yaml
 jobs:
@@ -147,37 +159,18 @@ jobs:
       wait: true
 ```
 
-For more about the jobs epm is capable of performing please see the [Jobs Specification](https://docs.erisindustries.com/documentation/eris-pm/latest/jobs_specification/).
+For more about the jobs eris-pm is capable of performing please see the [Jobs Specification](https://monax.io/docs/documentation/pm/latest/specifications/jobs_specification/).
 
-## Variable Handling
+### Variable Handling
 
-EPM will also handle variables; for more information please see the [Variables Specification](https://docs.erisindustries.com/documentation/eris-pm/latest/variable_specification/).
+`eris-pm` will also handle variables; for more information please see the [Variables Specification](https://monax.io/docs/documentation/pm/latest/specifications/variable_specification/).
 
-EPM will save an `epm.log` file with the variables used and results of the jobs in the `pwd` unless another location is specified.
+`eris-pm` will save an `jobs_output.json` file with the variables used and results of the jobs in the `pwd` unless another location is specified.
 
-# Contributions
+## Contribute
 
-Are Welcome! Before submitting a pull request please:
+See the [eris platform contributing file here](https://github.com/eris-ltd/coding/blob/master/github/CONTRIBUTING.md).
 
-* read up on [How The Marmots Git](https://github.com/eris-ltd/coding/wiki/How-The-Marmots-Git)
-* fork from `develop`
-* go fmt your changes
-* have tests
-* pull request
-* be awesome
+## License
 
-That's pretty much it.
-
-See our [CONTRIBUTING.md](.github/CONTRIBUTING.md) and [PULL_REQUEST_TEMPLATE.md](.github/PULL_REQUEST_TEMPLATE.md) for more details.
-
-Please note that this repository is GPLv3.0 per the LICENSE file. Any code which is contributed via pull request shall be deemed to have consented to GPLv3.0 via submission of the code (were such code accepted into the repository).
-
-# Bug Reporting
-
-Found a bug in our stack? Make an issue!
-
-The [issue template](.github/ISSUE_TEMPLATE.md] specifies what needs to be included in your issue and will autopopulate the issue.
-
-# License
-
-[Proudly GPL-3](http://www.gnu.org/philosophy/enforcing-gpl.en.html). See [license file](https://github.com/eris-ltd/eris-pm/blob/master/LICENSE.md).
+[GPL-3](LICENSE)

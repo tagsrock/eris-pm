@@ -1,91 +1,91 @@
 jobs: 
-  - name: deploy0
-    job:
-      deploy:
-        contract: app30.sol
-        wait: true
+- name: deploy0
+  job:
+    deploy:
+      contract: app30.sol
+      wait: true
 
-  - name: queryInts
-    job:
-      query-contract:
-        destination: $deploy0
-        data: getInts
-        
-  - name: intsValue
-    job:
-      set:
-        val: (1, 2)
-  
-  - name: assertInts
-    job:
-      assert:
-        key: $queryInts
-        relation: eq
-        val: $intsValue
+- name: queryInts
+  job:
+    query-contract:
+      destination: $deploy0
+      function: getInts
+      
+- name: intsValue
+  job:
+    set:
+      val: (1, 2)
 
-  - name: queryBools
-    job:
-      query-contract:
-        destination: $deploy0
-        data: getBools
+- name: assertInts
+  job:
+    assert:
+      key: $queryInts
+      relation: eq
+      val: $intsValue
 
-  - name: assertBools
-    job:
-      assert:
-        key: $queryBools.0
-        relation: eq
-        val: true
-  
-  - name: assertBools
-    job:
-      assert:
-        key: $queryBools.1
-        relation: eq
-        val: false
+- name: queryBools
+  job:
+    query-contract:
+      destination: $deploy0
+      function: getBools
 
-  - name: queryBytes
-    job:
-      query-contract:
-        destination: $deploy0
-        data: getBytes
+- name: assertBools
+  job:
+    assert:
+      key: $queryBools.0
+      relation: eq
+      val: true
 
-  - name: bytesValue
-    job:
-      set:
-        val: (Hello, World, of, marmots)
+- name: assertBools
+  job:
+    assert:
+      key: $queryBools.1
+      relation: eq
+      val: false
 
-  - name: assertBytes
-    job:
-      assert:
-        key: $queryBytes
-        relation: eq
-        val: $bytesValue
+- name: queryBytes
+  job:
+    query-contract:
+      destination: $deploy0
+      function: getBytes
 
-  - name: queryInterMixed
-    job:
-      query-contract:
-        destination: $deploy0
-        data: getInterMixed
+- name: bytesValue
+  job:
+    set:
+      val: (Hello, World, of, marmots)
 
-  - name: assertIntermixed
-    job:
-      assert:
-        key: $queryInterMixed.funNumber
-        relation: eq
-        val: 1
+- name: assertBytes
+  job:
+    assert:
+      key: $queryBytes
+      relation: eq
+      val: $bytesValue
 
-  - name: assertIntermixed
-    job:      
-      assert:
-        key: $queryInterMixed.elaborate
-        relation: eq
-        val: is
+- name: queryInterMixed
+  job:
+    query-contract:
+      destination: $deploy0
+      function: getInterMixed
 
-  - name: assertIntermixed
-    job:      
-      assert:
-        key: $queryInterMixed.myAddress
-        relation: eq
-        val: $deploy0
+- name: assertIntermixed
+  job:
+    assert:
+      key: $queryInterMixed.funNumber
+      relation: eq
+      val: 1
+
+- name: assertIntermixed
+  job:      
+    assert:
+      key: $queryInterMixed.elaborate
+      relation: eq
+      val: is
+
+- name: assertIntermixed
+  job:      
+    assert:
+      key: $queryInterMixed.myAddress
+      relation: eq
+      val: $deploy0
 
 

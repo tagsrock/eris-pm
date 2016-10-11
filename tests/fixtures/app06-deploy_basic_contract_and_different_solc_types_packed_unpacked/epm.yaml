@@ -15,14 +15,16 @@ jobs:
   job:
     call:
       destination: $deployStorageK
-      data: setBool $setStorageBaseBool
+      function: setBool 
+      data:
+        - $setStorageBaseBool
       wait: true
 
 - name: queryStorageBool
   job:
     query-contract:
       destination: $deployStorageK
-      data: getBool
+      function: getBool
 
 - name: assertStorageBool
   job:
@@ -36,14 +38,16 @@ jobs:
   job:
     call:
       destination: $deployStorageK
-      data: setBool2 true
+      function: setBool2 
+      data:
+        - true
       wait: true
 
 - name: queryStorageBool2
   job:
     query-contract:
       destination: $deployStorageK
-      data: getBool2
+      function: getBool2
 
 - name: assertStorageBool2
   job:
@@ -61,14 +65,16 @@ jobs:
   job:
     call:
       destination: $deployStorageK
-      data: setInt $setStorageBaseInt
+      function: setInt 
+      data:
+        - $setStorageBaseInt
       wait: true
 
 - name: queryStorageInt
   job:
     query-contract:
       destination: $deployStorageK
-      data: getInt
+      function: getInt
 
 - name: assertStorageInt
   job:
@@ -86,14 +92,16 @@ jobs:
   job:
     call:
       destination: $deployStorageK
-      data: setUint $setStorageBaseUint
+      function: setUint 
+      data:
+        - $setStorageBaseUint
       wait: true
 
 - name: queryStorageUint
   job:
     query-contract:
       destination: $deployStorageK
-      data: getUint
+      function: getUint
 
 - name: assertStorageUint
   job:
@@ -111,14 +119,16 @@ jobs:
   job:
     call:
       destination: $deployStorageK
-      data: setAddress $setStorageBaseAddress
+      function: setAddress 
+      data:
+        - $setStorageBaseAddress
       wait: true
 
 - name: queryStorageAddress
   job:
     query-contract:
       destination: $deployStorageK
-      data: getAddress
+      function: getAddress
 
 - name: assertStorageAddress
   job:
@@ -136,14 +146,16 @@ jobs:
   job:
     call:
       destination: $deployStorageK
-      data: setBytes $setStorageBaseBytes
+      function: setBytes 
+      data:
+        - $setStorageBaseBytes
       wait: true
 
 - name: queryStorageBytes
   job:
     query-contract:
       destination: $deployStorageK
-      data: getBytes
+      function: getBytes
 
 - name: assertStorageBytes
   job:
@@ -161,14 +173,16 @@ jobs:
   job:
     call:
       destination: $deployStorageK
-      data: setString $setStorageBaseString
+      function: setString 
+      data:
+        - $setStorageBaseString
       wait: true
 
 - name: queryStorageString
   job:
     query-contract:
       destination: $deployStorageK
-      data: getString
+      function: getString
 
 - name: assertStorageString
   job:

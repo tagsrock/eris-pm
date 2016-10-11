@@ -10,7 +10,7 @@ jobs:
   job:
     query-contract:
       destination: $contract
-      data: zeroInt
+      function: zeroInt
 
 - name: assertZeroInt
   job:
@@ -23,7 +23,7 @@ jobs:
   job:
     query-contract:
       destination: $contract
-      data: zeroUInt
+      function: zeroUInt
 
 - name: assertZeroUInt
   job:
@@ -36,7 +36,7 @@ jobs:
   job:
     query-contract:
       destination: $contract
-      data: zeroBytes
+      function: zeroBytes
 
 - name: assertZeroByte
   job:
@@ -49,7 +49,7 @@ jobs:
   job:
     query-contract:
       destination: $contract
-      data: zeroAddress
+      function: zeroAddress
 
 - name: assertZeroAddress
   job:
@@ -62,7 +62,7 @@ jobs:
   job:
     query-contract:
       destination: $contract
-      data: zeroBool
+      function: zeroBool
 
 - name: assertZeroBool
   job:

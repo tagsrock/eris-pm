@@ -1,8 +1,8 @@
 package definitions
 
 type Package struct {
-	Account string
-	Jobs    []*Jobs
+	Account   string
+	Jobs      []*Jobs
 	Libraries map[string]string
 }
 
