@@ -226,7 +226,7 @@ then
   echo
   echo "Building eris-pm in a docker container."
   set -e
-  # tests/build_tool.sh 1>/dev/null
+  tests/build_tool.sh 1>/dev/null
   if [ $? -ne 0 ]
   then
     echo "Could not build eris-pm. Debug via by directly running [`pwd`/tests/build_outside_tool.sh]"

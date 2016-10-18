@@ -30,9 +30,10 @@ imports:
 - name: github.com/docker/go-units
   version: f2d77a61e3c169b43402a0a1e84f06daf29b8190
 - name: github.com/eris-ltd/common
-  version: 244a29bda27f25b00dd0cdc64a5e0b8e0bfcd369
+  version: 8ca15f5455104403db4202c995e2f6e161654c02
   subpackages:
   - go/common
+  - go/docs
 - name: github.com/eris-ltd/eris-abi
   version: 61d1c08b5be1b46519835503c51338bbd451f065
   subpackages:
@@ -44,7 +45,7 @@ imports:
   - network
   - util
 - name: github.com/eris-ltd/eris-db
-  version: 6cd9f1eed2613f43d4dcca21afb76cfa84c70a4d
+  version: f61579a5547ce5271b878b32e2ede050a497cffa
   subpackages:
   - client
   - client/core
