@@ -1,7 +1,6 @@
 package: github.com/eris-ltd/eris-pm
 import:
 - package: github.com/eris-ltd/eris-db
-  version: f61579a5547ce5271b878b32e2ede050a497cffa
 - package: github.com/eris-ltd/eris-compilers
   subpackages:
   - network
@@ -10,36 +9,11 @@ import:
   subpackages:
   - go/common
   - go/docs
-- packages: github.com/eris-ltd/eris-logger
-  version: ea48a395d6ecc0eccc67a26da9fc7a6106fabb84
-- package: github.com/russross/blackfriday
-- package: golang.org/x/sys/unix
-  version: 62bee037599929a6e9146f29d10dd5208c43507d
-  subpackages:
-  - unix
+- package: github.com/eris-ltd/eris-keys
+  version: dbd72454cdb83c8baee21b24ba3fd6661a452cd9
+- package: github.com/eris-ltd/eris-logger
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
-- package: github.com/tendermint/go-wire
-- package: github.com/Azure/go-ansiterm
-  version: fa152c58bc15761d0200cb75fe958b89a9d4888e
-  subpackages:
-  - winterm
-- package: github.com/bugsnag/bugsnag-go
-  version: 02e952891c52fbcb15f113d90633897355783b6e
-  subpackages:
-  - errors
-- package: github.com/bugsnag/osext
-  version: 0dd3f918b21bec95ace9dc86c7e70266cfc5c702
-- package: github.com/bugsnag/panicwrap
-  version: d6191e27ad06236eaad65d79e49a08b03b9f8029
-- package: github.com/docker/docker
-  version: 91fd0df9c0775dc48446c924c4789c81b4f5f47e
-  subpackages:
-  - pkg/term
-  - pkg/system
-  - pkg/term/windows
-- package: github.com/docker/go-units
-  version: f2d77a61e3c169b43402a0a1e84f06daf29b8190
-- package: golang.org/x/crypto
-  subpackages:
-  - ed25519
+# NOTE tendermint/go-wire is an explicit dependency [to be removed]
+# but inclusion causes additional dependency conflicts
+# - package: github.com/tendermint/go-wire
