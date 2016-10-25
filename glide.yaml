@@ -10,6 +10,8 @@ import:
   subpackages:
   - go/common
   - go/docs
+- package: github.com/eris-ltd/eris-keys
+  version: dbd72454cdb83c8baee21b24ba3fd6661a452cd9
 - packages: github.com/eris-ltd/eris-logger
   version: ea48a395d6ecc0eccc67a26da9fc7a6106fabb84
 - package: github.com/russross/blackfriday
