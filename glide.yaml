@@ -14,4 +14,6 @@ import:
 - package: github.com/eris-ltd/eris-logger
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper
-- package: github.com/tendermint/go-wire
+# NOTE tendermint/go-wire is an explicit dependency [to be removed]
+# but inclusion causes additional dependency conflicts
+# - package: github.com/tendermint/go-wire
