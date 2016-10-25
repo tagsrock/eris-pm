@@ -2,6 +2,7 @@ package perform
 
 import (
 	"fmt"
+	"encoding/hex"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -309,10 +310,13 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 	call.Gas = useDefault(call.Gas, do.DefaultGas)
 
 	// formulate call
+	var packedBytes []byte
 	if call.ABI == "" {
-		callData, err = util.ReadAbiFormulateCall(call.Destination, call.Function, callDataArray, do)
+		packedBytes, err = util.ReadAbiFormulateCall(call.Destination, call.Function, callDataArray, do)
+		callData = hex.EncodeToString(packedBytes)
 	} else {
-		callData, err = util.ReadAbiFormulateCall(call.ABI, call.Function, callDataArray, do)
+		packedBytes, err = util.ReadAbiFormulateCall(call.ABI, call.Function, callDataArray, do)
+		callData = hex.EncodeToString(packedBytes)
 	}
 	if err != nil {
 		if call.Function == "()" {
@@ -349,22 +353,24 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 	}
 
 	// Sign, broadcast, display
-	var result string
 
 	res, err := core.SignAndBroadcast(do.ChainID, erisNodeClient, erisKeyClient, tx, true, true, call.Wait)
 	if err != nil {
 		var str, err = util.MintChainErrorHandler(do, err)
 		return str, make([]*definitions.Variable, 0), err
 	}
-	result = fmt.Sprintf("%X", res.Return)
-
+	
+	txResult := res.Return
+	var result string
+	log.Debug(txResult)
+	
 	// Formally process the return
-	if result != "" {
+	if txResult != nil {
 		log.WithField("=>", result).Debug("Decoding Raw Result")
 		if call.ABI == "" {
-			call.Variables, err = util.ReadAndDecodeContractReturn(call.Destination, call.Function, result, do)
+			call.Variables, err = util.ReadAndDecodeContractReturn(call.Destination, call.Function, txResult, do)
 		} else {
-			call.Variables, err = util.ReadAndDecodeContractReturn(call.ABI, call.Function, result, do)
+			call.Variables, err = util.ReadAndDecodeContractReturn(call.ABI, call.Function, txResult, do)
 		}
 		if err != nil {
 			return "", make([]*definitions.Variable, 0), err

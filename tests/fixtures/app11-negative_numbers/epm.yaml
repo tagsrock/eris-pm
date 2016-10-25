@@ -37,7 +37,7 @@ jobs:
 - name: setStorageBaseSecond
   job:
     set:
-      val: -99
+      val: -867676543
 
 - name: setStorageSecond
   job:
@@ -65,7 +65,7 @@ jobs:
 - name: setStorageBaseThird
   job:
     set:
-      val: -999999999
+      val: -457654789753436542135
 
 - name: setStorageThird
   job:
