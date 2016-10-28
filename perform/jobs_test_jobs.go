@@ -80,7 +80,7 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	result2 := util.GetReturnValue(query.Variables)
 	// Finalize
 	if result2 != "" {
-		log.WithField("=>", result).Warn("Return Value")
+		log.WithField("=>", result2).Warn("Return Value")
 	} else {
 		log.Debug("No return.")
 	}
