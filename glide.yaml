@@ -1,6 +1,7 @@
 package: github.com/eris-ltd/eris-pm
 import:
 - package: github.com/eris-ltd/eris-db
+  version: develop
 - package: github.com/eris-ltd/eris-compilers
   subpackages:
   - network
@@ -10,7 +11,6 @@ import:
   - go/common
   - go/docs
 - package: github.com/eris-ltd/eris-keys
-  version: dbd72454cdb83c8baee21b24ba3fd6661a452cd9
 - package: github.com/eris-ltd/eris-logger
 - package: github.com/spf13/cobra
 - package: github.com/spf13/viper

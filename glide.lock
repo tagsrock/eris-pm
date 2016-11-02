@@ -1,5 +1,5 @@
-hash: c60f92a4eb23e36787ce24cbe4b14847cddec707da654a0dd2ab35c8bb14cfb8
-updated: 2016-10-25T13:21:08.717259545+02:00
+hash: 32f6b555e66ee858a3e6ebfdc3a46ee685758a2c55414af1b80ffec835685b5f
+updated: 2016-11-02T15:54:37.224949887+01:00
 imports:
 - name: github.com/btcsuite/btcd
   version: 6b8a24918e53e3c928df3eef0fd06f1c94e7e1cd
@@ -26,29 +26,29 @@ imports:
   - network
   - util
 - name: github.com/eris-ltd/eris-db
-  version: 11b9a3e2646117a62c44ef95045f177de9b9f3cf
+  version: dfef80c878c114ec71862aca00ce5c4f0824d8c3
   subpackages:
+  - account
   - client
   - client/core
-  - keys
-  - txs
-  - account
   - consensus/types
   - core/types
+  - event
+  - keys
+  - manager/eris-mint/state/types
+  - permission/types
   - rpc/tendermint/client
   - rpc/tendermint/core/types
-  - permission/types
-  - event
-  - manager/eris-mint/state/types
+  - txs
 - name: github.com/eris-ltd/eris-keys
   version: dbd72454cdb83c8baee21b24ba3fd6661a452cd9
   subpackages:
   - crypto
-  - eris-keys
   - crypto/helpers
   - crypto/randentropy
   - crypto/secp256k1
   - crypto/sha3
+  - eris-keys
 - name: github.com/eris-ltd/eris-logger
   version: cb5a0fa6ec4162413cfd5abf070d4c508b30541d
 - name: github.com/fsnotify/fsnotify
@@ -68,10 +68,10 @@ imports:
   subpackages:
   - hcl/ast
   - hcl/parser
-  - hcl/token
-  - json/parser
   - hcl/scanner
   - hcl/strconv
+  - hcl/token
+  - json/parser
   - json/scanner
   - json/token
 - name: github.com/howeyc/gopass
@@ -121,14 +121,14 @@ imports:
   version: 6b4daa5362b502898ddf367c5c11deb9e7a5c727
   subpackages:
   - leveldb
-  - leveldb/errors
-  - leveldb/opt
   - leveldb/cache
   - leveldb/comparer
+  - leveldb/errors
   - leveldb/filter
   - leveldb/iterator
   - leveldb/journal
   - leveldb/memdb
+  - leveldb/opt
   - leveldb/storage
   - leveldb/table
   - leveldb/util
@@ -163,7 +163,6 @@ imports:
   version: 479510be0e80dd9e5d6b1f941adad168df0af85f
   subpackages:
   - client
-  - server
   - types
 - name: github.com/tendermint/go-wire
   version: 3b0adbc86ed8425eaed98516165b6788d9f4de7a
@@ -174,23 +173,17 @@ imports:
 - name: github.com/tendermint/tendermint
   version: aaea0c5d2e3ecfbf29f2608f9d43649ec7f07f50
   subpackages:
-  - node
-  - proxy
-  - types
-  - version
-  - consensus
-  - rpc/core/types
   - blockchain
+  - consensus
   - mempool
-  - rpc/core
+  - proxy
   - state
+  - types
 - name: github.com/tendermint/tmsp
   version: 73e5c3cb7bbee2f9c49792e5a0fcbcab442bf7dc
   subpackages:
   - client
   - types
-  - example/dummy
-  - example/nil
 - name: github.com/wayn3h0/go-uuid
   version: 71e8f6f01226f577139a7b4f9c8161f7311d3bac
   subpackages:
@@ -205,30 +198,30 @@ imports:
 - name: golang.org/x/crypto
   version: 1150b8bd09e53aea1d415621adae9bad665061a1
   subpackages:
-  - ripemd160
-  - scrypt
-  - pbkdf2
-  - nacl/secretbox
-  - openpgp/armor
-  - ssh/terminal
-  - ssh
-  - nacl/box
-  - poly1305
-  - salsa20/salsa
-  - openpgp/errors
   - curve25519
   - ed25519
   - ed25519/internal/edwards25519
+  - nacl/box
+  - nacl/secretbox
+  - openpgp/armor
+  - openpgp/errors
+  - pbkdf2
+  - poly1305
+  - ripemd160
+  - salsa20/salsa
+  - scrypt
+  - ssh
+  - ssh/terminal
 - name: golang.org/x/net
   version: 65dfc08770ce66f74becfdff5f8ab01caef4e946
   subpackages:
   - context
   - http2
-  - trace
   - http2/hpack
   - idna
-  - lex/httplex
   - internal/timeseries
+  - lex/httplex
+  - trace
 - name: golang.org/x/sys
   version: c200b10b5d5e122be351b67af224adc6128af5bf
   subpackages:
@@ -247,8 +240,8 @@ imports:
   - internal
   - metadata
   - naming
-  - transport
   - peer
+  - transport
 - name: gopkg.in/yaml.v2
   version: a5b47d31c556af34a302ce5d659e6fea44d90de0
-devImports: []
+testImports: []
