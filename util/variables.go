@@ -143,13 +143,14 @@ func PreProcessInputData(function string, data interface{}, do *definitions.Do) 
 	var callDataArray []string
 	if function == "" {
 		if reflect.TypeOf(data).Kind() == reflect.Slice {
-			return "", make([]string, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
+			return "", []string{""}, fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
 		}
-		log.Warn("You called a job without a function. Please update your epm run file to utilize the function field instead of only using the data field as this functionality will soon be deprecated.")
+		log.Warn("Deprecation Warning: The use of the 'data' field to specify the name of the contract function has been deprecated. Please update your epm jobs file to utilize a combination of 'function' and 'data' fields instead. See documentation for further details.")
 		function = strings.Split(data.(string), " ")[0]
-		callDataArray = strings.Split(data.(string), " ")[1:]
-		for i, val := range callDataArray {
-			callDataArray[i], _ = PreProcess(val, do)
+		callArray := strings.Split(data.(string), " ")[1:]
+		for _, val := range callArray {
+			output, _ := PreProcess(val, do)
+			callDataArray = append(callDataArray, output)
 		}
 	} else if data != nil {
 		if reflect.TypeOf(data).Kind() != reflect.Slice {
@@ -207,13 +208,17 @@ func PreProcessLibs(libs string, do *definitions.Do) (string, error) {
 
 func GetReturnValue(vars []*definitions.Variable) string {
 	var result []string
-	//log.WithField("=>", vars).Debug("GetReturnValue")
-	for _, value := range vars {
-		result = append(result, value.Value)
-	}
+	
 	if len(vars) > 1 {
+		for _, value := range vars {
+			log.WithField("=>", []byte(value.Value)).Debug("Value")
+			result = append(result, value.Value)
+		}
 		return "(" + strings.Join(result, ", ") + ")"
+	} else if len(vars) == 1 {
+		log.Debug("Debugging: ", vars[0].Value)
+		return vars[0].Value
 	} else {
-		return result[0]
-	}
+		return ""
+	} 
 }

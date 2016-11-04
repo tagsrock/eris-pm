@@ -4,6 +4,8 @@ import (
 	"encoding/hex"
 	"fmt"
 	"strconv"
+	//"strings"
+	//"unicode/utf8"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
@@ -37,10 +39,13 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 
 	// Get the packed data from the ABI functions
 	var data string
+	var packedBytes []byte
 	if query.ABI == "" {
-		data, err = util.ReadAbiFormulateCall(query.Destination, query.Function, queryDataArray, do)
+		packedBytes, err = util.ReadAbiFormulateCall(query.Destination, query.Function, queryDataArray, do)
+		data = hex.EncodeToString(packedBytes)
 	} else {
-		data, err = util.ReadAbiFormulateCall(query.ABI, query.Function, queryDataArray, do)
+		packedBytes, err = util.ReadAbiFormulateCall(query.ABI, query.Function, queryDataArray, do)
+		data = hex.EncodeToString(packedBytes)
 	}
 	if err != nil {
 		var str, err = util.ABIErrorHandler(do, err, nil, query)
@@ -63,10 +68,10 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	log.WithField("res", result).Debug("Decoding Raw Result")
 	if query.ABI == "" {
 		log.WithField("abi", query.Destination).Debug()
-		query.Variables, err = util.ReadAndDecodeContractReturn(query.Destination, query.Function, fmt.Sprintf("%X", result), do)
+		query.Variables, err = util.ReadAndDecodeContractReturn(query.Destination, query.Function, result, do)
 	} else {
 		log.WithField("abi", query.ABI).Debug()
-		query.Variables, err = util.ReadAndDecodeContractReturn(query.ABI, query.Function, fmt.Sprintf("%X", result), do)
+		query.Variables, err = util.ReadAndDecodeContractReturn(query.ABI, query.Function, result, do)
 	}
 	if err != nil {
 		return "", make([]*definitions.Variable, 0), err
@@ -75,7 +80,7 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 	result2 := util.GetReturnValue(query.Variables)
 	// Finalize
 	if result2 != "" {
-		log.WithField("=>", result).Warn("Return Value")
+		log.WithField("=>", result2).Warn("Return Value")
 	} else {
 		log.Debug("No return.")
 	}
@@ -165,6 +170,11 @@ func AssertJob(assertion *definitions.Assert, do *definitions.Do) (string, error
 
 	switch assertion.Relation {
 	case "==", "eq":
+		/*log.Debug("Compare", strings.Compare(assertion.Key, assertion.Value))
+		log.Debug("UTF8?: ", utf8.ValidString(assertion.Key))
+		log.Debug("UTF8?: ", utf8.ValidString(assertion.Value))
+		log.Debug("UTF8?: ", utf8.RuneCountInString(assertion.Key))
+		log.Debug("UTF8?: ", utf8.RuneCountInString(assertion.Value))*/
 		if assertion.Key == assertion.Value {
 			return assertPass("==", assertion.Key, assertion.Value)
 		} else {

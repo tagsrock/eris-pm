@@ -28,7 +28,7 @@ jobs:
       destination: $deployC
       function: bytesCallWithArray
       data:
-        - [Hello,World,Of,Marmots]
+        - ["Hello","World","Of","Marmots"]
       wait: true
 
 - name: assertBytesCall
@@ -44,7 +44,7 @@ jobs:
       destination: $deployC
       function: boolCallWithArray 
       data:
-        - [true,false,true,false]
+        - ["true","false","true","false"]
       wait: true
 
 - name: assertBoolsCall
@@ -52,7 +52,7 @@ jobs:
     assert:
       key: $callWithBoolArray
       relation: eq
-      val: false
+      val: "false"
 
 - name: callWithAddressArray
   job:

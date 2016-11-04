@@ -1,142 +1,124 @@
-hash: 491fa7101bbf91137260a2f7266503ac34afbe8293bd6b4e5f8e80feb6ca8b9d
-updated: 2016-10-07T21:07:52.762036573+02:00
+hash: 32f6b555e66ee858a3e6ebfdc3a46ee685758a2c55414af1b80ffec835685b5f
+updated: 2016-11-02T15:54:37.224949887+01:00
 imports:
-- name: github.com/Azure/go-ansiterm
-  version: fa152c58bc15761d0200cb75fe958b89a9d4888e
-  subpackages:
-  - winterm
 - name: github.com/btcsuite/btcd
-  version: 99165eb5580b0cb3af1401a9dd641af867852300
+  version: 6b8a24918e53e3c928df3eef0fd06f1c94e7e1cd
   subpackages:
   - btcec
 - name: github.com/btcsuite/fastsha256
   version: 637e656429416087660c84436a2a035d69d54e2e
 - name: github.com/bugsnag/bugsnag-go
-  version: 02e952891c52fbcb15f113d90633897355783b6e
+  version: 718a5c3648c101c24adc20b7d3fe0be7af35a17a
   subpackages:
   - errors
-- name: github.com/bugsnag/osext
-  version: 0dd3f918b21bec95ace9dc86c7e70266cfc5c702
 - name: github.com/bugsnag/panicwrap
-  version: d6191e27ad06236eaad65d79e49a08b03b9f8029
+  version: aa7703c9414b36d4e9b2e42e6c704d0bfae7db64
 - name: github.com/BurntSushi/toml
   version: 99064174e013895bbd9b025c31100bd1d9b590ca
-- name: github.com/docker/docker
-  version: 91fd0df9c0775dc48446c924c4789c81b4f5f47e
-  subpackages:
-  - pkg/term
-  - pkg/system
-  - pkg/term/windows
-- name: github.com/docker/go-units
-  version: f2d77a61e3c169b43402a0a1e84f06daf29b8190
 - name: github.com/eris-ltd/common
-  version: 244a29bda27f25b00dd0cdc64a5e0b8e0bfcd369
+  version: 8ca15f5455104403db4202c995e2f6e161654c02
   subpackages:
   - go/common
-- name: github.com/eris-ltd/eris-abi
-  version: 61d1c08b5be1b46519835503c51338bbd451f065
-  subpackages:
-  - core
-  - abi
+  - go/docs
 - name: github.com/eris-ltd/eris-compilers
-  version: b56060c5cbd4c0858d7aa741aff4442829a0580a
+  version: d3c710fb329cd0fbff47fe8e83deb04040a78b8f
   subpackages:
   - network
   - util
 - name: github.com/eris-ltd/eris-db
-  version: 6cd9f1eed2613f43d4dcca21afb76cfa84c70a4d
+  version: dfef80c878c114ec71862aca00ce5c4f0824d8c3
   subpackages:
+  - account
   - client
   - client/core
-  - keys
-  - txs
-  - account
   - consensus/types
   - core/types
+  - event
+  - keys
+  - manager/eris-mint/state/types
+  - permission/types
   - rpc/tendermint/client
   - rpc/tendermint/core/types
-  - permission/types
-  - event
-  - manager/eris-mint/state/types
+  - txs
 - name: github.com/eris-ltd/eris-keys
-  version: 114ebc77443db9a153692233294e48bc7e184215
+  version: dbd72454cdb83c8baee21b24ba3fd6661a452cd9
   subpackages:
-  - eris-keys
   - crypto
-  - crypto/ed25519
+  - crypto/helpers
   - crypto/randentropy
   - crypto/secp256k1
   - crypto/sha3
+  - eris-keys
 - name: github.com/eris-ltd/eris-logger
-  version: ea48a395d6ecc0eccc67a26da9fc7a6106fabb84
-- name: github.com/ethereum/go-ethereum
-  version: 421df866cd4468d62b09295199b7228d0ae2b714
-  subpackages:
-  - crypto/sha3
+  version: cb5a0fa6ec4162413cfd5abf070d4c508b30541d
 - name: github.com/fsnotify/fsnotify
-  version: f12c6236fe7b5cf6bcf30e5935d08cb079d78334
+  version: bd2828f9f176e52d7222e565abb2d338d3f3c103
 - name: github.com/go-stack/stack
   version: 100eb0c0a9c5b306ca2fb4f165df21d80ada4b82
 - name: github.com/golang/protobuf
-  version: 1f49d83d9aa00e6ce4fc8258c71cc7786aec968a
+  version: 98fa357170587e470c5f27d3c3ea0947b71eb455
   subpackages:
   - proto
 - name: github.com/golang/snappy
-  version: 799c780093d646c1b79d30894e22512c319fa137
+  version: d9eb7a3d35ec988b8585d4a0068e462c27d28380
 - name: github.com/gorilla/websocket
-  version: 2d1e4548da234d9cb742cc3628556fef86aafbac
+  version: 0b847f2facc24ec406130a05bb1bb72d41993b05
 - name: github.com/hashicorp/hcl
-  version: ef8133da8cda503718a74741312bf50821e6de79
+  version: 99ce73d4fe576449f7a689d4fc2b2ad09a86bdaa
   subpackages:
   - hcl/ast
   - hcl/parser
-  - hcl/token
-  - json/parser
   - hcl/scanner
   - hcl/strconv
+  - hcl/token
+  - json/parser
   - json/scanner
   - json/token
+- name: github.com/howeyc/gopass
+  version: f5387c492211eb133053880d23dfae62aa14123d
 - name: github.com/inconshreveable/mousetrap
   version: 76626ae9c91c4f2a10f34cad8ce83ea42c93bb75
+- name: github.com/kardianos/osext
+  version: c2c54e542fb797ad986b31721e1baedf214ca413
 - name: github.com/kr/fs
   version: 2788f0dbd16903de03cb8186e5c7d97b69ad387b
 - name: github.com/magiconair/properties
   version: 0723e352fa358f9322c938cc2dadda874e9151a9
 - name: github.com/mattn/go-colorable
-  version: ed8eb9e318d7a84ce5915b495b7d35e0cfe7b5a8
+  version: 6c903ff4aa50920ca86087a280590b36b3152b9c
 - name: github.com/mattn/go-isatty
-  version: 56b76bdf51f7708750eac80fa38b952bb9f32639
+  version: 66b8e73f3f5cda9f96b69efd03dd3d7fc4a5cdb8
 - name: github.com/mitchellh/mapstructure
-  version: ca63d7c062ee3c9f34db231e352b60012b4fd0c1
+  version: f3009df150dadf309fdee4a54ed65c124afad715
 - name: github.com/pelletier/go-buffruneio
   version: df1e16fde7fc330a0ca68167c23bf7ed6ac31d6d
 - name: github.com/pelletier/go-toml
   version: 45932ad32dfdd20826f5671da37a5f3ce9f26a8d
 - name: github.com/pkg/errors
-  version: a887431f7f6ef7687b556dbf718d9f351d4858a0
+  version: 839d9e913e063e28dfd0e6c7b7512793e0a48be9
 - name: github.com/pkg/sftp
-  version: 8197a2e580736b78d704be0fc47b2324c0591a32
-- name: github.com/russross/blackfriday
-  version: 35eb537633d9950afc8ae7bdf0edb6134584e9fc
-- name: github.com/Sirupsen/logrus
-  version: 3ec0642a7fb6488f65b06f9040adc67e3990296a
+  version: 4d0e916071f68db74f8a73926335f809396d6b42
+- name: github.com/rs/cors
+  version: a62a804a8a009876ca59105f7899938a1349f4b3
+- name: github.com/rs/xhandler
+  version: ed27b6fd65218132ee50cd95f38474a3d8a2cd12
 - name: github.com/spf13/afero
   version: 52e4a6cfac46163658bd4f123c49b6ee7dc75f78
   subpackages:
   - mem
   - sftp
 - name: github.com/spf13/cast
-  version: 60e7a69a428e9ac1cf7e0c865fc2fe810d34363e
+  version: 2580bc98dc0e62908119e4737030cc2fdfc45e4c
 - name: github.com/spf13/cobra
-  version: 9c28e4bbd74e5c3ed7aacbc552b2cab7cfdfe744
+  version: 856b96dcb49d6427babe192998a35190a12c2230
 - name: github.com/spf13/jwalterweatherman
   version: 33c24e77fb80341fe7130ee7c594256ff08ccc46
 - name: github.com/spf13/pflag
-  version: c7e63cf4530bcd3ba943729cee0efeff2ebea63f
+  version: 5ccb023bc27df288a957c5e994cd44fd19619465
 - name: github.com/spf13/viper
-  version: a78f70b5b977efe08e313a9e2341c3f5457abdaf
+  version: 80ab6657f9ec7e5761f6603320d3d58dfe6970f6
 - name: github.com/syndtr/goleveldb
-  version: 917f41c560270110ceb73c5b38be2a9127387071
+  version: 6b4daa5362b502898ddf367c5c11deb9e7a5c727
   subpackages:
   - leveldb
   - leveldb/cache
@@ -151,30 +133,30 @@ imports:
   - leveldb/table
   - leveldb/util
 - name: github.com/tendermint/ed25519
-  version: 1f52c6f8b8a5c7908aff4497c186af344b428925
+  version: fdac6641497281ed1cc368687ec6377e96e02b24
   subpackages:
-  - extra25519
   - edwards25519
+  - extra25519
 - name: github.com/tendermint/flowcontrol
   version: 84d9671090430e8ec80e35b339907e0579b999eb
 - name: github.com/tendermint/go-clist
-  version: 3baa390bbaf7634251c42ad69a8682e7e3990552
+  version: 634527f5b60fd7c71ca811262493df2ad65ee0ca
 - name: github.com/tendermint/go-common
-  version: 47e06734f6ee488cc2e61550a38642025e1d4227
+  version: dcfa46af1341d03b80d32e4901019d1668b978b9
 - name: github.com/tendermint/go-config
-  version: e64b424499acd0eb9856b88e10c0dff41628c0d6
+  version: cfcef384d64b94e50909596e39b32ffb3cc20573
 - name: github.com/tendermint/go-crypto
-  version: 4b11d62bdb324027ea01554e5767b71174680ba0
+  version: 41cfb7b677f4e16cdfd22b6ce0946c89919fbc7b
 - name: github.com/tendermint/go-db
   version: 31fdd21c7eaeed53e0ea7ca597fb1e960e2988a5
 - name: github.com/tendermint/go-events
-  version: 48fa21511b259278b871a37b6951da2d5bef698d
+  version: 7b75ca7bb55aa25e9ef765eb8c0b69486b227357
 - name: github.com/tendermint/go-logger
-  version: cefb3a45c0bf3c493a04e9bcd9b1540528be59f2
+  version: 529efe50eab1a8a9c111d55f4de4ecd95f482761
 - name: github.com/tendermint/go-merkle
   version: 05042c6ab9cad51d12e4cecf717ae68e3b1409a8
 - name: github.com/tendermint/go-p2p
-  version: f508f3f20b5bb36f03d3bc83647b7a92425139d1
+  version: 5bd7692323ec60d6461678f09b5024a952164151
   subpackages:
   - upnp
 - name: github.com/tendermint/go-rpc
@@ -189,56 +171,68 @@ imports:
   subpackages:
   - term
 - name: github.com/tendermint/tendermint
-  version: bd43cf244263041567f7e37412e67b727c245691
+  version: aaea0c5d2e3ecfbf29f2608f9d43649ec7f07f50
   subpackages:
-  - types
-  - consensus
   - blockchain
+  - consensus
   - mempool
   - proxy
   - state
-- name: github.com/tendermint/tmsp
-  version: 538862321aed1120d6e5e7fbd8e0a23b00bbc4c3
-  subpackages:
   - types
-  - client
-  - example/dummy
-  - example/nil
-- name: golang.org/x/crypto
-  version: 1f22c0103821b9390939b6776727195525381532
+- name: github.com/tendermint/tmsp
+  version: 73e5c3cb7bbee2f9c49792e5a0fcbcab442bf7dc
   subpackages:
+  - client
+  - types
+- name: github.com/wayn3h0/go-uuid
+  version: 71e8f6f01226f577139a7b4f9c8161f7311d3bac
+  subpackages:
+  - internal/dcesecurity
+  - internal/layout
+  - internal/namebased
+  - internal/namebased/md5
+  - internal/namebased/sha1
+  - internal/random
+  - internal/timebased
+  - internal/version
+- name: golang.org/x/crypto
+  version: 1150b8bd09e53aea1d415621adae9bad665061a1
+  subpackages:
+  - curve25519
   - ed25519
-  - ripemd160
+  - ed25519/internal/edwards25519
+  - nacl/box
   - nacl/secretbox
   - openpgp/armor
-  - ssh
-  - nacl/box
-  - poly1305
-  - salsa20/salsa
   - openpgp/errors
-  - curve25519
+  - pbkdf2
+  - poly1305
+  - ripemd160
+  - salsa20/salsa
+  - scrypt
+  - ssh
+  - ssh/terminal
 - name: golang.org/x/net
-  version: 6d3beaea10370160dea67f5c9327ed791afd5389
+  version: 65dfc08770ce66f74becfdff5f8ab01caef4e946
   subpackages:
-  - http2
   - context
-  - trace
+  - http2
   - http2/hpack
   - idna
-  - lex/httplex
   - internal/timeseries
+  - lex/httplex
+  - trace
 - name: golang.org/x/sys
-  version: 62bee037599929a6e9146f29d10dd5208c43507d
+  version: c200b10b5d5e122be351b67af224adc6128af5bf
   subpackages:
   - unix
-  - unix
 - name: golang.org/x/text
-  version: 2df9074612f50810d82416d2229398a1e7188c5c
+  version: 2556e8494a202e0b4008f70eda8cdb089b03fa50
   subpackages:
   - transform
   - unicode/norm
 - name: google.golang.org/grpc
-  version: 71d2ea4f75286a63b606aca2422cd17ff37fd5b8
+  version: 2b7e876a2eb64e93cb8140f497d3ea9d8882279c
   subpackages:
   - codes
   - credentials
@@ -246,8 +240,8 @@ imports:
   - internal
   - metadata
   - naming
-  - transport
   - peer
+  - transport
 - name: gopkg.in/yaml.v2
-  version: 31c299268d302dd0aa9a0dcf765a3d58971ac83f
-devImports: []
+  version: a5b47d31c556af34a302ce5d659e6fea44d90de0
+testImports: []

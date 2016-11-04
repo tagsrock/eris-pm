@@ -187,6 +187,9 @@ func PermissionJob(perm *definitions.Permission, do *definitions.Do) (string, er
 	// Set defaults
 	perm.Source = useDefault(perm.Source, do.Package.Account)
 
+	log.Debug("Target: ", perm.Target)
+	log.Debug("Marmots Deny: ", perm.Role)
+	log.Debug("Action: ", perm.Action)
 	// Populate the transaction appropriately
 	var args []string
 	switch perm.Action {
@@ -217,6 +220,8 @@ func PermissionJob(perm *definitions.Permission, do *definitions.Do) (string, er
 	if err != nil {
 		return util.MintChainErrorHandler(do, err)
 	}
+
+	log.Debug("What are the args returned in transaction: ", tx.PermArgs)
 
 	// Don't use pubKey if account override
 	if perm.Source != do.Package.Account {

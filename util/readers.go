@@ -1,17 +1,15 @@
 package util
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
-	"strconv"
 
 	"github.com/eris-ltd/eris-pm/definitions"
 
 	"github.com/eris-ltd/common/go/common"
-	ebi "github.com/eris-ltd/eris-abi/core"
+	ebi "github.com/eris-ltd/eris-pm/abi"
 	"github.com/eris-ltd/eris-db/client/core"
 	log "github.com/eris-ltd/eris-logger"
 )
@@ -53,71 +51,41 @@ func ReadTxSignAndBroadcast(result *core.TxResult, err error) error {
 	return nil
 }
 
-func ReadAbiFormulateCall(abiLocation, funcName string, dataRaw []string, do *definitions.Do) (string, error) {
+func ReadAbiFormulateCall(abiLocation string, funcName string, args []string, do *definitions.Do) ([]byte, error) {
 	abiSpecBytes, err := readAbi(do.ABIPath, abiLocation)
 	if err != nil {
-		return "", err
+		return []byte{}, err
 	}
 	log.WithField("=>", string(abiSpecBytes)).Debug("ABI Specification (Formulate)")
-	totalArgs := make([]string, 0)
-	totalArgs = append(totalArgs, funcName)
-	// Process and Pack the Call
-	totalArgs = append(totalArgs, dataRaw...)
 	log.WithFields(log.Fields{
-		"arguments": totalArgs,
+		"function":  funcName,
+		"arguments": fmt.Sprintf("%v", args),
 	}).Debug("Packing Call via ABI")
 
-	return ebi.Packer(abiSpecBytes, totalArgs...)
+	return ebi.Packer(abiSpecBytes, funcName, args...)
 }
 
-func ReadAndDecodeContractReturn(abiLocation string, funcName string, resultRaw string, do *definitions.Do) ([]*definitions.Variable, error) {
+func ReadAndDecodeContractReturn(abiLocation, funcName string, resultRaw []byte, do *definitions.Do) ([]*definitions.Variable, error) {
 	abiSpecBytes, err := readAbi(do.ABIPath, abiLocation)
 	if err != nil {
 		return nil, err
 	}
-	log.WithField("=>", string(abiSpecBytes)).Debug("ABI Specification (Decode)")
+	log.WithField("=>", abiSpecBytes).Debug("ABI Specification (Decode)")
 
 	// Unpack the result
-	res, err := ebi.UnPacker(abiSpecBytes, funcName, resultRaw, false)
-	if err != nil {
-		return nil, err
-	}
-
-	// Wrangle these returns
-	type ContractReturn struct {
-		Name  string `mapstructure:"," json:","`
-		Type  string `mapstructure:"," json:","`
-		Value string `mapstructure:"," json:","`
-	}
-	var resTotal []ContractReturn
-	err = json.Unmarshal([]byte(res), &resTotal)
-	if err != nil {
-		return nil, err
-	}
-
-	// Get the values and put them into neat little structs
-	result := make([]*definitions.Variable, len(resTotal))
-	for index, i := range resTotal {
-		if i.Name == "" {
-			result[index] = &definitions.Variable{strconv.Itoa(index), i.Value}
-		} else {
-			result[index] = &definitions.Variable{i.Name, i.Value}
-		}
-	}
-
-	return result, nil
+	return ebi.Unpacker(abiSpecBytes, funcName, resultRaw)
 }
 
-func readAbi(root, contract string) ([]byte, error) {
+func readAbi(root, contract string) (string, error) {
 	p := path.Join(root, common.StripHex(contract))
 	if _, err := os.Stat(p); err != nil {
-		return []byte{}, fmt.Errorf("Abi doesn't exist for =>\t%s", p)
+		return "", fmt.Errorf("Abi doesn't exist for =>\t%s", p)
 	}
 
 	b, err := ioutil.ReadFile(p)
 	if err != nil {
-		return []byte{}, err
+		return "", err
 	}
 
-	return b, nil
+	return string(b), nil
 }
