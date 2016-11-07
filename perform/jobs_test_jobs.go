@@ -23,7 +23,7 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 
 	var queryDataArray []string
 	var err error
-	query.Function, queryDataArray, err = util.PreProcessInputData(query.Function, query.Data, do)
+	query.Function, queryDataArray, err = util.PreProcessInputData(query.Function, query.Data, do, false)
 	if err != nil {
 		return "", make([]*definitions.Variable, 0), err
 	}

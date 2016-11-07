@@ -47,15 +47,20 @@ func Packer(abiData, funcName string, args ...string) ([]byte, error) {
 }
 
 func getPackingTypes(abiSpec ABI, methodName string, args ...string) ([]interface{}, error) {
-	method, exist := abiSpec.Methods[methodName]
-	if !exist {
-		return nil, fmt.Errorf("method '%s' not found", methodName)
+	var method Method
+	if methodName == "" {
+		method = abiSpec.Constructor
+	} else {
+		var exist bool
+		method, exist = abiSpec.Methods[methodName]
+		if !exist {
+			return nil, fmt.Errorf("method '%s' not found", methodName)
+		}
 	}
 	var values []interface{}
-
+	fmt.Println("Method Inputs: ", method.Inputs)
 	for i, input := range method.Inputs { //loop through and get string vals packed into proper types
 		inputType := input.Type
-		
 		val, err := packInterfaceValue(inputType, args[i])
 		if err != nil {
 			return nil, err
