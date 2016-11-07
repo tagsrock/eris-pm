@@ -219,7 +219,7 @@ func PreProcessLibs(libs string, do *definitions.Do) (string, error) {
 
 func GetReturnValue(vars []*definitions.Variable) string {
 	var result []string
-	
+
 	if len(vars) > 1 {
 		for _, value := range vars {
 			log.WithField("=>", []byte(value.Value)).Debug("Value")
@@ -231,5 +231,5 @@ func GetReturnValue(vars []*definitions.Variable) string {
 		return vars[0].Value
 	} else {
 		return ""
-	} 
+	}
 }

@@ -59,10 +59,7 @@ func AccountsInfo(account, field string, do *definitions.Do) (string, error) {
 	if strings.Contains(field, "permissions") {
 		// TODO: [ben] resolve conflict between explicit types and json better
 
-
-
 		fields := strings.Split(field, ".")
-
 
 		if len(fields) > 1 {
 			switch fields[1] {

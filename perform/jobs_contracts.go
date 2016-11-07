@@ -1,8 +1,8 @@
 package perform
 
 import (
-	"fmt"
 	"encoding/hex"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -329,11 +329,11 @@ func CallJob(call *definitions.Call, do *definitions.Do) (string, []*definitions
 		var str, err = util.MintChainErrorHandler(do, err)
 		return str, make([]*definitions.Variable, 0), err
 	}
-	
+
 	txResult := res.Return
 	var result string
 	log.Debug(txResult)
-	
+
 	// Formally process the return
 	if txResult != nil {
 		log.WithField("=>", result).Debug("Decoding Raw Result")

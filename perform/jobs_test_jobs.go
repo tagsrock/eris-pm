@@ -63,7 +63,6 @@ func QueryContractJob(query *definitions.QueryContract, do *definitions.Do) (str
 		return "", make([]*definitions.Variable, 0), err
 	}
 
-
 	// Formally process the return
 	log.WithField("res", result).Debug("Decoding Raw Result")
 	if query.ABI == "" {

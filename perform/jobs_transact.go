@@ -10,7 +10,7 @@ import (
 	"github.com/eris-ltd/eris-pm/util"
 
 	log "github.com/eris-ltd/eris-logger"
-	
+
 	"github.com/eris-ltd/eris-db/client"
 	"github.com/eris-ltd/eris-db/client/core"
 	"github.com/eris-ltd/eris-db/keys"

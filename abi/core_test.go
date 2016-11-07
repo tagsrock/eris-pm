@@ -1,7 +1,8 @@
 package abi
+
 import (
-	"fmt"
 	"bytes"
+	"fmt"
 	pm "github.com/eris-ltd/eris-pm/definitions"
 	"strings"
 	"testing"
