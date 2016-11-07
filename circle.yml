@@ -4,7 +4,7 @@ machine:
     REPO: ${GOPATH}/src/github.com/${CIRCLE_PROJECT_USERNAME}/${CIRCLE_PROJECT_REPONAME}
     DOCKER_VERSION: 1.9.1
     DOCKER_MACHINE_VERSION: 0.7.0
-    ERIS_CLI_BRANCH: develop
+    ERIS_CLI_BRANCH: master
     # ERIS_PM_LEAN is an intermediary measure to build eris-pm outside of the docker container
     # and then move only the executable into the container to counteract bloating the image
     # ERIS_PM_LEAN: true
