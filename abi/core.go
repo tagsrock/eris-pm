@@ -58,7 +58,9 @@ func getPackingTypes(abiSpec ABI, methodName string, args ...string) ([]interfac
 		}
 	}
 	var values []interface{}
-	fmt.Println("Method Inputs: ", method.Inputs)
+	if len(args) != len(method.Inputs){
+		return nil, fmt.Errorf("Invalid number of arguments asked to be packed, expected %v, got %v", len(method.Inputs), len(args))
+	}
 	for i, input := range method.Inputs { //loop through and get string vals packed into proper types
 		inputType := input.Type
 		val, err := packInterfaceValue(inputType, args[i])
