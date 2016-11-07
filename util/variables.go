@@ -153,20 +153,20 @@ func PreProcessInputData(function string, data interface{}, do *definitions.Do, 
 			output, _ := PreProcess(val, do)
 			callDataArray = append(callDataArray, output)
 		}
-	} else if data != nil {
-		if reflect.TypeOf(data).Kind() != reflect.Slice {
-			if constructor {
-				log.Warn("Your deploy job is currently using a soon to be deprecated way of declaring constructor values. Please remember to update your run file to use the new way of declaring constructor values.")
-				callArray = strings.Split(data.(string), " ")[1:]
-				for _, val := range callArray {
-					output, _ := PreProcess(val, do)
-					callDataArray = append(callDataArray, output)
-				}
-				return function, callDataArray, nil
-			} else {
-				return "", make([]string, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
+	} else if reflect.TypeOf(data).Kind() != reflect.Slice {
+		if constructor {
+			log.Warn("Your deploy job is currently using a soon to be deprecated way of declaring constructor values. Please remember to update your run file to use the new way of declaring constructor values.")
+			callArray = strings.Split(data.(string), " ")
+			for _, val := range callArray {
+				output, _ := PreProcess(val, do)
+				callDataArray = append(callDataArray, output)
 			}
+			return function, callDataArray, nil
+		} else {
+			return "", make([]string, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
 		}
+	} else if data != nil {
+
 		val := reflect.ValueOf(data)
 		for i := 0; i < val.Len(); i++ {
 			s := val.Index(i)
