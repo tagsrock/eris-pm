@@ -6,9 +6,9 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/eris-ltd/common/go/docs"
 	commands "github.com/eris-ltd/eris-pm/cmd"
 	"github.com/eris-ltd/eris-pm/version"
-	"github.com/eris-ltd/common/go/docs"
 
 	"github.com/spf13/cobra"
 )

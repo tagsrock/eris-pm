@@ -139,22 +139,33 @@ func replaceBlockVariable(toReplace string, do *definitions.Do) (string, error) 
 	return toReplace, nil
 }
 
-func PreProcessInputData(function string, data interface{}, do *definitions.Do) (string, []string, error) {
+func PreProcessInputData(function string, data interface{}, do *definitions.Do, constructor bool) (string, []string, error) {
 	var callDataArray []string
-	if function == "" {
+	var callArray []string
+	if function == "" && !constructor {
 		if reflect.TypeOf(data).Kind() == reflect.Slice {
 			return "", []string{""}, fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
 		}
 		log.Warn("Deprecation Warning: The use of the 'data' field to specify the name of the contract function has been deprecated. Please update your epm jobs file to utilize a combination of 'function' and 'data' fields instead. See documentation for further details.")
 		function = strings.Split(data.(string), " ")[0]
-		callArray := strings.Split(data.(string), " ")[1:]
+		callArray = strings.Split(data.(string), " ")[1:]
 		for _, val := range callArray {
 			output, _ := PreProcess(val, do)
 			callDataArray = append(callDataArray, output)
 		}
 	} else if data != nil {
 		if reflect.TypeOf(data).Kind() != reflect.Slice {
-			return "", make([]string, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
+			if constructor {
+				log.Warn("Deprecation Warning: Your deploy job is currently using a soon to be deprecated way of declaring constructor values. Please remember to update your run file to store them as a array rather than a string. See documentation for further details.")
+				callArray = strings.Split(data.(string), " ")
+				for _, val := range callArray {
+					output, _ := PreProcess(val, do)
+					callDataArray = append(callDataArray, output)
+				}
+				return function, callDataArray, nil
+			} else {
+				return "", make([]string, 0), fmt.Errorf("Incorrect formatting of epm run file. Please update your epm run file to include a function field.")
+			}
 		}
 		val := reflect.ValueOf(data)
 		for i := 0; i < val.Len(); i++ {
@@ -208,7 +219,7 @@ func PreProcessLibs(libs string, do *definitions.Do) (string, error) {
 
 func GetReturnValue(vars []*definitions.Variable) string {
 	var result []string
-	
+
 	if len(vars) > 1 {
 		for _, value := range vars {
 			log.WithField("=>", []byte(value.Value)).Debug("Value")
@@ -220,5 +231,5 @@ func GetReturnValue(vars []*definitions.Variable) string {
 		return vars[0].Value
 	} else {
 		return ""
-	} 
+	}
 }

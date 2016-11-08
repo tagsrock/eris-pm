@@ -9,9 +9,9 @@ import (
 	"github.com/eris-ltd/eris-pm/definitions"
 
 	"github.com/eris-ltd/common/go/common"
-	ebi "github.com/eris-ltd/eris-pm/abi"
 	"github.com/eris-ltd/eris-db/client/core"
 	log "github.com/eris-ltd/eris-logger"
+	ebi "github.com/eris-ltd/eris-pm/abi"
 )
 
 // This is a closer function which is called by most of the tx_run functions
