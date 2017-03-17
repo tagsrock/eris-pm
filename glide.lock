@@ -30,7 +30,7 @@ imports:
   subpackages:
   - version
 - name: github.com/eris-ltd/eris-compilers
-  version: a15ec8e88d29df839661d395dddf7f73d94cbd2b
+  version: f098421e829a0dd1152e43601e18a4962c2f4a83
   subpackages:
   - perform
   - definitions
