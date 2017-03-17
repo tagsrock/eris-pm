@@ -11,8 +11,7 @@ import (
 	"github.com/eris-ltd/eris-pm/definitions"
 	"github.com/eris-ltd/eris-pm/util"
 
-	compilers "github.com/eris-ltd/eris-compilers/network"
-	response "github.com/eris-ltd/eris-compilers/util"
+	compilers "github.com/eris-ltd/eris-compilers/perform"
 	log "github.com/eris-ltd/eris-logger"
 
 	"github.com/eris-ltd/eris-db/client"
@@ -75,24 +74,32 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 	if filepath.Ext(deploy.Contract) == ".bin" {
 		log.Info("Binary file detected. Using binary deploy sequence.")
 		// binary deploy sequence
-		contractCode, err := ioutil.ReadFile(p)
+		contractPath, err := ioutil.ReadFile(p)
 		if err != nil {
 			result := "could not read binary file"
 			return result, err
 		}
+		binaryResponse, err := compilers.RequestBinaryLinkage(do.Compiler+"/binaries", contractPath, deploy.Libraries)
+		if err != nil {
+			return "", fmt.Errorf("Something went wrong with your binary deployment: %v", err)
+		}
+		if binaryResponse.Error != "" {
+			return "", fmt.Errorf("Something went wrong when you were trying to link your binaries: %v", binaryResponse.Error)
+		}
+		contractCode := binaryResponse.Binary
+
 		tx, err := deployRaw(do, deploy, contractName, string(contractCode))
 		if err != nil {
-			result := "could not deploy binary contract"
-			return result, err
+			return "could not deploy binary contract", err
 		}
-		result, err := deployFinalize(do, tx, deploy.Wait)
+		result, err := deployFinalize(do, tx)
 		if err != nil {
-			return "", fmt.Errorf("Error finalizing contract deploy %s: %v", p, err)
+			return "", fmt.Errorf("Error finalizing contract deploy from path %s: %v", contractPath, err)
 		}
 		return result, err
 	} else {
 		// normal compilation/deploy sequence
-		resp, err := compilers.BeginCompile(do.Compiler, p, false, deploy.Libraries)
+		resp, err := compilers.RequestCompile(do.Compiler, p, false, deploy.Libraries)
 
 		if err != nil {
 			log.Errorln("Error compiling contracts: Compilers error:")
@@ -154,7 +161,7 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 	return result, nil
 }
 
-func deployContract(deploy *definitions.Deploy, do *definitions.Do, r response.ResponseItem, p string) (string, error) {
+func deployContract(deploy *definitions.Deploy, do *definitions.Do, r compilers.ResponseItem, p string) (string, error) {
 	log.WithField("=>", string(r.ABI)).Debug("ABI Specification (From Compilers)")
 	contractCode := r.Bytecode
 

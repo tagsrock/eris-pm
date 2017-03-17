@@ -21,9 +21,10 @@ imports:
   - go/common
   - go/docs
 - name: github.com/eris-ltd/eris-compilers
-  version: f3a46af81bca5cb05d8b389b6383a498b8fcf831
+  version: a15ec8e88d29df839661d395dddf7f73d94cbd2b
   subpackages:
-  - network
+  - perform
+  - definitions
   - util
 - name: github.com/eris-ltd/eris-db
   version: dfef80c878c114ec71862aca00ce5c4f0824d8c3
