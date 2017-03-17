@@ -74,12 +74,7 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 	if filepath.Ext(deploy.Contract) == ".bin" {
 		log.Info("Binary file detected. Using binary deploy sequence.")
 		// binary deploy sequence
-		contractPath, err := ioutil.ReadFile(p)
-		if err != nil {
-			result := "could not read binary file"
-			return result, err
-		}
-		binaryResponse, err := compilers.RequestBinaryLinkage(do.Compiler+"/binaries", contractPath, deploy.Libraries)
+		binaryResponse, err := compilers.RequestBinaryLinkage(do.Compiler+"/binaries", p, deploy.Libraries)
 		if err != nil {
 			return "", fmt.Errorf("Something went wrong with your binary deployment: %v", err)
 		}
@@ -92,9 +87,9 @@ func DeployJob(deploy *definitions.Deploy, do *definitions.Do) (result string, e
 		if err != nil {
 			return "could not deploy binary contract", err
 		}
-		result, err := deployFinalize(do, tx)
+		result, err := deployFinalize(do, tx, deploy.Wait)
 		if err != nil {
-			return "", fmt.Errorf("Error finalizing contract deploy from path %s: %v", contractPath, err)
+			return "", fmt.Errorf("Error finalizing contract deploy from path %s: %v", p, err)
 		}
 		return result, err
 	} else {

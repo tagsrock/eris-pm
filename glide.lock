@@ -20,6 +20,15 @@ imports:
   subpackages:
   - go/common
   - go/docs
+- name: github.com/eris-ltd/eris
+  version: 77f05ad6c05a5e2a4f96eccaf50039e44b8082ea
+  subpackages:
+  - config
+  - log
+- name: github.com/eris-ltd/eris-cli
+  version: 002c63e2d0850b33c279c29fee52dd30853e100d
+  subpackages:
+  - version
 - name: github.com/eris-ltd/eris-compilers
   version: a15ec8e88d29df839661d395dddf7f73d94cbd2b
   subpackages:
